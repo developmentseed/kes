@@ -4,7 +4,7 @@ This is a library for managing and deploying AWS resources using CloudFormation.
 
 ### Installation
 
-    $ npm install
+    $ npm install kes
 
 ### Usage
 
