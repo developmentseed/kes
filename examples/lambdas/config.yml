@@ -1,0 +1,23 @@
+stackName: my-kes-project
+stage: dev
+
+buckets:
+  internal: my-s3-bucket
+
+lambdas:
+  - name: func1 # function name must match the lambda folder name in build directory
+    handler: func1.handler
+    timeout: 300
+
+  - name: func2
+    handler: func2.handler
+    timeout: 300
+
+  - name: func3
+    handler: func3.handler
+    timeout: 300
+    dlq: DispatcherFailedQueue # name of the dead letter queue
+    # if broadcast is set to true, the lambda ARN is
+    # included as an env variable
+    broadcast: true
+

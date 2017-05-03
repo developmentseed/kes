@@ -1,9 +1,13 @@
 'use strict';
 
-module.exports.common = require('./src/common');
-module.exports.cf = require('./src/cf');
-module.exports.lambda = require('./src/lambda');
-module.exports.offline = require('./src/offline');
-module.exports.dynamo = require('./src/dynamo');
-module.exports.envs = require('./src/envs');
-module.exports.bootstrap = require('./src/bootstrap');
+function Kes() {};
+
+Kes.prototype.common = require('./src/common');
+Kes.prototype.cf = require('./src/cf');
+Kes.prototype.lambda = require('./src/lambda');
+Kes.prototype.offline = require('./src/offline');
+Kes.prototype.dynamo = require('./src/dynamo');
+Kes.prototype.envs = require('./src/envs');
+Kes.prototype.bootstrap = require('./src/bootstrap');
+
+module.exports = Kes;

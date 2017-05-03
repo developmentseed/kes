@@ -5,6 +5,7 @@ This is a library for managing and deploying AWS resources using CloudFormation.
 ### Installation
 
     $ npm install kes
+    $ kes init
 
 ### Usage
 

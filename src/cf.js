@@ -4,11 +4,9 @@ const Handlebars = require('handlebars');
 const path = require('path');
 const fs = require('fs-extra');
 const parseConfig = require('./common').parseConfig;
-const uploadKeyPair = require('./crypto').uploadKeyPair;
 const exec = require('./common').exec;
 const getProfile = require('./common').getProfile;
 const uploadLambdas = require('./lambda').uploadLambdas;
-
 
 /**
  * Compiles a CloudFormation template in Yaml format
@@ -118,7 +116,6 @@ function dlqToLambda(options) {
     }
   }
 }
-
 
 /**
  * Returns the configuration file and checks if the bucket specified
@@ -240,16 +237,7 @@ function opsStack(options, ops) {
  * @param  {Object} options The options object should include the profile name (optional)
  */
 function createStack(options) {
-  // generating private/public keys first
-  const c = getConfig(options, options.config);
-  uploadKeyPair(c.buckets.internal, c.stackName, c.stage, options.profile, (e) => {
-    if (e) {
-      console.log(e);
-      process.exit(1);
-    }
-
-    opsStack(options, 'create');
-  });
+  opsStack(options, 'create');
 }
 
 /**
@@ -261,6 +249,7 @@ function updateStack(options) {
     opsStack(options, 'update');
   }
   catch (e) {
+    console.log(e);
     console.log('CloudFormation Update failed');
     process.exit(1);
   }

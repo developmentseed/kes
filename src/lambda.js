@@ -54,6 +54,14 @@ function zipLambda(name, includeConfig) {
     exec(`cp .kes/config.yml dist/${name}/`);
   }
 
+  const lambdaPath = path.join(process.cwd(), 'dist', name);
+
+  // make sure the built file exist
+  if (!fs.existsSync(lambdaPath)) {
+    console.log(`${lambdaPath} folder is missing`);
+    process.exit(1);
+  }
+
   exec(`cd dist && zip -r ../build/lambda/${name} ${name}`);
 }
 
@@ -63,23 +71,25 @@ function zipLambda(name, includeConfig) {
  * @param  {string} profile The profile name used in aws CLI
  */
 function uploadLambdas(s3Path, profile, config) {
-  // remove the build folder if exists
-  fs.removeSync(path.join(process.cwd(), 'build'));
+  if (config.lambdas) {
+    // remove the build folder if exists
+    fs.removeSync(path.join(process.cwd(), 'build'));
 
-  // create the lambda folder
-  fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
+    // create the lambda folder
+    fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
 
-  // zip files dist folders
-  for (const lambda of config.lambdas) {
-    zipLambda(lambda.name, lambda.includeConfig);
+    // zip files dist folders
+    for (const lambda of config.lambdas) {
+      zipLambda(lambda.name, lambda.includeConfig);
+    }
+
+    // upload the artifacts to AWS S3
+    // we use the aws cli to make things easier
+    // this fails if the user doesn't have aws-cli installed
+    exec(`cd build && aws s3 cp --recursive . ${s3Path}/ \
+                                ${getProfile(profile)} \
+                                --exclude=.DS_Store`);
   }
-
-  // upload the artifacts to AWS S3
-  // we use the aws cli to make things easier
-  // this fails if the user doesn't have aws-cli installed
-  exec(`cd build && aws s3 cp --recursive . ${s3Path}/ \
-                              ${getProfile(profile)} \
-                              --exclude=.DS_Store`);
 }
 
 /**
