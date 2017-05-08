@@ -17,7 +17,6 @@ module.exports.loadCredentials = function loadCredentials() {
   });
 };
 
-
 module.exports.setEnvs = function setEnvs(stage) {
   const config = common.parseConfig(null, null, stage);
 
@@ -25,7 +24,6 @@ module.exports.setEnvs = function setEnvs(stage) {
     process.env[key] = config.envs[key];
   });
 };
-
 
 module.exports.apply = function apply(stage) {
   const isLocal = process.argv[2] === 'local';
