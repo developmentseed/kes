@@ -4,6 +4,7 @@ const _ = require('lodash');
 const path = require('path');
 const yaml = require('js-yaml');
 const fs = require('fs-extra');
+const dotenv = require('dotenv');
 const execSync = require('child_process').execSync;
 
 const getProfile = profile => (profile !== 'default' ? `--profile ${profile}` : '');
@@ -158,7 +159,7 @@ const configureApiGateway = (config) => {
     };
   }
 
-  return {}
+  return {};
 };
 
 /**
@@ -221,25 +222,17 @@ const configureDynamo = (config) => {
   return config;
 };
 
-function addCommonSettings(group, envList) {
-  // add env list and stack and stage name to all
-  // level2 lists
-  group.forEach((item, index) => {
-    item.stackName = config.stackName;
-    item.stage = config.stage;
-    item.distributionEndpoint = config.distributionEndpoint;
-    if (item.hasOwnProperty('envs')) {
-      item.envs = item.envs.concat(envList);
-    }
-    else {
-      item.envs = envList;
-    }
-    group[index] = item;
+function parseLocalEnvVariables(config) {
+  const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
+  const localEnvs = {};
+
+  Object.keys(envConfig).forEach((k) => {
+    localEnvs[k] = envConfig[k];
   });
 
-  return group;
+  config.localEnvs = localEnvs;
+  return config;
 }
-
 
 /**
  * Extract and parse environment variables
@@ -310,6 +303,7 @@ function parseConfig(configPath, stackName, stage) {
   config = configureDynamo(config);
   config = configureLambda(config);
   config = parseEnvVariables(config);
+  config = parseLocalEnvVariables(config);
   config = Object.assign(config, configureApiGateway(config));
 
   return config;

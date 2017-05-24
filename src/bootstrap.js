@@ -131,7 +131,6 @@ module.exports = function(cmd, options, deleteEs) {
   const mainIndex = `${config.stackName}-${config.stage}`;
   const logIndex = `${config.stackName}-${config.stage}-logs`;
 
-
   esClient.indices.exists({
     index: mainIndex
   }).then((exists) => {

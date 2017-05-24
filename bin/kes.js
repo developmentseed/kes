@@ -108,6 +108,20 @@ const configureProgram = function (Kes) {
           console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
       }
     });
+
+  program
+    .command('lambda <lambdaName>')
+    .description('uploads a given lambda function to Lambda service')
+    .option('-w, --webpack', 'Whether to run the webpack before updating the lambdas')
+    .action((cmd, options) => {
+      const kes = new Kes();
+      if (cmd) {
+        kes.lambda.updateLambda(program, cmd, options);
+      }
+      else {
+        console.log('Lambda name is missing');
+      }
+    });
 };
 
 // check if there is an override file in .kes folder
@@ -126,65 +140,6 @@ else {
   const Kes = require('../index');
   configureProgram(Kes);
 }
-
-
-//const lib = require('../index');
-
-
-
-// check if .kes folder exists
-
-//const cf = lib.cf;
-//const dynamo = lib.dynamo;
-//const lambda = lib.lambda;
-//const serve = lib.offline;
-//const bootstrap = lib.bootstrap;
-//const envs = lib.envs;
-
-
-//program
-  //.command('db [add]')
-  //.description('Add given record to DynamoDB')
-  //.option('-t, --table <table>', 'DynamoDB table name')
-  //.option('-r, --record <record>', 'Path to a JSON file containing the record to be added')
-  //.option('-l, --local', 'Whether to add the record to a local dynamoDB running on port 8000')
-  //.action((cmd, options) => {
-    //switch (cmd) {
-      //case 'add':
-        //dynamo.addRecord(Object.assign({}, program, options));
-        //break;
-      //default:
-        //console.log('Wrong choice. Accepted arguments: [add]');
-    //}
-  //});
-
-//program
-  //.command('lambda <lambdaName>')
-  //.description('uploads a given lambda function to Lambda service')
-  //.option('-w, --webpack', 'Whether to run the webpack before updating the lambdas')
-  //.action((cmd, options) => {
-    //if (cmd) {
-      //lambda.updateLambda(program, cmd, options);
-    //}
-    //else {
-      //console.log('Lambda name is missing');
-    //}
-  //});
-
-//program
-  //.command('serve')
-  //.description('Serves the APIGateway locally')
-  //.action(() => serve());
-
-//program
-  //.command('bootstrap [local|remote]')
-  //.description('create tables and queues on local DynamoDB and SQS')
-  //.option(
-    //'--delete',
-    //'Delete Elasticsearch indices and recreate them. WARNING: This will delete all the data'
-  //).action((cmd, options) => {
-    //bootstrap(cmd, program, options.delete);
-  //});
 
 program
   .parse(process.argv);
