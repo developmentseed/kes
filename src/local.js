@@ -16,6 +16,6 @@ module.exports.localRun = (func, stage) => {
     envs.loadCredentials();
 
     // Run the function
-    func();
+    return func();
   }
 };

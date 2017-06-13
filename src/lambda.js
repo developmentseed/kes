@@ -33,14 +33,14 @@ function lambdaObject(c, step) {
       obj[funcName].push({
         handler: lambda.handler,
         function: funcName,
-        name: `${c.stackName}-${lambda.name}-${c.stage}`
+        name: `${c.stackName}-${c.stage}-${lambda.name}`
       });
     }
     else {
       obj[funcName] = [{
         handler: lambda.handler,
         function: funcName,
-        name: `${c.stackName}-${lambda.name}-${c.stage}`
+        name: `${c.stackName}-${c.stage}-${lambda.name}`
       }];
     }
   }
