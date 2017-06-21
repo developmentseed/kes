@@ -48,13 +48,15 @@ function lambdaObject(c, step) {
   return obj;
 }
 
-function zipLambda(name, includeConfig) {
-  // copy config file
-  if (includeConfig) {
-    exec(`cp .kes/config.yml dist/${name}/`);
-  }
+function getFolderName(handler) {
+  return handler.split('.')[0];
+}
 
-  const lambdaPath = path.join(process.cwd(), 'dist', name);
+function zipLambda(lambdaConfig) {
+  // get folder name from handler
+  const folderName = getFolderName(lambdaConfig.handler);
+
+  const lambdaPath = path.join(process.cwd(), 'dist', folderName);
 
   // make sure the built file exist
   if (!fs.existsSync(lambdaPath)) {
@@ -62,7 +64,7 @@ function zipLambda(name, includeConfig) {
     process.exit(1);
   }
 
-  exec(`cd dist && zip -r ../build/lambda/${name} ${name}`);
+  exec(`cd dist && zip -r ../build/lambda/${folderName} ${folderName}`);
 }
 
 /**
@@ -80,7 +82,7 @@ function uploadLambdas(s3Path, profile, config) {
 
     // zip files dist folders
     for (const lambda of config.lambdas) {
-      zipLambda(lambda.name, lambda.includeConfig);
+      zipLambda(lambda);
     }
 
     // upload the artifacts to AWS S3
@@ -109,14 +111,14 @@ function updateLambda(options, name, webpack) {
   // create the lambda folder if it doesn't already exist
   fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
 
-  // Update the zip file
-  zipLambda(name);
-
   for (const lambda of lambdas[name]) {
     // Upload the zip file to AWS Lambda
+    zipLambda(lambda);
+    const folderName = getFolderName(lambda.handler);
+
     exec(`aws lambda update-function-code \
       --function-name ${lambda.name} \
-      --zip-file fileb://build/lambda/${name}.zip \
+      --zip-file fileb://build/lambda/${folderName}.zip \
       ${getProfile(profile)}`);
   }
 }
