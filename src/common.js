@@ -285,18 +285,6 @@ function parseEnvVariables(config) {
   return Object.assign(config, { envs: envs });
 }
 
-function parseLocalEnvVariables(config) {
-  const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
-  const localEnvs = {};
-
-  Object.keys(envConfig).forEach((k) => {
-    localEnvs[k] = envConfig[k];
-  });
-
-  config.localEnvs = localEnvs;
-  return config;
-}
-
 function loadLocalEnvs() {
   let _dotenv;
   try {
@@ -321,6 +309,7 @@ function parseStageVariables(stage = 'dev') {
 
   // replace env variables
   const envs = loadLocalEnvs();
+  Mustache.escape = (text) => text;
   const rendered = Mustache.render(t.toString(), envs);
 
   // convert to object from yaml
@@ -347,6 +336,7 @@ function parseConfig(configPath, stackName, stage) {
   const configFile = fs.readFileSync(p, 'utf8');
 
   const v = merge(stageConfig, envs);
+  Mustache.escape = (text) => text;
   const rendered = Mustache.render(configFile.toString(), v);
   let config = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
 
@@ -358,7 +348,7 @@ function parseConfig(configPath, stackName, stage) {
     config.stage = stage;
   }
 
-  config.envs = stageConfig;
+  config = merge(config, stageConfig);
   config = configureDynamo(config);
   config = configureLambda(config);
   config = parseEnvVariables(config);
