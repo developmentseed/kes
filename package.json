@@ -1,6 +1,6 @@
 {
   "name": "kes",
-  "version": "0.0.2-beta-5",
+  "version": "0.0.2-beta-6",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {},
   "bin": {
@@ -27,8 +27,11 @@
     "http-aws-es": "^1.1.3",
     "js-yaml": "^3.8.1",
     "lodash": "^4.17.4",
+    "lodash.merge": "^4.6.0",
+    "mustache": "^2.3.0",
     "node-forge": "^0.7.0",
-    "prompt": "^1.0.0"
+    "prompt": "^1.0.0",
+    "yaml-include": "^1.2.0"
   },
   "devDependencies": {
     "eslint": "^3.19.0",

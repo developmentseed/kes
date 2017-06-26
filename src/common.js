@@ -3,7 +3,10 @@
 const _ = require('lodash');
 const path = require('path');
 const yaml = require('js-yaml');
+const yamlinc = require('yaml-include');
 const fs = require('fs-extra');
+const merge = require('lodash.merge');
+const Mustache = require('mustache');
 const dotenv = require('dotenv');
 const execSync = require('child_process').execSync;
 
@@ -282,6 +285,53 @@ function parseEnvVariables(config) {
   return Object.assign(config, { envs: envs });
 }
 
+function parseLocalEnvVariables(config) {
+  const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
+  const localEnvs = {};
+
+  Object.keys(envConfig).forEach((k) => {
+    localEnvs[k] = envConfig[k];
+  });
+
+  config.localEnvs = localEnvs;
+  return config;
+}
+
+function loadLocalEnvs() {
+  let _dotenv;
+  try {
+    _dotenv = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
+  }
+  catch (e) {
+    if (e.message.includes('ENOENT')) {
+      console.log('.env file is missing');
+    }
+    else {
+      throw e;
+    }
+  }
+
+  // load all env variables to an object
+  return merge(process.env, _dotenv);
+}
+
+function parseStageVariables(stage = 'dev') {
+  const p = path.join(process.cwd(), '.kes/stage.yml');
+  const t = fs.readFileSync(p);
+
+  // replace env variables
+  const envs = loadLocalEnvs();
+  const rendered = Mustache.render(t.toString(), envs);
+
+  // convert to object from yaml
+  const stageConfig = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+
+  if (stage) {
+    return merge(stageConfig.default, stageConfig[stage]);
+  }
+  return stageConfig.default;
+}
+
 /**
  * Parses the .kes/config.yml to js Object
  * @return {Object}
@@ -289,8 +339,16 @@ function parseEnvVariables(config) {
 function parseConfig(configPath, stackName, stage) {
   stackName = stackName || null;
   stage = stage || null;
+
+  const stageConfig = parseStageVariables();
+  const envs = loadLocalEnvs();
+
   const p = configPath || path.join(process.cwd(), '.kes/config.yml');
-  let config = yaml.safeLoad(fs.readFileSync(p, 'utf8'));
+  const configFile = fs.readFileSync(p, 'utf8');
+
+  const v = merge(stageConfig, envs);
+  const rendered = Mustache.render(configFile.toString(), v);
+  let config = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
 
   if (stackName) {
     config.stackName = stackName;
@@ -300,6 +358,7 @@ function parseConfig(configPath, stackName, stage) {
     config.stage = stage;
   }
 
+  config.envs = stageConfig;
   config = configureDynamo(config);
   config = configureLambda(config);
   config = parseEnvVariables(config);
