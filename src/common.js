@@ -329,7 +329,7 @@ function parseConfig(configPath, stackName, stage) {
   stackName = stackName || null;
   stage = stage || null;
 
-  const stageConfig = parseStageVariables();
+  const stageConfig = parseStageVariables(stage);
   const envs = loadLocalEnvs();
 
   const p = configPath || path.join(process.cwd(), '.kes/config.yml');
