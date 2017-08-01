@@ -1,12 +1,15 @@
 'use strict';
 
 const Handlebars = require('handlebars');
+const AWS = require('aws-sdk');
 const path = require('path');
 const fs = require('fs-extra');
 const parseConfig = require('./common').parseConfig;
 const exec = require('./common').exec;
 const getProfile = require('./common').getProfile;
 const uploadLambdas = require('./lambda').uploadLambdas;
+
+function CF() {}
 
 /**
  * Compiles a CloudFormation template in Yaml format
@@ -16,7 +19,7 @@ const uploadLambdas = require('./lambda').uploadLambdas;
  * for generating the final CF template
  * @return {null}
  */
-const compileCF = (options, stage) => {
+CF.compileCF = (options, stage) => {
   const config = parseConfig(options.config, options.stack, stage);
 
   const t = fs.readFileSync(path.join(process.cwd(), '.kes/cloudformation.template.yml'), 'utf8');
@@ -32,29 +35,29 @@ const compileCF = (options, stage) => {
  * @param  {string} s3Path  A valid S3 URI for uploading the zip files
  * @param  {string} profile The profile name used in aws CLI
  */
-function uploadCF(s3Path, profile, configPath, stage) {
+CF.uploadCF = (s3Path, profile, configPath, stage) => {
   // build the template first
-  compileCF(configPath, stage);
+  CF.compileCF(configPath, stage);
 
   // make sure cloudformation template exists
   try {
     fs.accessSync(path.join(process.cwd(), '.kes/cloudformation.yml'));
   }
   catch (e) {
-    console.log('cloudformation.yml is missing.');
-    process.exit(1);
+    throw new Error('cloudformation.yml is missing.');
   }
 
   // upload CF template to S3
   exec(`aws s3 cp .kes/cloudformation.yml ${s3Path}/ \
                   ${getProfile(profile)}`);
-}
+};
 
-function cloudFormation(op, templateUrl, stackName, configBucket, artifactHash, profile, stage) {
+CF.cloudFormation = (op, templateUrl, stackName, configBucket, artifactHash, profile, stage) => {
+  let r;
   const name = stage ? `${stackName}-${stage}` : stackName;
   // Run the cloudformation cli command
   try {
-    exec(`aws cloudformation ${op}-stack \
+    r = exec(`aws cloudformation ${op}-stack \
   ${getProfile(profile)} \
   --stack-name ${name} \
   --template-url "${templateUrl}" \
@@ -66,10 +69,11 @@ function cloudFormation(op, templateUrl, stackName, configBucket, artifactHash, 
   catch (e) {
     if (e.message.match(/(No updates are to be performed)/)) {
       console.log('Nothing to update');
-      process.exit(0);
+      return;
     }
-    console.error(e);
-    process.exit(1);
+    else {
+      throw e;
+    }
   }
 
   // await for the response
@@ -82,12 +86,13 @@ function cloudFormation(op, templateUrl, stackName, configBucket, artifactHash, 
   }
   catch (e) {
     console.log('Stack creation failed due to:');
-    console.log(e);
-    process.exit(1);
+    throw e;
   }
-}
 
-function dlqToLambda(options) {
+  return r;
+};
+
+CF.dlqToLambda = (options) => {
   const profile = options.profile;
   const config = parseConfig(options.config, options.stack, options.stage);
   let queueUrl;
@@ -115,7 +120,7 @@ function dlqToLambda(options) {
         --dead-letter-config TargetArn=${queueArn}`);
     }
   }
-}
+};
 
 /**
  * Returns the configuration file and checks if the bucket specified
@@ -124,7 +129,7 @@ function dlqToLambda(options) {
  * @param  {String} profile The profile name to use with AWS CLI
  * @return {Object}         The configuration Object
  */
-function getConfig(options, configPath) {
+CF.getConfig = (options, configPath) => {
   // get the configs
   const config = parseConfig(configPath, options.stack, options.stage);
 
@@ -133,8 +138,7 @@ function getConfig(options, configPath) {
     fs.accessSync('dist');
   }
   catch (e) {
-    console.error('Dist folder is missing. Run npm install first.');
-    process.exit(1);
+    throw new Error('Dist folder is missing. Run npm install first.');
   }
 
   // check if the configBucket exists, if not throw an error
@@ -142,14 +146,13 @@ function getConfig(options, configPath) {
     exec(`aws s3 ls s3://${config.buckets.internal} ${getProfile(options.profile)}`);
   }
   catch (e) {
-    console.error(`${config.buckets.internal} does not exist or ` +
+    throw new Error(`${config.buckets.internal} does not exist or ` +
       'your profile doesn\'t have access to it. Either create the ' +
       'bucket or make sure your credentials have access to it');
-    process.exit(1);
   }
 
   return config;
-}
+};
 
 /**
  * Generates a unique hash for the deployment from the files
@@ -157,7 +160,7 @@ function getConfig(options, configPath) {
  * @param  {Object} c Configuration file
  * @return {Object}   Returns the hash and the S3 bucket path for storing the data
  */
-function getHash(c) {
+CF.getHash = (c) => {
   // get the artifact hash
   // this is used to separate deployments from different machines
   let artifactHash = exec(`find dist -type f | \
@@ -173,55 +176,70 @@ function getHash(c) {
     path: s3Path,
     url: url
   };
-}
+};
 
 /**
  * Validates the CF template
  * @param  {Object} options The options object should include the profile name (optional)
  */
-function validateTemplate(options) {
+CF.validateTemplate = (options) => {
   const profile = options.profile;
   const configPath = options.config;
 
   // Get the config
-  const c = getConfig(options, configPath);
+  const c = CF.getConfig(options, configPath);
 
   // Get the checksum hash
-  const h = getHash(c);
+  const h = CF.getHash(c);
 
   console.log('Validating the template');
   const url = `${h.url}/cloudformation.yml`;
 
   // Build and upload the CF template
-  uploadCF(h.path, profile, configPath, options.stage);
+  CF.uploadCF(h.path, profile, configPath, options.stage);
 
   exec(`aws cloudformation validate-template \
 --template-url "${url}" \
 ${getProfile(profile)}`);
-}
+};
+
+CF.describeCF = (stackName, stage, region, profile, cb) => {
+  const credentials = new AWS.SharedIniFileCredentials({ profile: profile });
+  AWS.config.credentials = credentials;
+  console.log(region);
+  AWS.config.update({ region: region });
+  const cf = new AWS.CloudFormation();
+
+  cf.describeStacks({
+    StackName: `${stackName}-${stage}`
+  }, (e, r) => {
+    console.log('inside');
+    cb(e, r);
+  });
+};
 
 /**
  * Generic create/update a CloudFormation stack
  * @param  {Object} options The options object should include the profile name (optional)
  * @param {String} ops Operation name, e.g. create/update
  */
-function opsStack(options, ops) {
+CF.opsStack = (options, ops) => {
   const profile = options.profile;
   const configPath = options.config;
 
   // Get the config
-  const c = getConfig(options, configPath);
+  const c = CF.getConfig(options, configPath);
 
   // Get the checksum hash
-  const h = getHash(c);
+  const h = CF.getHash(c);
 
   // upload lambdas and the cf template
   uploadLambdas(h.path, profile, c);
 
   // Build and upload the CF template
-  uploadCF(h.path, profile, configPath, options.stage);
+  CF.uploadCF(h.path, profile, configPath, options.stage);
 
-  cloudFormation(
+  CF.cloudFormation(
     ops,
     `${h.url}/cloudformation.yml`,
     c.stackName,
@@ -230,33 +248,28 @@ function opsStack(options, ops) {
     profile,
     c.stage
   );
-}
+};
 
 /**
  * Creates a CloudFormation stack
  * @param  {Object} options The options object should include the profile name (optional)
  */
-function createStack(options) {
-  opsStack(options, 'create');
-}
+CF.createStack = (options) => {
+  CF.opsStack(options, 'create');
+};
 
 /**
  * Updates a CloudFormation stack
  * @param  {Object} options The options object should include the profile name (optional)
  */
-function updateStack(options) {
+CF.updateStack = (options) => {
   try {
-    opsStack(options, 'update');
+    CF.opsStack(options, 'update');
   }
   catch (e) {
-    console.log(e);
     console.log('CloudFormation Update failed');
-    process.exit(1);
+    throw e;
   }
-}
+};
 
-module.exports.validateTemplate = validateTemplate;
-module.exports.compileCF = compileCF;
-module.exports.createStack = createStack;
-module.exports.updateStack = updateStack;
-module.exports.dlqToLambda = dlqToLambda;
+module.exports = CF;

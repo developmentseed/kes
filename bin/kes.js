@@ -61,7 +61,7 @@ const init = function () {
   });
 };
 
-const configureProgram = function (Kes) {
+const configureProgram = function (kes) {
   program
     .usage('init')
     .description('Start a Kes project')
@@ -74,7 +74,7 @@ const configureProgram = function (Kes) {
     .usage('TYPE COMMAND [options]')
     .option('-p, --profile <profile>', 'AWS profile name to use for authentication', 'default')
     .option('-c, --config <config>', 'Path to config file', path.join(kesFolder, 'config.yml'))
-    .option('-r, --region', 'AWS region', 'us-east-1')
+    .option('-r, --region <region>', 'AWS region', 'us-east-1')
     .option('--stack <stack>', 'stack name, defaults to the config value')
     .option('--stage <stage>', 'stage name, defaults to the config value');
 
@@ -87,25 +87,30 @@ const configureProgram = function (Kes) {
     compile   Compiles the CF stack
     dlq       add dead letter queue to lambdas`)
     .action((cmd) => {
-      const kes = new Kes();
-      switch (cmd) {
-        case 'create':
-          kes.cf.createStack(program);
-          break;
-        case 'update':
-          kes.cf.updateStack(program);
-          break;
-        case 'validate':
-          kes.cf.validateTemplate(program);
-          break;
-        case 'compile':
-          kes.cf.compileCF(program);
-          break;
-        case 'dlq':
-          kes.cf.dlqToLambda(program);
-          break;
-        default:
-          console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
+      try {
+        switch (cmd) {
+          case 'create':
+            kes.CF.createStack(program);
+            break;
+          case 'update':
+            kes.CF.updateStack(program);
+            break;
+          case 'validate':
+            kes.CF.validateTemplate(program);
+            break;
+          case 'compile':
+            kes.CF.compileCF(program);
+            break;
+          case 'dlq':
+            kes.CF.dlqToLambda(program);
+            break;
+          default:
+            console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
+        }
+      }
+      catch (e) {
+        console.log(e);
+        process.exit(1);
       }
     });
 
@@ -114,7 +119,6 @@ const configureProgram = function (Kes) {
     .description('uploads a given lambda function to Lambda service')
     .option('-w, --webpack', 'Whether to run the webpack before updating the lambdas')
     .action((cmd, options) => {
-      const kes = new Kes();
       if (cmd) {
         kes.lambda.updateLambda(program, cmd, options);
       }
@@ -127,18 +131,13 @@ const configureProgram = function (Kes) {
 // check if there is an override file in .kes folder
 if (fs.existsSync(path.join(kesFolder, 'kes.js'))) {
   const override = require(path.join(kesFolder, 'kes.js'));
+  let kes = require('../index');
 
-  if (override.Kes) {
-    configureProgram(override.Kes);
-  }
-  else {
-    const Kes = require('../index');
-    configureProgram(Kes);
-  }
+  kes = override(kes);
+  configureProgram(kes);
 }
 else {
-  const Kes = require('../index');
-  configureProgram(Kes);
+  configureProgram(require('../index'));
 }
 
 program
