@@ -34,6 +34,26 @@ function exec(cmd, verbose) {
  * @param  {Object} config The configuration object
  * @return {Object}        Returns ApiGateway updated configruation
  */
+const configureStepFunction = (config) => {
+  if (config.stepFunctions) {
+    const updatedStepFunctions = [];
+    config.stepFunctions.forEach((s) => {
+      s.definition = JSON.stringify(s.definition);
+      updatedStepFunctions.push(s);
+    });
+    config.stepFunctions = updatedStepFunctions;
+    return config;
+  }
+
+  return config;
+};
+
+/**
+ * Generates configuration arrays for ApiGateway portion of
+ * the CloudFormation
+ * @param  {Object} config The configuration object
+ * @return {Object}        Returns ApiGateway updated configruation
+ */
 const configureApiGateway = (config) => {
   if (config.apis) {
     // APIGateway name used in AWS APIGateway Definition
@@ -351,6 +371,7 @@ function parseConfig(configPath, stackName, stage) {
   config = merge(config, stageConfig);
   config = configureDynamo(config);
   config = configureLambda(config);
+  config = configureStepFunction(config);
   config = parseEnvVariables(config);
   config = parseLocalEnvVariables(config);
   config = Object.assign(config, configureApiGateway(config));
