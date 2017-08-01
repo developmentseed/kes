@@ -32,6 +32,7 @@ function lambdaObject(c, step) {
     if (_.has(obj, funcName)) {
       obj[funcName].push({
         handler: lambda.handler,
+        source: lambda.source,
         function: funcName,
         name: `${c.stackName}-${c.stage}-${lambda.name}`
       });
@@ -39,6 +40,7 @@ function lambdaObject(c, step) {
     else {
       obj[funcName] = [{
         handler: lambda.handler,
+        source: lambda.source,
         function: funcName,
         name: `${c.stackName}-${c.stage}-${lambda.name}`
       }];
@@ -55,8 +57,11 @@ function getFolderName(handler) {
 function zipLambda(lambdaConfig) {
   // get folder name from handler
   const folderName = getFolderName(lambdaConfig.handler);
-
   const lambdaPath = path.join(process.cwd(), 'dist', folderName);
+
+  if (lambdaConfig.source) {
+    exec(`mkdir -p ${lambdaPath}; cp ${lambdaConfig.source} ${lambdaPath}/`);
+  }
 
   // make sure the built file exist
   if (!fs.existsSync(lambdaPath)) {
