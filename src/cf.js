@@ -6,270 +6,217 @@ const path = require('path');
 const fs = require('fs-extra');
 const parseConfig = require('./common').parseConfig;
 const exec = require('./common').exec;
-const getProfile = require('./common').getProfile;
 const uploadLambdas = require('./lambda').uploadLambdas;
 
-function CF() {}
-
-/**
- * Compiles a CloudFormation template in Yaml format
- * Reads the configuration yaml from .kes/config.yml
- * Writes the template to .kes/cloudformation.yml
- * Uses .kes/cloudformation.tempalte.yml as the base template
- * for generating the final CF template
- * @return {null}
- */
-CF.compileCF = (options, stage) => {
-  const config = parseConfig(options.config, options.stack, stage);
-
-  const t = fs.readFileSync(path.join(process.cwd(), '.kes/cloudformation.template.yml'), 'utf8');
-  const template = Handlebars.compile(t);
-
-  const destPath = path.join(process.cwd(), '.kes/cloudformation.yml');
-  console.log(`CF template saved to ${destPath}`);
-  fs.writeFileSync(destPath, template(config));
-};
-
-/**
- * Uploads the Cloud Formation template to a given S3 location
- * @param  {string} s3Path  A valid S3 URI for uploading the zip files
- * @param  {string} profile The profile name used in aws CLI
- */
-CF.uploadCF = (s3Path, profile, configPath, stage) => {
-  // build the template first
-  CF.compileCF(configPath, stage);
-
-  // make sure cloudformation template exists
-  try {
-    fs.accessSync(path.join(process.cwd(), '.kes/cloudformation.yml'));
-  }
-  catch (e) {
-    throw new Error('cloudformation.yml is missing.');
+class CF {
+  constructor(options) {
+    this.options = options;
+    this.region = options.region;
+    this.profile = options.profile;
+    this.config = parseConfig(options.config, options.stack, options.stage);
+    this.stage = options.stage || this.config.stage;
+    this.configureAws();
   }
 
-  // upload CF template to S3
-  exec(`aws s3 cp .kes/cloudformation.yml ${s3Path}/ \
-                  ${getProfile(profile)}`);
-};
-
-CF.cloudFormation = (op, templateUrl, stackName, configBucket, artifactHash, profile, stage) => {
-  let r;
-  const name = stage ? `${stackName}-${stage}` : stackName;
-  // Run the cloudformation cli command
-  try {
-    r = exec(`aws cloudformation ${op}-stack \
-  ${getProfile(profile)} \
-  --stack-name ${name} \
-  --template-url "${templateUrl}" \
-  --parameters "ParameterKey=ConfigS3Bucket,ParameterValue=${configBucket},UsePreviousValue=false" \
-  "ParameterKey=ArtifactPath,ParameterValue=${artifactHash},UsePreviousValue=false" \
-  --capabilities CAPABILITY_IAM`
-    );
-  }
-  catch (e) {
-    if (e.message.match(/(No updates are to be performed)/)) {
-      console.log('Nothing to update');
-      return;
+  configureAws() {
+    if (this.profile) {
+      const credentials = new AWS.SharedIniFileCredentials({ profile: this.profile });
+      AWS.config.credentials = credentials;
     }
-    else {
+    AWS.config.update({ region: this.region });
+  }
+
+  /**
+   * Compiles a CloudFormation template in Yaml format
+   * Reads the configuration yaml from .kes/config.yml
+   * Writes the template to .kes/cloudformation.yml
+   * Uses .kes/cloudformation.tempalte.yml as the base template
+   * for generating the final CF template
+   * @return {null}
+   */
+  compileCF() {
+    const t = fs.readFileSync(path.join(process.cwd(), '.kes/cloudformation.template.yml'), 'utf8');
+    const template = Handlebars.compile(t);
+
+    const destPath = path.join(process.cwd(), '.kes/cloudformation.yml');
+    console.log(`CF template saved to ${destPath}`);
+    fs.writeFileSync(destPath, template(this.config));
+  }
+
+  /**
+   * Uploads the Cloud Formation template to a given S3 location
+   * @param  {string} s3Path  A valid S3 URI for uploading the zip files
+   * @param  {string} profile The profile name used in aws CLI
+   */
+  uploadCF(s3Path, cb) {
+    // build the template first
+    this.compileCF();
+
+    // make sure cloudformation template exists
+    try {
+      fs.accessSync(path.join(process.cwd(), '.kes/cloudformation.yml'));
+    }
+    catch (e) {
+      throw new Error('cloudformation.yml is missing.');
+    }
+
+    const parsed = s3Path.match(/s3:\/\/([^/]*)\/(.*)/);
+
+    // upload CF template to S3
+    const s3 = new AWS.S3();
+    s3.upload({
+      Bucket: parsed[1],
+      Key: `${parsed[2]}/cloudformation.yml`,
+      Body: fs.readFileSync('.kes/cloudformation.yml')
+    }, (e, r) => {
+      console.log(`Uploaded CF template to s3://${r.Bucket}/${r.key}`);
+      cb(e, r);
+    });
+  }
+
+  cloudFormation(op, templateUrl, artifactHash, cb = () => {}) {
+    const stackName = this.config.stackName;
+    const name = this.stage ? `${stackName}-${this.stage}` : stackName;
+    // Run the cloudformation cli command
+    const cf = new AWS.CloudFormation();
+    cf.updateStack({
+      StackName: name,
+      TemplateURL: templateUrl,
+      Parameters: [{
+        ParameterKey: 'ConfigS3Bucket',
+        ParameterValue: this.config.buckets.internal,
+        UsePreviousValue: false
+      }, {
+        ParameterKey: 'ArtifactPath',
+        ParameterValue: artifactHash,
+        UsePreviousValue: false
+      }],
+      Capabilities: ['CAPABILITY_IAM']
+    }, (e, r) => {
+      if (e) {
+        if (e.message === 'No updates are to be performed.') {
+          console.log(e.message);
+          return cb(null, e.message);
+        }
+        else {
+          console.log('There was an error updating the CF stack');
+          return cb(e);
+        }
+      }
+      else {
+        console.log('Waiting for the CF operation to complete');
+        cf.waitFor('stackUpdateComplete', { StackName: name }, (e, r) => {
+          console.log('CF update is completed');
+          cb(e, r);
+        });
+      }
+    });
+  }
+
+  /**
+   * Generates a unique hash for the deployment from the files
+   * in the dist forlder
+   * @param  {Object} c Configuration file
+   * @return {Object}   Returns the hash and the S3 bucket path for storing the data
+   */
+  getHash() {
+    // get the artifact hash
+    // this is used to separate deployments from different machines
+    let artifactHash = exec(`find dist -type f | \
+                             xargs shasum | shasum | awk '{print $1}' ${''}`);
+    artifactHash = artifactHash.toString().replace(/\n/, '');
+
+    // Make the S3 Path
+    const c = this.config;
+    const s3Path = `s3://${c.buckets.internal}/${c.stackName}-${c.stage}/${artifactHash}`;
+    const url = `https://s3.amazonaws.com/${c.buckets.internal}/${c.stackName}-${c.stage}/${artifactHash}`;
+
+    return {
+      hash: artifactHash,
+      path: s3Path,
+      url: url
+    };
+  }
+
+  /**
+   * Validates the CF template
+   * @param  {Object} options The options object should include the profile name (optional)
+   */
+  validateTemplate(cb = () => {}) {
+    // Get the checksum hash
+    const h = this.getHash();
+
+    console.log('Validating the template');
+    const url = `${h.url}/cloudformation.yml`;
+
+    // Build and upload the CF template
+    const cf = new AWS.CloudFormation();
+    cf.validateTemplate({ TemplateURL: url }, (e, r) => {
+      if (e) {
+        console.log(e);
+      }
+      else {
+        console.log(r);
+      }
+      cb(e, r);
+    });
+  }
+
+  describeCF(cb) {
+    const cf = new AWS.CloudFormation();
+
+    cf.describeStacks({
+      StackName: `${this.config.stackName}-${this.stage}`
+    }, (e, r) => {
+      cb(e, r);
+    });
+  }
+
+  /**
+   * Generic create/update a CloudFormation stack
+   * @param  {Object} options The options object should include the profile name (optional)
+   * @param {String} ops Operation name, e.g. create/update
+   */
+  opsStack(ops, cb) {
+    // Get the checksum hash
+    const h = this.getHash();
+
+    // upload lambdas and the cf template
+    uploadLambdas(h.path, this.profile, this.config, this.region, (e, r) => {
+      if (e) return cb(e);
+      // Build and upload the CF template
+      this.uploadCF(h.path, (e, r) => {
+        this.cloudFormation(
+          ops,
+          `${h.url}/cloudformation.yml`,
+          h.hash,
+          cb
+        );
+      });
+    });
+  }
+
+  /**
+   * Creates a CloudFormation stack
+   * @param  {Object} options The options object should include the profile name (optional)
+   */
+  createStack(cb = () => {}) {
+    this.opsStack('create', cb);
+  }
+
+  /**
+   * Updates a CloudFormation stack
+   * @param  {Object} options The options object should include the profile name (optional)
+   */
+  updateStack(cb = () => {}) {
+    try {
+      this.opsStack('update', cb);
+    }
+    catch (e) {
+      console.log('CloudFormation Update failed');
       throw e;
     }
   }
-
-  // await for the response
-  console.log(`Waiting for the stack to be ${op}d:`);
-  try {
-    exec(`aws cloudformation wait stack-${op}-complete \
-            --stack-name ${name} \
-            ${getProfile(profile)}`);
-    console.log(`Stack is successfully ${op}d`);
-  }
-  catch (e) {
-    console.log('Stack creation failed due to:');
-    throw e;
-  }
-
-  return r;
-};
-
-CF.dlqToLambda = (options) => {
-  const profile = options.profile;
-  const config = parseConfig(options.config, options.stack, options.stage);
-  let queueUrl;
-  let queueArn;
-
-  console.log('Adding Dead Letter Queue to Lambda Functions');
-  for (const lambda of config.lambdas) {
-    if (lambda.dlq) {
-      // get queue arn
-      if (!queueUrl) {
-        let temp = exec(`aws sqs get-queue-url \
-          --queue-name ${config.stackName}-${config.stage}-${lambda.dlq} \
-          ${getProfile(profile)}`);
-        queueUrl = JSON.parse(temp).QueueUrl;
-
-        temp = exec(`aws sqs get-queue-attributes \
-          --attribute-names QueueArn \
-          --queue-url ${queueUrl} \
-          ${getProfile(profile)}`);
-        queueArn = JSON.parse(temp).Attributes.QueueArn;
-      }
-
-      exec(`aws lambda update-function-configuration \
-        --function-name ${config.stackName}-${lambda.name}-${config.stage} \
-        --dead-letter-config TargetArn=${queueArn}`);
-    }
-  }
-};
-
-/**
- * Returns the configuration file and checks if the bucket specified
- * in the configuration file exists on S3. If the bucket does not exist,
- * it throws an error.
- * @param  {String} profile The profile name to use with AWS CLI
- * @return {Object}         The configuration Object
- */
-CF.getConfig = (options, configPath) => {
-  // get the configs
-  const config = parseConfig(configPath, options.stack, options.stage);
-
-  // throw error if dist folder doesn't exist
-  try {
-    fs.accessSync('dist');
-  }
-  catch (e) {
-    throw new Error('Dist folder is missing. Run npm install first.');
-  }
-
-  // check if the configBucket exists, if not throw an error
-  try {
-    exec(`aws s3 ls s3://${config.buckets.internal} ${getProfile(options.profile)}`);
-  }
-  catch (e) {
-    throw new Error(`${config.buckets.internal} does not exist or ` +
-      'your profile doesn\'t have access to it. Either create the ' +
-      'bucket or make sure your credentials have access to it');
-  }
-
-  return config;
-};
-
-/**
- * Generates a unique hash for the deployment from the files
- * in the dist forlder
- * @param  {Object} c Configuration file
- * @return {Object}   Returns the hash and the S3 bucket path for storing the data
- */
-CF.getHash = (c) => {
-  // get the artifact hash
-  // this is used to separate deployments from different machines
-  let artifactHash = exec(`find dist -type f | \
-                           xargs shasum | shasum | awk '{print $1}' ${''}`);
-  artifactHash = artifactHash.toString().replace(/\n/, '');
-
-  // Make the S3 Path
-  const s3Path = `s3://${c.buckets.internal}/${c.stackName}-${c.stage}/${artifactHash}`;
-  const url = `https://s3.amazonaws.com/${c.buckets.internal}/${c.stackName}-${c.stage}/${artifactHash}`;
-
-  return {
-    hash: artifactHash,
-    path: s3Path,
-    url: url
-  };
-};
-
-/**
- * Validates the CF template
- * @param  {Object} options The options object should include the profile name (optional)
- */
-CF.validateTemplate = (options) => {
-  const profile = options.profile;
-  const configPath = options.config;
-
-  // Get the config
-  const c = CF.getConfig(options, configPath);
-
-  // Get the checksum hash
-  const h = CF.getHash(c);
-
-  console.log('Validating the template');
-  const url = `${h.url}/cloudformation.yml`;
-
-  // Build and upload the CF template
-  CF.uploadCF(h.path, profile, configPath, options.stage);
-
-  exec(`aws cloudformation validate-template \
---template-url "${url}" \
-${getProfile(profile)}`);
-};
-
-CF.describeCF = (stackName, stage, region, profile, cb) => {
-  const credentials = new AWS.SharedIniFileCredentials({ profile: profile });
-  AWS.config.credentials = credentials;
-  console.log(region);
-  AWS.config.update({ region: region });
-  const cf = new AWS.CloudFormation();
-
-  cf.describeStacks({
-    StackName: `${stackName}-${stage}`
-  }, (e, r) => {
-    console.log('inside');
-    cb(e, r);
-  });
-};
-
-/**
- * Generic create/update a CloudFormation stack
- * @param  {Object} options The options object should include the profile name (optional)
- * @param {String} ops Operation name, e.g. create/update
- */
-CF.opsStack = (options, ops) => {
-  const profile = options.profile;
-  const configPath = options.config;
-
-  // Get the config
-  const c = CF.getConfig(options, configPath);
-
-  // Get the checksum hash
-  const h = CF.getHash(c);
-
-  // upload lambdas and the cf template
-  uploadLambdas(h.path, profile, c);
-
-  // Build and upload the CF template
-  CF.uploadCF(h.path, profile, configPath, options.stage);
-
-  CF.cloudFormation(
-    ops,
-    `${h.url}/cloudformation.yml`,
-    c.stackName,
-    c.buckets.internal,
-    h.hash,
-    profile,
-    c.stage
-  );
-};
-
-/**
- * Creates a CloudFormation stack
- * @param  {Object} options The options object should include the profile name (optional)
- */
-CF.createStack = (options) => {
-  CF.opsStack(options, 'create');
-};
-
-/**
- * Updates a CloudFormation stack
- * @param  {Object} options The options object should include the profile name (optional)
- */
-CF.updateStack = (options) => {
-  try {
-    CF.opsStack(options, 'update');
-  }
-  catch (e) {
-    console.log('CloudFormation Update failed');
-    throw e;
-  }
-};
+}
 
 module.exports = CF;

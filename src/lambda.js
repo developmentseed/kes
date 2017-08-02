@@ -2,6 +2,7 @@
 
 const _ = require('lodash');
 const path = require('path');
+const AWS = require('aws-sdk');
 const fs = require('fs-extra');
 const parseConfig = require('./common').parseConfig;
 const exec = require('./common').exec;
@@ -77,25 +78,38 @@ function zipLambda(lambdaConfig) {
  * @param  {string} s3Path  A valid S3 URI for uploading the zip files
  * @param  {string} profile The profile name used in aws CLI
  */
-function uploadLambdas(s3Path, profile, config) {
+function uploadLambdas(s3Path, profile, config, region, cb) {
   if (config.lambdas) {
+    if (profile) {
+      const credentials = new AWS.SharedIniFileCredentials({ profile });
+      AWS.config.credentials = credentials;
+    }
+    AWS.config.update({ region });
+    const s3 = new AWS.S3();
+
     // remove the build folder if exists
     fs.removeSync(path.join(process.cwd(), 'build'));
 
     // create the lambda folder
     fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
+    const parsed = s3Path.match(/s3:\/\/([^/]*)\/(.*)/);
 
     // zip files dist folders
-    for (const lambda of config.lambdas) {
+    const uploads = config.lambdas.map((lambda) => {
       zipLambda(lambda);
-    }
+      const folderName = getFolderName(lambda.handler);
 
-    // upload the artifacts to AWS S3
-    // we use the aws cli to make things easier
-    // this fails if the user doesn't have aws-cli installed
-    exec(`cd build && aws s3 cp --recursive . ${s3Path}/ \
-                                ${getProfile(profile)} \
-                                --exclude=.DS_Store`);
+      return s3.upload({
+        Bucket: parsed[1],
+        Key: `${parsed[2]}/${folderName}.zip`,
+        Body: fs.readFileSync(`./build/lambda/${folderName}.zip`)
+      }).promise();
+    });
+
+    Promise.all(uploads).then((r) => {
+      r.forEach(l => console.log(`Uploaded: ${l.Location}`));
+      cb(null);
+    }).catch(e => cb(e));
   }
 }
 
@@ -104,9 +118,17 @@ function uploadLambdas(s3Path, profile, config) {
  * @param  {Object} options options passed by the commander module
  * @param  {String} name    name of the lambda function
  */
-function updateLambda(options, name, webpack) {
+function updateLambda(options, name, webpack, cb) {
   const profile = options.profile;
+  const region = options.region;
   const lambdas = lambdaObject(null, options.stage);
+
+  if (profile) {
+    const credentials = new AWS.SharedIniFileCredentials({ profile });
+    AWS.config.credentials = credentials;
+  }
+  AWS.config.update({ region });
+  const l = new AWS.Lambda();
 
   // Run webpack
   if (_.has(webpack, 'webpack') && webpack.webpack) {
@@ -116,16 +138,26 @@ function updateLambda(options, name, webpack) {
   // create the lambda folder if it doesn't already exist
   fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
 
-  for (const lambda of lambdas[name]) {
+  if (!lambdas[name]) {
+    return cb(new Error('Lambda function is not defined in config.yml'));
+  }
+
+  const uploads = lambdas[name].map((lambda) => {
     // Upload the zip file to AWS Lambda
     zipLambda(lambda);
     const folderName = getFolderName(lambda.handler);
 
-    exec(`aws lambda update-function-code \
-      --function-name ${lambda.name} \
-      --zip-file fileb://build/lambda/${folderName}.zip \
-      ${getProfile(profile)}`);
-  }
+    return l.updateFunctionCode({
+      FunctionName: lambda.name,
+      ZipFile: fs.readFileSync(`./build/lambda/${folderName}.zip`)
+    }).promise();
+  });
+
+  Promise.all(uploads).then((r) => {
+    console.log(r);
+    console.log('Lambda function got updated');
+    cb(null);
+  }).catch(e => cb(e));
 }
 
 module.exports.uploadLambdas = uploadLambdas;

@@ -12,6 +12,19 @@ const program = require('commander');
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
 
+const cb = (e, r) => {
+  if (e) {
+    if (e.message) {
+      console.log(e.message);
+    }
+    else {
+      console.log(e);
+    }
+    process.exit(1);
+  }
+  process.exit(0);
+};
+
 const init = function () {
   if (fs.existsSync(kesFolder)) {
     console.log('.kes folder already exists!');
@@ -87,30 +100,22 @@ const configureProgram = function (kes) {
     compile   Compiles the CF stack
     dlq       add dead letter queue to lambdas`)
     .action((cmd) => {
-      try {
-        switch (cmd) {
-          case 'create':
-            kes.CF.createStack(program);
-            break;
-          case 'update':
-            kes.CF.updateStack(program);
-            break;
-          case 'validate':
-            kes.CF.validateTemplate(program);
-            break;
-          case 'compile':
-            kes.CF.compileCF(program);
-            break;
-          case 'dlq':
-            kes.CF.dlqToLambda(program);
-            break;
-          default:
-            console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
-        }
-      }
-      catch (e) {
-        console.log(e);
-        process.exit(1);
+      const k = new kes.CF(program);
+      switch (cmd) {
+        case 'create':
+          k.createStack(cb);
+          break;
+        case 'update':
+          k.updateStack(cb);
+          break;
+        case 'validate':
+          k.validateTemplate(cb);
+          break;
+        case 'compile':
+          k.compileCF(cb);
+          break;
+        default:
+          console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
       }
     });
 
@@ -120,7 +125,7 @@ const configureProgram = function (kes) {
     .option('-w, --webpack', 'Whether to run the webpack before updating the lambdas')
     .action((cmd, options) => {
       if (cmd) {
-        kes.lambda.updateLambda(program, cmd, options);
+        kes.lambda.updateLambda(program, cmd, options, cb);
       }
       else {
         console.log('Lambda name is missing');
