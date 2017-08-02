@@ -6,7 +6,6 @@ const AWS = require('aws-sdk');
 const fs = require('fs-extra');
 const parseConfig = require('./common').parseConfig;
 const exec = require('./common').exec;
-const getProfile = require('./common').getProfile;
 
 function getLambdaZipFile(handler) {
   return _.split(handler, '.')[0];
@@ -101,7 +100,7 @@ function uploadLambdas(s3Path, profile, config, region, cb) {
 
       return s3.upload({
         Bucket: parsed[1],
-        Key: `${parsed[2]}/${folderName}.zip`,
+        Key: `${parsed[2]}/lambda/${folderName}.zip`,
         Body: fs.readFileSync(`./build/lambda/${folderName}.zip`)
       }).promise();
     });

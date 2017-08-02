@@ -43,6 +43,14 @@ class CF {
     fs.writeFileSync(destPath, template(this.config));
   }
 
+  uploadToS3(bucket, key, body, cb) {
+    const s3 = new AWS.S3();
+    s3.upload({ Bucket: bucket, Key: key, Body: body }, (e, r) => {
+      console.log(`Uploaded document to s3://${r.Bucket}/${r.key}`);
+      cb(e, r);
+    });
+  }
+
   /**
    * Uploads the Cloud Formation template to a given S3 location
    * @param  {string} s3Path  A valid S3 URI for uploading the zip files
@@ -63,23 +71,24 @@ class CF {
     const parsed = s3Path.match(/s3:\/\/([^/]*)\/(.*)/);
 
     // upload CF template to S3
-    const s3 = new AWS.S3();
-    s3.upload({
-      Bucket: parsed[1],
-      Key: `${parsed[2]}/cloudformation.yml`,
-      Body: fs.readFileSync('.kes/cloudformation.yml')
-    }, (e, r) => {
-      console.log(`Uploaded CF template to s3://${r.Bucket}/${r.key}`);
-      cb(e, r);
-    });
+    this.uploadToS3(
+      parsed[1],
+      `${parsed[2]}/cloudformation.yml`,
+      fs.readFileSync('.kes/cloudformation.yml'),
+      cb
+    );
   }
 
   cloudFormation(op, templateUrl, artifactHash, cb = () => {}) {
     const stackName = this.config.stackName;
     const name = this.stage ? `${stackName}-${this.stage}` : stackName;
-    // Run the cloudformation cli command
+
     const cf = new AWS.CloudFormation();
-    cf.updateStack({
+    let opFn = op === 'create' ? cf.createStack : cf.updateStack;
+    const wait = op === 'create' ? 'stackCreateComplete' : 'stackUpdateComplete';
+
+    opFn = opFn.bind(cf);
+    opFn({
       StackName: name,
       TemplateURL: templateUrl,
       Parameters: [{
@@ -99,15 +108,23 @@ class CF {
           return cb(null, e.message);
         }
         else {
-          console.log('There was an error updating the CF stack');
+          console.log('There was an error creating/updating the CF stack');
           return cb(e);
         }
       }
       else {
         console.log('Waiting for the CF operation to complete');
-        cf.waitFor('stackUpdateComplete', { StackName: name }, (e, r) => {
-          console.log('CF update is completed');
-          cb(e, r);
+        cf.waitFor(wait, { StackName: name }, (e, r) => {
+          if (e) {
+            if (e.message.includes('Resource is not in the state')) {
+              console.log('CF create/update failed. Check the logs');
+            }
+            return cb(e);
+          }
+          else {
+            console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`);
+            cb(null, r);
+          }
         });
       }
     });
