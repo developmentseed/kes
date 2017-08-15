@@ -246,14 +246,19 @@ const configureDynamo = (config) => {
 };
 
 function parseLocalEnvVariables(config) {
-  const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
-  const localEnvs = {};
+  try {
+    const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
+    const localEnvs = {};
 
-  Object.keys(envConfig).forEach((k) => {
-    localEnvs[k] = envConfig[k];
-  });
+    Object.keys(envConfig).forEach((k) => {
+      localEnvs[k] = envConfig[k];
+    });
 
-  config.localEnvs = localEnvs;
+    config.localEnvs = localEnvs;
+  }
+  catch (e) {
+    console.log('.env was not found. skipping...');
+  }
   return config;
 }
 
