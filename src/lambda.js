@@ -95,6 +95,10 @@ function uploadLambdas(s3Path, profile, config, region, cb) {
 
     // zip files dist folders
     const uploads = config.lambdas.map((lambda) => {
+      if (lambda.s3Source) {
+        return { Location: `s3://${lambda.s3Source.bucket}/${lambda.s3Source.key}` };
+      }
+
       zipLambda(lambda);
       const folderName = getFolderName(lambda.handler);
 
