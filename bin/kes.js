@@ -85,7 +85,7 @@ const configureProgram = function (kes) {
   // the CLI activation
   program
     .usage('TYPE COMMAND [options]')
-    .option('-p, --profile <profile>', 'AWS profile name to use for authentication', 'default')
+    .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
     .option('-c, --config <config>', 'Path to config file', path.join(kesFolder, 'config.yml'))
     .option('-r, --region <region>', 'AWS region', 'us-east-1')
     .option('--stack <stack>', 'stack name, defaults to the config value')
