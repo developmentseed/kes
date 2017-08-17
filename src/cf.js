@@ -1,6 +1,7 @@
 'use strict';
 
 const Handlebars = require('handlebars');
+const forge = require('node-forge');
 const AWS = require('aws-sdk');
 const path = require('path');
 const fs = require('fs-extra');
@@ -36,6 +37,17 @@ class CF {
    */
   compileCF() {
     const t = fs.readFileSync(path.join(process.cwd(), '.kes/cloudformation.template.yml'), 'utf8');
+
+    Handlebars.registerHelper('ToMd5', function(value) {
+      const md = forge.md.md5.create();
+      md.update(value);
+      return md.digest().toHex();
+    });
+
+    Handlebars.registerHelper('ToJson', function(value) {
+      return JSON.stringify(value);
+    });
+
     const template = Handlebars.compile(t);
 
     const destPath = path.join(process.cwd(), '.kes/cloudformation.yml');
