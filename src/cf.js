@@ -99,19 +99,33 @@ class CF {
     let opFn = op === 'create' ? cf.createStack : cf.updateStack;
     const wait = op === 'create' ? 'stackCreateComplete' : 'stackUpdateComplete';
 
+    const params = [{
+      ParameterKey: 'ConfigS3Bucket',
+      ParameterValue: this.config.buckets.internal,
+      UsePreviousValue: false
+    }, {
+      ParameterKey: 'ArtifactPath',
+      ParameterValue: artifactHash,
+      UsePreviousValue: false
+    }];
+
+    // add custom params from the config file if any
+    if (this.config.params) {
+      this.config.params.forEach((p) => {
+        params.push({
+          ParameterKey: p.name,
+          ParameterValue: p.value,
+          UsePreviousValue: p.usePrevious || false,
+          //NoEcho: p.noEcho || true
+        });
+      });
+    }
+
     opFn = opFn.bind(cf);
     opFn({
       StackName: name,
       TemplateURL: templateUrl,
-      Parameters: [{
-        ParameterKey: 'ConfigS3Bucket',
-        ParameterValue: this.config.buckets.internal,
-        UsePreviousValue: false
-      }, {
-        ParameterKey: 'ArtifactPath',
-        ParameterValue: artifactHash,
-        UsePreviousValue: false
-      }],
+      Parameters: params,
       Capabilities: ['CAPABILITY_IAM']
     }, (e, r) => {
       if (e) {
