@@ -72,6 +72,19 @@ function zipLambda(lambdaConfig) {
   exec(`cd dist && zip -r ../build/lambda/${folderName} ${folderName}`);
 }
 
+function zipLambdas(lambdas) {
+  // group lambdas by handler name
+  const zipping = {};
+  lambdas.forEach(l => {
+    if (!l.s3Source) {
+      zipping[l.handler.split('.')[0]] = l;
+    }
+  });
+
+  // zip lambdas
+  Object.values(zipping).forEach(l => zipLambda(l));
+}
+
 /**
  * Zips lambda functions and uploads them to a given S3 location
  * @param  {string} s3Path  A valid S3 URI for uploading the zip files
@@ -93,13 +106,14 @@ function uploadLambdas(s3Path, profile, config, region, cb) {
     fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
     const parsed = s3Path.match(/s3:\/\/([^/]*)\/(.*)/);
 
+    zipLambdas(config.lambdas);
+
     // zip files dist folders
     const uploads = config.lambdas.map((lambda) => {
       if (lambda.s3Source) {
         return { Location: `s3://${lambda.s3Source.bucket}/${lambda.s3Source.key}` };
       }
 
-      zipLambda(lambda);
       const folderName = getFolderName(lambda.handler);
 
       return s3.upload({
@@ -145,11 +159,14 @@ function updateLambda(options, name, webpack, cb) {
     return cb(new Error('Lambda function is not defined in config.yml'));
   }
 
+  // zip lambdas
+  zipLambdas(lambdas[name]);
+
   const uploads = lambdas[name].map((lambda) => {
     // Upload the zip file to AWS Lambda
-    zipLambda(lambda);
     const folderName = getFolderName(lambda.handler);
 
+    console.log(`Updating ${lambda.name}`);
     return l.updateFunctionCode({
       FunctionName: lambda.name,
       ZipFile: fs.readFileSync(`./build/lambda/${folderName}.zip`)
@@ -157,8 +174,7 @@ function updateLambda(options, name, webpack, cb) {
   });
 
   Promise.all(uploads).then((r) => {
-    console.log(r);
-    console.log('Lambda function got updated');
+    console.log(`${uploads.length} Lambda function(s) are updated`);
     cb(null);
   }).catch(e => cb(e));
 }
