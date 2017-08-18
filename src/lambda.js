@@ -7,49 +7,6 @@ const fs = require('fs-extra');
 const parseConfig = require('./common').parseConfig;
 const exec = require('./common').exec;
 
-function getLambdaZipFile(handler) {
-  return _.split(handler, '.')[0];
-}
-
-/**
- * Groups the lambdas by their folder name in a js object
- * This is needed because the code for a lambda function could
- * be shared across multiple lambdas. For example, collections.zip
- * is used for getCollection, listCollections and PostCollection
- * lambdas. This function creats list of all lambdas for each
- * lambda zip file. The information is exracted from the config.yml
- * @return {Object} A grouped lambdas list
- */
-function lambdaObject(c, step) {
-  c = c || parseConfig(null, null, step);
-  const obj = {};
-
-  for (const lambda of c.lambdas) {
-    // extract the lambda folder name from the handler
-    const funcName = getLambdaZipFile(lambda.handler);
-
-    // create the list
-    if (_.has(obj, funcName)) {
-      obj[funcName].push({
-        handler: lambda.handler,
-        source: lambda.source,
-        function: funcName,
-        name: `${c.stackName}-${c.stage}-${lambda.name}`
-      });
-    }
-    else {
-      obj[funcName] = [{
-        handler: lambda.handler,
-        source: lambda.source,
-        function: funcName,
-        name: `${c.stackName}-${c.stage}-${lambda.name}`
-      }];
-    }
-  }
-
-  return obj;
-}
-
 function getFolderName(handler) {
   return handler.split('.')[0];
 }
@@ -138,7 +95,8 @@ function uploadLambdas(s3Path, profile, config, region, cb) {
 function updateLambda(options, name, webpack, cb) {
   const profile = options.profile;
   const region = options.region;
-  const lambdas = lambdaObject(null, options.stage);
+  const config = parseConfig(null, null, options.stage);
+  //const lambdas = lambdaObject(null, options.stage);
 
   if (profile) {
     const credentials = new AWS.SharedIniFileCredentials({ profile });
@@ -155,30 +113,33 @@ function updateLambda(options, name, webpack, cb) {
   // create the lambda folder if it doesn't already exist
   fs.mkdirpSync(path.join(process.cwd(), 'build/lambda'));
 
-  if (!lambdas[name]) {
+  let lambda;
+  config.lambdas.forEach(l => {
+    if (l.name === name) {
+      lambda = l;
+    }
+  });
+
+  if (!lambda) {
     return cb(new Error('Lambda function is not defined in config.yml'));
   }
 
   // zip lambdas
-  zipLambdas(lambdas[name]);
+  zipLambda(lambda);
 
-  const uploads = lambdas[name].map((lambda) => {
+  //const uploads = config.lambdas[name].map((lambda) => {
     // Upload the zip file to AWS Lambda
-    const folderName = getFolderName(lambda.handler);
+  const folderName = getFolderName(lambda.handler);
 
-    console.log(`Updating ${lambda.name}`);
-    return l.updateFunctionCode({
-      FunctionName: lambda.name,
-      ZipFile: fs.readFileSync(`./build/lambda/${folderName}.zip`)
-    }).promise();
-  });
-
-  Promise.all(uploads).then((r) => {
-    console.log(`${uploads.length} Lambda function(s) are updated`);
+  console.log(`Updating ${lambda.name}`);
+  l.updateFunctionCode({
+    FunctionName: lambda.fullName,
+    ZipFile: fs.readFileSync(`./build/lambda/${folderName}.zip`)
+  }).promise().then((r) => {
+    console.log(`Lambda function ${lambda.name} has been updated`);
     cb(null);
   }).catch(e => cb(e));
 }
 
 module.exports.uploadLambdas = uploadLambdas;
 module.exports.updateLambda = updateLambda;
-module.exports.getLambdaZipFile = getLambdaZipFile;

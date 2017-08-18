@@ -196,6 +196,9 @@ const configureLambda = (config) => {
       if (!_.has(lambda, 'envs')) {
         lambda.envs = [];
       }
+
+      // lambda fullName
+      lambda.fullName = `${config.stackName}-${config.stage}-${lambda.name}`;
     }
   }
 
