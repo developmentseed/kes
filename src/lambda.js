@@ -65,22 +65,24 @@ function uploadLambdas(s3Path, profile, config, region, cb) {
 
     zipLambdas(config.lambdas);
 
-    // zip files dist folders
-    const uploads = config.lambdas.map((lambda) => {
+    // upload files dist folders
+    const uploads = {};
+    config.lambdas.forEach((lambda) => {
       if (lambda.s3Source) {
         return { Location: `s3://${lambda.s3Source.bucket}/${lambda.s3Source.key}` };
       }
 
       const folderName = getFolderName(lambda.handler);
-
-      return s3.upload({
+      uploads[`${parsed[2]}/lambda/${folderName}.zip`] = {
         Bucket: parsed[1],
         Key: `${parsed[2]}/lambda/${folderName}.zip`,
         Body: fs.readFileSync(`./build/lambda/${folderName}.zip`)
-      }).promise();
+      };
     });
 
-    Promise.all(uploads).then((r) => {
+    const jobs = Object.values(uploads).map(u => s3.upload(u).promise());
+
+    Promise.all(jobs).then((r) => {
       r.forEach(l => console.log(`Uploaded: ${l.Location}`));
       cb(null);
     }).catch(e => cb(e));
