@@ -115,7 +115,7 @@ class CF {
         params.push({
           ParameterKey: p.name,
           ParameterValue: p.value,
-          UsePreviousValue: p.usePrevious || false,
+          UsePreviousValue: p.usePrevious || false
           //NoEcho: p.noEcho || true
         });
       });

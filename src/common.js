@@ -345,8 +345,29 @@ function parseConfig(configPath, stackName, stage) {
 
   const v = merge(stageConfig, envs);
   Mustache.escape = (text) => text;
-  const rendered = Mustache.render(configFile.toString(), v);
-  let config = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+  let rendered = Mustache.render(configFile.toString(), v);
+
+  //const re = /!!inc\/file (.*)/g;
+  //let myArray;
+  //while ((myArray = re.exec(rendered)) !== null) {
+    //var msg = 'Found ' + myArray[0] + '. ';
+    //console.log(myArray[1]);
+    //msg += 'Next match starts at ' + re.lastIndex;
+    //console.log(msg);
+  //}
+  //const match = re.exec(rendered);
+  //console.log(match.map(m => m[1]));
+  //console.log(match);
+  //console.log(rendered);
+
+  // load, dump, then load to make sure all yaml included files pass through mustach render
+  const tmp = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+
+  const tmp2 = yaml.dump(tmp);
+  rendered = Mustache.render(tmp2, v);
+
+  let config = yaml.safeLoad(rendered);
+  //console.log(config.lambdas.filter(l => l.name === 'ApiWorkflows')[0].envs);
 
   if (stackName) {
     config.stackName = stackName;
