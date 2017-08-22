@@ -1,6 +1,6 @@
 {
   "name": "kes",
-  "version": "0.0.3-beta-9",
+  "version": "0.0.3-beta-10",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {},
   "bin": {
