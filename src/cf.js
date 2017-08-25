@@ -39,9 +39,12 @@ class CF {
     const t = fs.readFileSync(path.join(process.cwd(), '.kes/cloudformation.template.yml'), 'utf8');
 
     Handlebars.registerHelper('ToMd5', function(value) {
-      const md = forge.md.md5.create();
-      md.update(value);
-      return md.digest().toHex();
+      if (value) {
+        const md = forge.md.md5.create();
+        md.update(value);
+        return md.digest().toHex();
+      }
+      return value;
     });
 
     Handlebars.registerHelper('ToJson', function(value) {
