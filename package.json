@@ -4,7 +4,7 @@
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {},
   "bin": {
-    "kes": "./bin/kes.js"
+    "kes": "./bin/cli.js"
   },
   "keywords": [
     "CloudFormation",

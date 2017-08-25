@@ -87,6 +87,7 @@ const configureProgram = function (kes) {
     .usage('TYPE COMMAND [options]')
     .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
     .option('-c, --config <config>', 'Path to config file', path.join(kesFolder, 'config.yml'))
+    .option('--configFolder <configFolder>', 'Path to config folder', path.join(kesFolder))
     .option('-r, --region <region>', 'AWS region', 'us-east-1')
     .option('--stack <stack>', 'stack name, defaults to the config value')
     .option('--stage <stage>', 'stage name, defaults to the config value');
