@@ -1,9 +1,7 @@
 'use strict';
 
 const fs = require('fs');
-const dotenv = require('dotenv');
 const has = require('lodash.has');
-const path = require('path');
 const startsWith = require('lodash.startswith');
 const trim = require('lodash.trim');
 const replace = require('lodash.replace');
@@ -14,6 +12,21 @@ const yamlinc = require('yaml-include');
 const Mustache = require('mustache');
 const utils = require('./utils');
 
+/**
+ * This class handles reading and parsing configuration files.
+ * It primarily reads `stage.yml`, `config.yml` and `.env` files
+ *
+ * @example
+ * const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/stage.yml', '.kes/.env');
+ * const config = configurator.parse();
+ *
+ * @param {String} stack Stack name
+ * @param {String} stage Stage name
+ * @param {String} configFile path to the config.yml file
+ * @param {String} stageFile path to the stage.yml file (optional)
+ * @param {String} envFile path to the .env file (optional)
+ * @class Config
+ */
 class Config {
   constructor(stack, stage, configFile, stageFile, envFile) {
     this.stack = stack;
@@ -26,8 +39,11 @@ class Config {
   /**
    * Generates configuration arrays for ApiGateway portion of
    * the CloudFormation
+   *
+   * @private
+   * @static
    * @param  {Object} config The configuration object
-   * @return {Object}        Returns ApiGateway updated configruation
+   * @return {Object} Returns the updated configuration object
    */
   static configureApiGateway(config) {
     if (config.apis) {
@@ -158,10 +174,14 @@ class Config {
   }
 
   /**
-   * Generates an array of configuration settings for
-   * Lambda function in CloudFormation Template
+   * Sets default values for the lambda function.
+   * if the lambda function includes source path, it does copy, zip and upload
+   * the functions to Amazon S3
+   *
+   * @private
+   * @static
    * @param  {Object} config The configuration object
-   * @return {Object}        Returns lambdas updated configruation
+   * @return {Object} Returns the updated configruation object
    */
   static configureLambda(config) {
     if (config.lambdas) {
@@ -194,71 +214,13 @@ class Config {
     return config;
   }
 
-  static parseLocalEnvVariables(config) {
-    try {
-      const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
-      const localEnvs = {};
-
-      Object.keys(envConfig).forEach((k) => {
-        localEnvs[k] = envConfig[k];
-      });
-
-      config.localEnvs = localEnvs;
-    }
-    catch (e) {
-      console.log('.env was not found. skipping...');
-    }
-    return config;
-  }
-
   /**
-   * Extract and parse environment variables
-   * @param  {Object} config The configuration object
-   * @return {Object}        Returns dyanmos updated configruation
+   * reads and parses stage.yml, merges the variables under default with
+   * the specified stage and returns the it as a js object
+   *
+   * @private
+   * @return {Object} returns the content of config.yml as a js object
    */
-  static parseEnvVariables(config) {
-    let envs = {
-      StackName: config.stackName,
-      Stage: config.stage
-    };
-
-    // add buckets
-    envs = Object.assign({}, envs, config.buckets);
-
-    if (config.dynamos) {
-      // Match tablenames to env variables name
-      for (const dynamo of config.dynamos) {
-        envs[dynamo.envName] = `${config.stackName}-${config.stage}-${dynamo.name}`;
-      }
-    }
-
-    if (config.sqs) {
-      // add sqs queues and their full names
-      for (const queue of config.sqs) {
-        envs[queue.name] = `${config.stackName}-${config.stage}-${queue.name}`;
-      }
-    }
-
-    if (config.lambdas) {
-      // add lambda names
-      for (const lambda of config.lambdas) {
-        if (lambda.broadcast) {
-          envs[lambda.name] = `arn:aws:lambda:$\{AWS::Region}:$\{AWS::AccountId}:function:${config.stackName}-${config.stage}-${lambda.name}`; // eslint-disable-line max-len
-        }
-      }
-    }
-
-    // convert the objects to list for the yml template
-    const envList = [];
-    Object.keys(envs).forEach((env) => {
-      envList.push({ key: env, value: envs[env] });
-    });
-
-    config.envsList = envList;
-
-    return Object.assign(config, { envs: envs });
-  }
-
   parseStage() {
     let t;
     try {
@@ -285,8 +247,12 @@ class Config {
   }
 
   /**
-   * Parses the .kes/config.yml to js Object
-   * @return {Object}
+   * Parses the config.yml to js Object after passing it through variables set
+   * in stage.yml
+   *
+   * @private
+   * @param {Object} stageConfig the stage.yml object
+   * @return {Object} returns configuration object
    */
   parseConfig(stageConfig) {
     const configText = fs.readFileSync(this.configFile, 'utf8');
@@ -302,7 +268,6 @@ class Config {
     rendered = Mustache.render(tmp2, stageConfig);
 
     let config = yaml.safeLoad(rendered);
-    //console.log(config.lambdas.filter(l => l.name === 'ApiWorkflows')[0].envs);
 
     if (this.stack) {
       config.stackName = this.stack;
@@ -314,13 +279,17 @@ class Config {
 
     Object.assign(config, stageConfig);
     config = this.constructor.configureLambda(config);
-    config = this.constructor.parseEnvVariables(config);
-    config = this.constructor.parseLocalEnvVariables(config);
     Object.assign(config, this.constructor.configureApiGateway(config));
 
     return config;
   }
 
+  /**
+   * Main method of this class. It parses the configuration specified
+   * a the class level
+   *
+   * @return {Object} the configuration object
+   */
   parse() {
     const stageConfig = this.parseStage();
     return this.parseConfig(stageConfig);
