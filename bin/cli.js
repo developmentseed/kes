@@ -9,7 +9,6 @@ const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
-const { Lambda } = require('../index');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
