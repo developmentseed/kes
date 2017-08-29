@@ -260,7 +260,17 @@ class Config {
   }
 
   parseStage() {
-    const t = fs.readFileSync(this.stageFile);
+    let t;
+    try {
+      t = fs.readFileSync(this.stageFile);
+    }
+    catch (e) {
+      if (e.message.includes('no such file or directory')) {
+        console.log(`${this.stageFile} was not found. Skipping stage`);
+        return {};
+      }
+      throw e;
+    }
 
     Mustache.escape = (text) => text;
     const rendered = Mustache.render(t.toString(), this.envs);
