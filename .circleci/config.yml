@@ -1,0 +1,24 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: node:6.10-wheezy
+
+
+    working_directory: ~/kes
+    steps:
+      - checkout
+
+      - run:
+          name: Install
+          command: npm install
+
+      - run:
+          name: Test Examples
+          command: |
+            mkdir ~/example1
+            cp -r examples/lambdas ~/example1/.kes
+            cd ~/example1/
+            kes cf compile
+            kes cf validate
+
