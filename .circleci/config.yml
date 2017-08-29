@@ -12,7 +12,7 @@ jobs:
       - run:
           name: Install
           command: |
-            sudo npm install -g kes
+            sudo npm install -g .
 
       - run:
           name: Test Examples
