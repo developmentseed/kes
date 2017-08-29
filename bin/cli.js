@@ -87,12 +87,12 @@ program
 program
   .usage('TYPE COMMAND [options]')
   .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
-  .option('-c, --config <config>', 'Path to config file', path.join(kesFolder, 'config.yml'))
-  .option('--stage-file <stageFile>', 'Path to config file', path.join(kesFolder, 'stage.yml'))
-  .option('--env-file <envFile>', 'Path to env file', path.join(kesFolder, '.env'))
-  .option('--cf-file <cfFile>', 'Path to CloudFormation template', path.join(kesFolder, 'cloudformation.template.yml'))
+  .option('-c, --config <config>', 'Path to config file')
+  .option('--stage-file <stageFile>', 'Path to config file')
+  .option('--env-file <envFile>', 'Path to env file')
+  .option('--cf-file <cfFile>', 'Path to CloudFormation template')
   .option('--kes-flass <kesClass>', 'Kes Class override', null)
-  .option('-k, --kes-folder <kesFolder>', 'Path to config folder', path.join(kesFolder))
+  .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
   .option('-r, --region <region>', 'AWS region', 'us-east-1')
   .option('--stack <stack>', 'stack name, defaults to the config value')
   .option('--stage <stage>', 'stage name, defaults to the config value');
