@@ -129,7 +129,7 @@ class Lambda {
       fs.mkdirpSync(this.buildFolder);
 
       // zip and upload lambdas
-      const jobs = Object.values(this.config.lambdas).map(l => this.zipAndUploadLambda(l));
+      const jobs = this.config.lambdas.map(l => this.zipAndUploadLambda(l));
 
       return new Promise((resolve, reject) => {
         Promise.all(jobs).then(lambdas => {
