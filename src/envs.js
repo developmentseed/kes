@@ -8,7 +8,6 @@
 const fs = require('fs');
 const dotenv = require('dotenv');
 const path = require('path');
-const common = require('./common');
 
 module.exports.loadCredentials = function loadCredentials() {
   const envConfig = dotenv.parse(fs.readFileSync(path.join(process.cwd(), '.env')));
@@ -18,11 +17,6 @@ module.exports.loadCredentials = function loadCredentials() {
 };
 
 module.exports.setEnvs = function setEnvs(stage) {
-  const config = common.parseConfig(null, null, stage);
-
-  Object.keys(config.envs).forEach((key) => {
-    process.env[key] = config.envs[key];
-  });
 };
 
 module.exports.apply = function apply(stage) {
