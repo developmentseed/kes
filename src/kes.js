@@ -38,6 +38,11 @@ class Kes {
     utils.configureAws(this.region, this.profile);
   }
 
+  updateSingleLambda(name) {
+    const lambda = new Lambda(this.config, this.kesFolder, this.bucket, this.name);
+    return lambda.updateSingleLambda(name);
+  }
+
   /**
    * Compiles a CloudFormation template in Yaml format
    * Reads the configuration yaml from .kes/config.yml
@@ -168,7 +173,8 @@ class Kes {
 
     // Build and upload the CF template
     const cf = new AWS.CloudFormation();
-    return cf.validateTemplate({ TemplateURL: url }).promise();
+    return cf.validateTemplate({ TemplateURL: url })
+      .promise().then(() => console.log('Template is valid'));
   }
 
   describeCF() {
