@@ -1,5 +1,6 @@
 'use strict';
 
+const get = require('lodash.get');
 const AWS = require('aws-sdk');
 const fs = require('fs-extra');
 const path = require('path');
@@ -11,7 +12,7 @@ class Lambda {
     this.kesFolder = kesFolder;
     this.distFolder = path.join(this.kesFolder, 'dist');
     this.buildFolder = path.join(this.kesFolder, 'build');
-    this.bucket = config.buckets.internal;
+    this.bucket = get(config, 'buckets.internal');
     this.key = path.join(key, 'lambdas');
     this.grouped = {};
   }
@@ -137,6 +138,8 @@ class Lambda {
         }).catch(e => reject(e));
       });
     }
+
+    return new Promise(resolve => resolve(this.config));
   }
 
   /**
