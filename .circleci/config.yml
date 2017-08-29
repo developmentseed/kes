@@ -12,15 +12,14 @@ jobs:
       - run:
           name: Install
           command: |
-            npm install
+            sudo npm install -g kes
 
       - run:
           name: Test Examples
           command: |
-            PATH=$PATH:/home/circleci/kes/bin
             mkdir ~/example1
             cp -r examples/lambdas ~/example1/.kes
             cd ~/example1/
-            cli.js cf compile
-            cli.js cf validate
+            kes cf compile
+            kes cf validate
 
