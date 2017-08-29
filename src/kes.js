@@ -76,6 +76,7 @@ class Kes {
 
     return lambda.process().then((config) => {
       this.config = config;
+      console.log(`Template saved to ${destPath}`);
       return fs.writeFileSync(destPath, template(this.config));
     });
   }
@@ -186,9 +187,18 @@ class Kes {
     console.log('Validating the template');
     const url = `https://s3.amazonaws.com/${this.bucket}/${this.name}/cloudformation.yml`;
 
+    const params = {};
+
+    if (this.bucket) {
+      params.TemplateUrl = url;
+    }
+    else {
+      params.TemplateBody = fs.readFileSync(path.join(this.kesFolder, 'cloudformation.yml')).toString();
+    }
+
     // Build and upload the CF template
     const cf = new AWS.CloudFormation();
-    return cf.validateTemplate({ TemplateURL: url })
+    return cf.validateTemplate(params)
       .promise().then(() => console.log('Template is valid'));
   }
 
