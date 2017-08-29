@@ -44,7 +44,7 @@ class Lambda {
     const folderName = getZipName(lambda.handler);
     const lambdaPath = path.join(this.distFolder, folderName);
     exec(`mkdir -p ${lambdaPath}; cp -r ${lambda.source} ${lambdaPath}/`);
-    exec(`cd ${this.distFolder} && zip -r ${path.join(this.buildFolder, folderName)} ${folderName}`);
+    exec(`cd ${this.distFolder} && zip -r ../build/${folderName} ${folderName}`);
 
     const zipFile = `${folderName}.zip`;
     let hash = exec(`find ${path.join(this.distFolder, folderName)} -type f | \
@@ -93,7 +93,7 @@ class Lambda {
       return this.uploadLambda(lambda);
     }
     else if (lambda.s3Source) {
-      lambda.remotePath = lambda.s3Source.key;
+      lambda.remote = lambda.s3Source.key;
       lambda.bucket = lambda.s3Source.bucket;
       return new Promise(resolve => resolve(lambda));
     }
