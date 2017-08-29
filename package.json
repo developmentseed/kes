@@ -10,6 +10,9 @@
     "CloudFormation",
     "AWS"
   ],
+  "engines": {
+    "node": "6.10"
+  },
   "repository": "https://github.com/developmentseed/kes",
   "author": "Alireza Jazayeri <alireza@developmentseed.org>",
   "license": "Apache-2.0",
