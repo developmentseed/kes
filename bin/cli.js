@@ -2,27 +2,29 @@
 
 'use strict';
 
+const get = require('lodash.get');
 const fs = require('fs');
 const path = require('path');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
+const { Lambda } = require('../index');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
 
-const cb = (e, r) => {
-  if (e) {
-    if (e.message) {
-      console.log(e.message);
-    }
-    else {
-      console.log(e);
-    }
-    process.exit(1);
+const success = (r) => process.exit(0);
+
+const failure = (e) => {
+  console.log(e);
+  if (e.message) {
+    console.log(e.message);
   }
-  process.exit(0);
+  else {
+    console.log(e);
+  }
+  process.exit(1);
 };
 
 const init = function () {
@@ -74,77 +76,77 @@ const init = function () {
   });
 };
 
-const configureProgram = function (kes) {
-  program
-    .usage('init')
-    .description('Start a Kes project')
-    .action(() => {
-      init();
-    });
+//const configureProgram = function () {
+program
+  .usage('init')
+  .description('Start a Kes project')
+  .action(() => {
+    init();
+  });
 
-  // the CLI activation
-  program
-    .usage('TYPE COMMAND [options]')
-    .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
-    .option('-c, --config <config>', 'Path to config file', path.join(kesFolder, 'config.yml'))
-    .option('--configFolder <configFolder>', 'Path to config folder', path.join(kesFolder))
-    .option('-r, --region <region>', 'AWS region', 'us-east-1')
-    .option('--stack <stack>', 'stack name, defaults to the config value')
-    .option('--stage <stage>', 'stage name, defaults to the config value');
+// the CLI activation
+program
+  .usage('TYPE COMMAND [options]')
+  .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
+  .option('-c, --config <config>', 'Path to config file', path.join(kesFolder, 'config.yml'))
+  .option('--stage-file <stageFile>', 'Path to config file', path.join(kesFolder, 'stage.yml'))
+  .option('--env-file <envFile>', 'Path to env file', path.join(kesFolder, '.env'))
+  .option('--cf-file <cfFile>', 'Path to CloudFormation template', path.join(kesFolder, 'cloudformation.template.yml'))
+  .option('--kes-flass <kesClass>', 'Kes Class override', null)
+  .option('-k, --kes-folder <kesFolder>', 'Path to config folder', path.join(kesFolder))
+  .option('-r, --region <region>', 'AWS region', 'us-east-1')
+  .option('--stack <stack>', 'stack name, defaults to the config value')
+  .option('--stage <stage>', 'stage name, defaults to the config value');
 
-  program
-    .command('cf [create|update|validate|compile|dlq]')
-    .description(`CloudFormation Operations:
-    create    Creates the CF stack
-    update    Updates the CF stack
-    validate  Validates the CF stack
-    compile   Compiles the CF stack
-    dlq       add dead letter queue to lambdas`)
-    .action((cmd) => {
-      const k = new kes.CF(program);
-      switch (cmd) {
-        case 'create':
-          k.createStack(cb);
-          break;
-        case 'update':
-          k.updateStack(cb);
-          break;
-        case 'validate':
-          k.validateTemplate(cb);
-          break;
-        case 'compile':
-          k.compileCF(cb);
-          break;
-        default:
-          console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
-      }
-    });
+program
+  .command('cf [create|update|validate|compile]')
+  .description(`CloudFormation Operations:
+  create    Creates the CF stack
+  update    Updates the CF stack
+  validate  Validates the CF stack
+  compile   Compiles the CF stack`)
+  .action((cmd) => {
+    let Kes;
+    const kesClass = get(program, 'kesClass');
+    if (kesClass) {
+      Kes = require(kesClass);
+    }
+    else {
+      Kes = require('../index').Kes;
+    }
 
-  program
-    .command('lambda <lambdaName>')
-    .description('uploads a given lambda function to Lambda service')
-    .option('-w, --webpack', 'Whether to run the webpack before updating the lambdas')
-    .action((cmd, options) => {
-      if (cmd) {
-        kes.lambda.updateLambda(program, cmd, options, cb);
-      }
-      else {
-        console.log('Lambda name is missing');
-      }
-    });
-};
+    const kes = new Kes(program);
+    switch (cmd) {
+      case 'create':
+        kes.createStack().then(r => success(r)).catch(e => failure(e));
+        break;
+      case 'update':
+        kes.updateStack().then(r => success(r)).catch(e => failure(e));
+        break;
+      case 'validate':
+        kes.validateTemplate().then(r => success(r)).catch(e => failure(e));
+        break;
+      case 'compile':
+        kes.compileCF().then(r => success(r)).catch(e => failure(e));
+        break;
+      default:
+        console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
+    }
+  });
 
-// check if there is an override file in .kes folder
-if (fs.existsSync(path.join(kesFolder, 'kes.js'))) {
-  const override = require(path.join(kesFolder, 'kes.js'));
-  let kes = require('../index');
-
-  kes = override(kes);
-  configureProgram(kes);
-}
-else {
-  configureProgram(require('../index'));
-}
+program
+  .command('lambda <lambdaName>')
+  .description('uploads a given lambda function to Lambda service')
+  .action((cmd, options) => {
+    if (cmd) {
+      const Kes = require('../index').Kes;
+      const kes = new Kes(program);
+      kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => failure(e));
+    }
+    else {
+      console.log('Lambda name is missing');
+    }
+  });
 
 program
   .parse(process.argv);
