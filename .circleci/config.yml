@@ -13,11 +13,11 @@ jobs:
           name: Install
           command: |
             npm install
-            PATH=$PATH:/home/circleci/kes/bin
 
       - run:
           name: Test Examples
           command: |
+            PATH=$PATH:/home/circleci/kes/bin
             mkdir ~/example1
             cp -r examples/lambdas ~/example1/.kes
             cd ~/example1/
