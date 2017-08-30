@@ -1,5 +1,6 @@
 # Kes
-### Kes: Making deployment with CloudFormation Fun
+
+[![CircleCI](https://circleci.com/gh/developmentseed/kes/tree/master.svg?style=svg)](https://circleci.com/gh/developmentseed/kes/tree/master)
 
 Kes helps with managing and deploying AWS resources using CloudFormation. It makes much easier to deploy lambda functions and create API gateway resources.
 
