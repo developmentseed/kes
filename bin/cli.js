@@ -12,9 +12,14 @@ const program = require('commander');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
+require('./readme');
 
 const success = (r) => process.exit(0);
 
+/**
+ * @name failure
+ * @private
+ */
 const failure = (e) => {
   console.log(e);
   if (e.message) {

@@ -10,12 +10,36 @@ const Lambda = require('./lambda');
 const Config = require('./config');
 const utils = require('./utils');
 
+/**
+ * The main Kes class. This class is used in the command module to create
+ * the CLI interface for kes. This class can be extended in order to override
+ * and modify the behaviour of kes cli.
+ *
+ * @example
+ * const { Kes } = require('kes');
+ *
+ * const options = { stack: 'myStack' };
+ * const kes = new Kes(options);
+ *
+ * // create a new stack
+ * kes.createStack()
+ *  .then(() => updateStack())
+ *  .then(() => describeCF())
+ *  .then(() => updateSingleLambda('myLambda'))
+ *  .catch(e => console.log(e));
+ *
+ * @param {Object} options a js object that includes required options.
+ * @param {String} options.stack the stack name (required)
+ * @param {String} [options.stage='dev'] the stage name
+ * @param {String} [options.region='us-east-1'] the aws region
+ * @param {String} [options.profile=null] the profile name
+ * @param {String} [options.kesFolder='.kes'] the path to the kes folder
+ * @param {String} [options.configFile='config.yml'] the path to the config.yml
+ * @param {String} [options.stageFile='stage.yml'] the path to the stage.yml
+ * @param {String} [options.envFile='.env'] the path to the .env file
+ * @param {String} [options.cfFile='cloudformation.template.yml'] the path to the CF template
+ */
 class Kes {
-  static parseConfig(configFile, stageFile, envs, stack, stage) {
-    const stageConfig = utils.parseStage(stageFile, stage);
-    return utils.parseConfig(configFile, stageConfig, envs, stack, stage);
-  }
-
   constructor(options) {
     this.options = options;
     this.region = get(options, 'region', 'us-east-1');
@@ -39,18 +63,28 @@ class Kes {
     utils.configureAws(this.region, this.profile);
   }
 
+  /**
+   * Updates code of a deployed lambda function
+   *
+   * @param {String} name the name of the lambda function defined in config.yml
+   * @return {Promise} returns the promise of an AWS response object
+   */
   updateSingleLambda(name) {
     const lambda = new Lambda(this.config, this.kesFolder, this.bucket, this.name);
     return lambda.updateSingleLambda(name);
   }
 
   /**
-   * Compiles a CloudFormation template in Yaml format
-   * Reads the configuration yaml from .kes/config.yml
-   * Writes the template to .kes/cloudformation.yml
-   * Uses .kes/cloudformation.template.yml as the base template
-   * for generating the final CF template
-   * @return {null}
+   * Compiles a CloudFormation template in Yaml format.
+   *
+   * Reads the configuration yaml from `.kes/config.yml`.
+   *
+   * Writes the template to `.kes/cloudformation.yml`.
+   *
+   * Uses `.kes/cloudformation.template.yml` as the base template
+   * for generating the final CF template.
+   *
+   * @return {Promise} returns the promise of an AWS response object
    */
   compileCF() {
     const t = fs.readFileSync(this.cfFile, 'utf8');
@@ -81,6 +115,15 @@ class Kes {
     });
   }
 
+  /**
+   * This is just a wrapper around AWS s3.upload method.
+   * It uploads a given string to a S3 object.
+   *
+   * @param {String} bucket the s3 bucket name
+   * @param {String} key the path and name of the object
+   * @param {String} body the content of the object
+   * @returns {Promise} returns the promise of an AWS response object
+   */
   uploadToS3(bucket, key, body) {
     const s3 = new AWS.S3();
     return s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
@@ -88,8 +131,8 @@ class Kes {
 
   /**
    * Uploads the Cloud Formation template to a given S3 location
-   * @param  {string} s3Path  A valid S3 URI for uploading the zip files
-   * @param  {string} profile The profile name used in aws CLI
+   *
+   * @returns {Promise} returns the promise of an AWS response object
    */
   uploadCF() {
     // build the template first
@@ -117,6 +160,12 @@ class Kes {
     });
   }
 
+  /**
+   * Runs a cloudformation create or update operation on the class
+   *
+   * @param {String} op possible values are 'create' and 'update'
+   * @returns {Promise} returns the promise of an AWS response object
+   */
   cloudFormation(op) {
     const cf = new AWS.CloudFormation();
     let opFn = op === 'create' ? cf.createStack : cf.updateStack;
@@ -181,7 +230,8 @@ class Kes {
 
   /**
    * Validates the CF template
-   * @param  {Object} options The options object should include the profile name (optional)
+   *
+   * @returns {Promise} returns the promise of an AWS response object
    */
   validateTemplate() {
     console.log('Validating the template');
@@ -202,6 +252,11 @@ class Kes {
       .promise().then(() => console.log('Template is valid'));
   }
 
+  /**
+   * Describes the cloudformation stack deployed
+   *
+   * @returns {Promise} returns the promise of an AWS response object
+   */
   describeCF() {
     const cf = new AWS.CloudFormation();
 
@@ -211,25 +266,28 @@ class Kes {
   }
 
   /**
-   * Generic create/update a CloudFormation stack
-   * @param  {Object} options The options object should include the profile name (optional)
-   * @param {String} ops Operation name, e.g. create/update
+   * Generic create/update  method for CloudFormation
+   *
+   * @param {String} op possible values are 'create' and 'update'
+   * @returns {Promise} returns the promise of an AWS response object
    */
   opsStack(ops) {
     return this.uploadCF().then(() => this.cloudFormation(ops));
   }
 
   /**
-   * Creates a CloudFormation stack
-   * @param  {Object} options The options object should include the profile name (optional)
+   * Creates a CloudFormation stack for the class instance
+   *
+   * @returns {Promise} returns the promise of an AWS response object
    */
   createStack() {
     return this.opsStack('create');
   }
 
   /**
-   * Updates a CloudFormation stack
-   * @param  {Object} options The options object should include the profile name (optional)
+   * Updates an existing CloudFormation stack for the class instance
+   *
+   * @returns {Promise} returns the promise of an AWS response object
    */
   updateStack() {
     return this.opsStack('update');

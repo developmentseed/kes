@@ -1,22 +1,40 @@
 'use strict';
 
-const get = require('lodash.get');
 const AWS = require('aws-sdk');
 const fs = require('fs-extra');
 const path = require('path');
 const { exec, getZipName } = require('./utils');
 
+/**
+ * Copy, zip and upload lambda functions to S3
+ *
+ * @param {Object} config the configuration object
+ * @param {String} kesFolder the path to the `.kes` folder
+ * @param {String} bucket the S3 bucket name
+ * @param {String} key the main folder to store the data in the bucket (stack + stage)
+ */
 class Lambda {
   constructor(config, kesFolder, bucket, key) {
     this.config = config;
     this.kesFolder = kesFolder;
     this.distFolder = path.join(this.kesFolder, 'dist');
     this.buildFolder = path.join(this.kesFolder, 'build');
-    this.bucket = get(config, 'buckets.internal');
+    this.bucket = bucket;
     this.key = path.join(key, 'lambdas');
     this.grouped = {};
   }
 
+  /**
+   * Creates a hash of keys and bucket names for the lambdas
+   * in the deployment based on their source path
+   *
+   * @private
+   * @param {String} local the path to the lambda zip file on the host machine
+   * @param {String} key the key to the lambda zip on S3
+   * @param {String} source the path to the original code
+   *
+   * @return {Object}
+   */
   updateGroup(local, key, source) {
     const tmp = {
       local,
@@ -28,12 +46,27 @@ class Lambda {
     return tmp;
   }
 
+  /**
+   * Updates the lambda object with the bucket, s3 zip file path and
+   * local zip file location
+   *
+   * @param {Object} lambda the lambda object
+   * @returns {Object} returns the updated lambda object
+   */
   updateLambda(lambda) {
     const tmp = this.grouped[lambda.source];
     Object.assign(lambda, tmp);
     return lambda;
   }
 
+  /**
+   * Copy source code of a given lambda function, zips it, calculate
+   * the hash of the source code and updates the lambda object with
+   * the hash, local and remote locations of the code
+   *
+   * @param {Object} lambda the lambda object
+   * @returns {Object} returns the updated lambda object
+   */
   zipLambda(lambda) {
     // if lambda share source with another lambda,
     // check if there is already a hash, if so, set the hash and return
@@ -57,6 +90,16 @@ class Lambda {
     return Object.assign(lambda, this.updateGroup(localPath, key, lambda.source));
   }
 
+  /**
+   * Uploads the zipped lambda code to a given s3 bucket
+   * if the zip file already exists on S3 it skips the upload
+   *
+   * @param {Object} lambda the lambda object. It must have the following properties
+   * @param {String} lambda.bucket the s3 buckt name
+   * @param {String} lambda.remote the lambda code's key (path and filename) on s3
+   * @param {String} lambda.local the zip files location on local machine
+   * @returns {Promise} returns the promise of updated lambda object
+   */
   uploadLambda(lambda) {
     const s3 = new AWS.S3();
 
@@ -84,6 +127,17 @@ class Lambda {
     });
   }
 
+  /**
+   * Zips and Uploads a lambda function. If the source of the function
+   * is already zipped and uploaded, it skips the step only updates the
+   * lambda config object.
+   *
+   * If the lambda config includes a link to zip file on S3, it skips
+   * the whole step.
+   *
+   * @param {Object} lambda the lambda object.
+   * @returns {Promise} returns the promise of updated lambda object
+   */
   zipAndUploadLambda(lambda) {
     if (lambda.source) {
       if (this.grouped[lambda.source]) {
@@ -100,25 +154,16 @@ class Lambda {
     return new Promise(resolve => resolve(lambda));
   }
 
-  groupByHandler(lambdas) {
-    // group lambdas by source name
-    // this ensures that if there are multiple
-    // lambdas with the same source code only
-    // one of them is copied and zipped
-    const zipping = {};
-    lambdas.forEach(l => {
-      if (l.source) {
-        zipping[l.source] = {};
-      }
-    });
-
-    return zipping;
-  }
-
   /**
-   * Zips lambda functions and uploads them to a given S3 location
-   * @param  {string} s3Path  A valid S3 URI for uploading the zip files
-   * @param  {string} profile The profile name used in aws CLI
+   * Zips and Uploads lambda functions in the congifuration object.
+   * If the source of the function
+   * is already zipped and uploaded, it skips the step only updates the
+   * lambda config object.
+   *
+   * If the lambda config includes a link to zip file on S3, it skips
+   * the whole step.
+   *
+   * @returns {Promise} returns the promise of updated configuration object
    */
   process() {
     if (this.config.lambdas) {
@@ -143,9 +188,10 @@ class Lambda {
   }
 
   /**
-   * Uploads the zip code of a given lambda function to AWS Lambda
-   * @param  {Object} options options passed by the commander module
+   * Uploads the zip code of a single lambda function to AWS Lambda
+   *
    * @param  {String} name    name of the lambda function
+   * @returns {Promise} returns AWS response for lambda code update operation
    */
   updateSingleLambda(name) {
     const l = new AWS.Lambda();

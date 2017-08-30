@@ -8,8 +8,9 @@ const execSync = require('child_process').execSync;
 /**
  * Executes shell commands synchronously and logs the
  * stdout to console.
- * @param  {String} cmd  Bash command
- * @return {String}     The command's stdout
+ * @param {String} cmd  Bash command
+ * @param {Boolean} [verbose=true] whether to post stdout to console
+ * @return {Buffer} The command's stdout in for of Buffer
  */
 function exec(cmd, verbose) {
   verbose = verbose === false ? verbose : true;
@@ -21,6 +22,13 @@ function exec(cmd, verbose) {
   return stdout;
 }
 
+/**
+ * Updates region of an AWS configuration and point to the correct
+ * of profile on ~/.aws/credentials file if necessary
+ *
+ * @param {String} [region='us-east-1'] AWS region
+ * @param {String} [profile=null] aws credentials profile name
+ */
 function configureAws(region = 'us-east-1', profile = null) {
   if (profile) {
     const credentials = new AWS.SharedIniFileCredentials({ profile });
