@@ -13,6 +13,7 @@ jobs:
           name: Install
           command: |
             sudo npm install -g .
+            sudo npm install -g documentation
 
       - run:
           name: Test Examples
@@ -22,6 +23,19 @@ jobs:
             cd ~/example1/
             kes cf compile
             kes cf validate
+
+      - run:
+          name: docs
+          command: |
+            documentation build bin/cli.js -f html -o _docs --theme docs/default_theme
+            cd _docs
+            git init
+            git config user.name "Devseed-CI"
+            git config user.email "dev@developmentseed.org"
+            git add .
+            git commit -m "CI deploy [skip ci]"
+            git remote add origin git@github.com:developmentseed/kes.git
+            git push origin master:gh-pages --force
 
       - run:
           name: Deploy
