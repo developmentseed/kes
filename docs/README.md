@@ -21,8 +21,7 @@
 
 Kes helps with managing and deploying AWS resources using CloudFormation.
 
-It makes much easier to deploy lambda functions and create API gateway resources
-for them.
+It makes much easier to deploy lambda functions and create API gateway resources.
 
 ## Installation
 
