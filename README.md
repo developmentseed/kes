@@ -2,12 +2,12 @@
 
 [![CircleCI](https://circleci.com/gh/developmentseed/kes/tree/master.svg?style=svg)](https://circleci.com/gh/developmentseed/kes/tree/master)
 
-Kes helps with managing and deploying AWS resources using CloudFormation. It makes much easier to deploy lambda functions and create API gateway resources.
+Kes helps with managing and deploying AWS resources using CloudFormation. It makes it much easier to deploy lambda functions and create API gateway resources.
 
 ## Installation
 
     $ npm install -g kes
-    $ kes - h
+    $ kes -h
 
 ### Usage
 
