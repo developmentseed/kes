@@ -15,5 +15,4 @@ Kes helps with managing and deploying AWS resources using CloudFormation. It mak
 ### Updating Docs
 
      $ npm install -g documentation
-     $ documentation build bin/readme.js -f md -o docs/README.md
-     $ documentation build src/** -f md -o docs/API.md
+     $ npm run md-docs

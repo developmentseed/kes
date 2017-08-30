@@ -13,7 +13,6 @@ jobs:
           name: Install
           command: |
             sudo npm install -g .
-            sudo npm install -g documentation
 
       - run:
           name: Test Examples
@@ -27,7 +26,7 @@ jobs:
       - run:
           name: docs
           command: |
-            documentation build bin/cli.js -f html -o _docs --theme docs/default_theme
+            npm run html-docs
             cd _docs
             git init
             git config user.name "Devseed-CI"

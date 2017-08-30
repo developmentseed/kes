@@ -2,7 +2,10 @@
   "name": "kes",
   "version": "0.1.0-beta-3",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
-  "scripts": {},
+  "scripts": {
+    "html-docs": "documentation build bin/cli.js -f html -o _docs --theme docs/default_theme",
+    "md-docs": "documentation build bin/readme.js -f md -o docs/README.md && documentation build src/** -f md -o docs/API.md"
+  },
   "bin": {
     "kes": "./bin/cli.js"
   },
