@@ -24,6 +24,9 @@ jobs:
             kes cf compile
             kes cf validate
 
+      - add_ssh_keys:
+          fingerprints:
+             - "8f:58:d1:7d:1f:b0:ed:cc:fd:c9:46:cb:ee:6b:40:86"
       - run:
           name: docs
           command: |
