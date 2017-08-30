@@ -30,16 +30,18 @@ jobs:
       - run:
           name: docs
           command: |
-            cd ~/kes
-            npm run html-docs
-            cd _docs
-            git init
-            git config user.name "Devseed-CI"
-            git config user.email "dev@developmentseed.org"
-            git add .
-            git commit -m "CI deploy [skip ci]"
-            git remote add origin git@github.com:developmentseed/kes.git
-            git push origin master:gh-pages --force
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              cd ~/kes
+              npm run html-docs
+              cd _docs
+              git init
+              git config user.name "Devseed-CI"
+              git config user.email "dev@developmentseed.org"
+              git add .
+              git commit -m "CI deploy [skip ci]"
+              git remote add origin git@github.com:developmentseed/kes.git
+              git push origin master:gh-pages --force
+            fi
 
       - run:
           name: Deploy
