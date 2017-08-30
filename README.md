@@ -1,32 +1,19 @@
-## Kes: Make deployment with CloudFormation fun
+# Kes
+### Kes: Making deployment with CloudFormation Fun
 
-This is a library for managing and deploying AWS resources using CloudFormation. It is specifically designed to work with API Gateway and Lambda functions and includes `Hapi` server for simulating API Gateway on a local machine.
+Kes helps with managing and deploying AWS resources using CloudFormation. It makes much easier to deploy lambda functions and create API gateway resources.
 
-### Installation
+## Installation
 
-    $ npm install kes
-    $ kes init
+    $ npm install -g kes
+    $ kes - h
 
 ### Usage
 
-Kes expects a particular folder structure to operate properly:
+- [Usage Documentation](https://devseed.com/kes)
 
-- The cloudformation template and config files should be stored at `.kes` folder.
-- All lambdas functions must be stored in their own folders under `build/lambda`
-- We recommend using webpack, gulp or similar tools to bundle each lambda's code
+### Updating Docs
 
-#### Add config.yml
-
-Use an example provided in the `examples` folder.
-
-#### Add cloudformation.template.yml
-
-Use an example provided in the `examples` folder. Kes generates a cloudformation.yml file that is stored in the same `.kes` folder. There is no need to commit this file and can safely be added to `.gitignore`
-
-
-#### Commands
-
-- Create a new cloudformation stack `kes cf create --stage dev`
-- Update an existing cloudformation stack `kes cf update --stage dev`
-- Update a particular lambda `kes lambda myLambdaName`
-
+     $ npm install -g documentation
+     $ documentation build bin/readme.js -f md -o docs/README.md
+     $ documentation build src/** -f md -o docs/API.md
