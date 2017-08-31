@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {
-    "html-docs": "documentation build bin/cli.js -f html -o _docs --theme docs/default_theme",
+    "html-docs": "documentation build bin/cli.js -f html -o _docs --theme node_modules/documentation-devseed-theme",
     "md-docs": "documentation build bin/readme.js -f md -o docs/README.md && documentation build src/** -f md -o docs/API.md"
   },
   "bin": {
@@ -45,13 +45,14 @@
     "yaml-include": "^1.2.0"
   },
   "devDependencies": {
-    "eslint": "^3.19.0",
     "documentation": "^5.2.2",
-    "vinyl": "^2.1.0",
+    "documentation-devseed-theme": "^0.1.2",
+    "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
-    "eslint-plugin-standard": "^3.0.1"
+    "eslint-plugin-standard": "^3.0.1",
+    "vinyl": "^2.1.0"
   }
 }
