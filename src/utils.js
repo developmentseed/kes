@@ -56,7 +56,7 @@ function loadLocalEnvs(envFile) {
 }
 
 function getZipName(handler) {
-  return handler.replace(/(-|\.)/g, '_');
+  return handler.split('.')[0];
 }
 
 module.exports = {
