@@ -27,12 +27,12 @@
  *
  *      -h, --help                    output usage information
  *      -p, --profile <profile>       AWS profile name to use for authentication
- *      -c, --config <config>         Path to config file
- *      --stage-file <stageFile>      Path to config file
- *      --env-file <envFile>          Path to env file
- *      --cf-file <cfFile>            Path to CloudFormation template
- *      --kes-flass <kesClass>        Kes Class override
- *      -k, --kes-folder <kesFolder>  Path to config folder
+ *      -c, --config <config>         Path to config file. (example: .kes/config.yml)
+ *      --stage-file <stageFile>      Path to staging file. (example: .kes/stage.yml)
+ *      --env-file <envFile>          Path to env file. (example: .kes/.env)
+ *      --cf-file <cfFile>            Path to CloudFormation template (example .kes/cloudformation.template.yml)
+ *      --kes-flass <kesClass>        Kes Class override (example: .kes/kes.js)
+ *      -k, --kes-folder <kesFolder>  Path to config folder (example: .kes)
  *      -r, --region <region>         AWS region
  *      --stack <stack>               stack name, defaults to the config value
  *      --stage <stage>               stage name, defaults to the config value
