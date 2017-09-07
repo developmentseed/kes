@@ -54,7 +54,7 @@
  * |`cloudformation.template.yml`| A base CF template written with Mustache/Handlebar templating language
  * |`config.yml`| The main required configuration file for a kes deployment
  * |`kes.js`| An optional Kes class override that can change how Kes class is used
- * |`stage.yml`| An optional stage configuration file that allow you to assign different values for each stage
+ * |`stage.yml`| An optional stage configuration file that allow you to assign different values for each cloudformation deployment using the same template. For example, using the stage file you can assign a smaller ec2 instance for your test deployment and large one for your production deployment.
  *
  * The `cloudformation.template.yml` and `config.yml` are required files.
  * The variables in `config.yml` are parsed and used to generate the `cloudformation.yml`
