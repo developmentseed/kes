@@ -45,12 +45,12 @@ It makes it much easier to deploy lambda functions and create API gateway resour
 
      -h, --help                    output usage information
      -p, --profile <profile>       AWS profile name to use for authentication
-     -c, --config <config>         Path to config file
-     --stage-file <stageFile>      Path to config file
-     --env-file <envFile>          Path to env file
-     --cf-file <cfFile>            Path to CloudFormation template
-     --kes-flass <kesClass>        Kes Class override
-     -k, --kes-folder <kesFolder>  Path to config folder
+     -c, --config <config>         Path to config file. (example: .kes/config.yml)
+     --stage-file <stageFile>      Path to staging file. (example: .kes/stage.yml)
+     --env-file <envFile>          Path to env file. (example: .kes/.env)
+     --cf-file <cfFile>            Path to CloudFormation template (example .kes/cloudformation.template.yml)
+     --kes-flass <kesClass>        Kes Class override (example: .kes/kes.js)
+     -k, --kes-folder <kesFolder>  Path to config folder (example: .kes)
      -r, --region <region>         AWS region
      --stack <stack>               stack name, defaults to the config value
      --stage <stage>               stage name, defaults to the config value
@@ -66,13 +66,13 @@ $ npm init
 
 This will create a `.kes` folder on your project folder. It will include the following files:
 
-| file                          | description                                                                                   |
-| ----------------------------- | --------------------------------------------------------------------------------------------- |
-| `.env`                        | This optional file can hold your project secrets and should not be committed                  |
-| `cloudformation.template.yml` | A base CF template written with Mustache/Handlebar templating language                        |
-| `config.yml`                  | The main required configuration file for a kes deployment                                     |
-| `kes.js`                      | An optional Kes class override that can change how Kes class is used                          |
-| `stage.yml`                   | An optional stage configuration file that allow you to assign different values for each stage |
+| file                          | description                                                                                                                                                                                                                                                                               |
+| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `.env`                        | This optional file can hold your project secrets and should not be committed                                                                                                                                                                                                              |
+| `cloudformation.template.yml` | A base CF template written with Mustache/Handlebar templating language                                                                                                                                                                                                                    |
+| `config.yml`                  | The main required configuration file for a kes deployment                                                                                                                                                                                                                                 |
+| `kes.js`                      | An optional Kes class override that can change how Kes class is used                                                                                                                                                                                                                      |
+| `stage.yml`                   | An optional stage configuration file that allow you to assign different values for each cloudformation deployment using the same template. For example, using the stage file you can assign a smaller ec2 instance for your test deployment and large one for your production deployment. |
 
 The `cloudformation.template.yml` and `config.yml` are required files.
 The variables in `config.yml` are parsed and used to generate the `cloudformation.yml`

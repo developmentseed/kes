@@ -48,8 +48,15 @@ const config = configurator.parse();
 
 ### parse
 
-Main method of this class. It parses the configuration specified
-a the class level
+Main method of the class. It parses a configuration and returns it
+as a JS object.
+
+**Examples**
+
+```javascript
+const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/stage.yml', 'path/to/.env');
+config = configInstance.parse();
+```
 
 Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
 
@@ -132,7 +139,7 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ### cloudFormation
 
-Runs a cloudformation create or update operation on the class
+Calls CloudFormation's update-stack or create-stack methods
 
 **Parameters**
 
