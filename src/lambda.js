@@ -59,6 +59,24 @@ class Lambda {
     return lambda;
   }
 
+  getHash(folderName, method = 'shasum') {
+    const alternativeMethod = 'sha1sum';
+    let hash = exec(`find ${path.join(this.distFolder, folderName)} -type f | \
+                   xargs ${method} | ${method} | awk '{print $1}' ${''}`, false);
+
+    hash = hash.toString().replace(/\n/, '');
+
+    if (hash.length === 0) {
+      if (method === alternativeMethod) {
+        throw new Error('You must either have shasum or sha1sum');
+      }
+      console.log(`switching to ${alternativeMethod}`);
+      return this.getHash(folderName, alternativeMethod);
+    }
+
+    return hash;
+  }
+
   /**
    * Copy source code of a given lambda function, zips it, calculate
    * the hash of the source code and updates the lambda object with
@@ -80,9 +98,7 @@ class Lambda {
     exec(`cd ${this.distFolder} && zip -r ../build/${folderName} ${folderName}`);
 
     const zipFile = `${folderName}.zip`;
-    let hash = exec(`find ${path.join(this.distFolder, folderName)} -type f | \
-                      xargs shasum | shasum | awk '{print $1}' ${''}`, false);
-    hash = hash.toString().replace(/\n/, '');
+    const hash = this.getHash(folderName);
 
     const key = path.join(this.key, hash.toString(), zipFile);
     const localPath = path.join(this.buildFolder, zipFile);
