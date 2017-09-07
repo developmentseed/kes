@@ -70,6 +70,7 @@ class Lambda {
       if (method === alternativeMethod) {
         throw new Error('You must either have shasum or sha1sum');
       }
+      console.log(`switching to ${alternativeMethod}`);
       return this.getHash(folderName, alternativeMethod);
     }
 
