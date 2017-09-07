@@ -1,0 +1,54 @@
+version: 2
+jobs:
+  build:
+    docker:
+      - image: circleci/node:6.10
+
+
+    working_directory: ~/kes
+    steps:
+      - checkout
+
+      - run:
+          name: Install
+          command: |
+            npm install
+            sudo npm install -g .
+
+      - run:
+          name: Test Examples
+          command: |
+            mkdir ~/example1
+            cp -r examples/lambdas ~/example1/.kes
+            cd ~/example1/
+            kes cf compile
+            kes cf validate
+
+      - add_ssh_keys:
+          fingerprints:
+             - "8f:58:d1:7d:1f:b0:ed:cc:fd:c9:46:cb:ee:6b:40:86"
+      - run:
+          name: docs
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              cd ~/kes
+              npm run html-docs
+              cd _docs
+              git init
+              git config user.name "Devseed-CI"
+              git config user.email "dev@developmentseed.org"
+              git add .
+              git commit -m "CI deploy [skip ci]"
+              git remote add origin git@github.com:developmentseed/kes.git
+              git push origin master:gh-pages --force
+            fi
+
+      - run:
+          name: Deploy
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then
+              cd ~/kes
+              echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
+              npm publish
+            fi
+

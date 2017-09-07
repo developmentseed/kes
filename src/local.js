@@ -1,20 +1,24 @@
 'use strict';
-const envs = require('./envs');
 
 const isLocal = process.argv[2] === 'local';
-const isRemote = process.argv[2] === 'remote';
 
-module.exports.localRun = (func, stage) => {
-  stage = stage || 'dev';
-  if (isLocal || isRemote) {
-    process.env.IS_LOCAL = isLocal;
-
-    // set local env variables
-    envs.setEnvs(stage);
-
-    // Read .env file if it exists
-    envs.loadCredentials();
-
+/**
+ * A simple helper for running a function if `local` is passed as argument
+ * @example
+ * // test.js
+ * const { localRun } = require('kes');
+ * localRun(() => {
+ *   console.log('my function');
+ * });
+ * // result
+ * // $ node test.js local
+ * // my function
+ *
+ * @param {Function} func A javascript function
+ * @return {Object} returns the result of the function call
+ */
+module.exports.localRun = (func) => {
+  if (isLocal) {
     // Run the function
     return func();
   }

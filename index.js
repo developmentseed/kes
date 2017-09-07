@@ -1,10 +1,8 @@
 'use strict';
 
 module.exports = {
-  common: require('./src/common'),
-  lambda: require('./src/lambda'),
-  dynamo: require('./src/dynamo'),
-  envs: require('./src/envs'),
-  bootstrap: require('./src/bootstrap'),
-  CF: require('./src/cf')
+  Kes: require('./src/kes'),
+  Lambda: require('./src/lambda'),
+  Config: require('./src/config'),
+  local: require('./src/local')
 };
