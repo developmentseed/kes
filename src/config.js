@@ -285,8 +285,12 @@ class Config {
   }
 
   /**
-   * Main method of this class. It parses the configuration specified
-   * a the class level
+   * Main method of the class. It parses a configuration and returns it
+   * as a JS object.
+   *
+   * @example
+   * const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/stage.yml', 'path/to/.env');
+   * config = configInstance.parse();
    *
    * @return {Object} the configuration object
    */
