@@ -161,7 +161,7 @@ class Kes {
   }
 
   /**
-   * Runs a cloudformation create or update operation on the class
+   * Calls CloudFormation's update-stack or create-stack methods
    *
    * @param {String} op possible values are 'create' and 'update'
    * @returns {Promise} returns the promise of an AWS response object
