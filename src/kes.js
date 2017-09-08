@@ -240,7 +240,7 @@ class Kes {
     const params = {};
 
     if (this.bucket) {
-      params.TemplateUrl = url;
+      params.TemplateURL = url;
     }
     else {
       params.TemplateBody = fs.readFileSync(path.join(this.kesFolder, 'cloudformation.yml')).toString();
