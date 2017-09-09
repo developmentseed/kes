@@ -126,6 +126,7 @@ class Kes {
    */
   uploadToS3(bucket, key, body) {
     const s3 = new AWS.S3();
+    console.log(`Uploaded: s3://${bucket}/${key}`);
     return s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
   }
 
