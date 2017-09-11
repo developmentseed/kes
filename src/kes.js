@@ -44,6 +44,7 @@ class Kes {
     this.options = options;
     this.region = get(options, 'region', 'us-east-1');
     this.profile = get(options, 'profile', null);
+    this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
     this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
     this.stageFile = get(options, 'stageFile', path.join(this.kesFolder, 'stage.yml'));
@@ -60,7 +61,7 @@ class Kes {
     this.bucket = get(this.config, 'buckets.internal');
     this.templateUrl = `https://s3.amazonaws.com/${this.bucket}/${this.name}/cloudformation.yml`;
 
-    utils.configureAws(this.region, this.profile);
+    utils.configureAws(this.region, this.profile, this.role);
   }
 
   /**
@@ -126,6 +127,7 @@ class Kes {
    */
   uploadToS3(bucket, key, body) {
     const s3 = new AWS.S3();
+    console.log(`Uploaded: s3://${bucket}/${key}`);
     return s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
   }
 
