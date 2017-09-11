@@ -311,3 +311,4 @@ of profile on ~/.aws/credentials file if necessary
 
 -   `region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** AWS region (optional, default `'us-east-1'`)
 -   `profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** aws credentials profile name (optional, default `null`)
+-   `role`   (optional, default `null`)

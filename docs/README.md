@@ -13,6 +13,7 @@
     -   [Deployment](#deployment)
         -   [create](#create)
         -   [update](#update)
+    -   [Deployment Using IAM Role](#deployment-using-iam-role)
         -   [Updating One Lambda Function](#updating-one-lambda-function)
 
 ## 
@@ -45,11 +46,12 @@ It makes it much easier to deploy lambda functions and create API gateway resour
 
      -h, --help                    output usage information
      -p, --profile <profile>       AWS profile name to use for authentication
+     --role <role>                 AWS role arn to be assumed for the deployment
      -c, --config <config>         Path to config file. (example: .kes/config.yml)
      --stage-file <stageFile>      Path to staging file. (example: .kes/stage.yml)
      --env-file <envFile>          Path to env file. (example: .kes/.env)
      --cf-file <cfFile>            Path to CloudFormation template (example .kes/cloudformation.template.yml)
-     --kes-flass <kesClass>        Kes Class override (example: .kes/kes.js)
+     --kes-class <kesClass>        Kes Class override (example: .kes/kes.js)
      -k, --kes-folder <kesFolder>  Path to config folder (example: .kes)
      -r, --region <region>         AWS region
      --stack <stack>               stack name, defaults to the config value
@@ -250,6 +252,16 @@ To update an existing CF stack
 
 ```bash
  kes cf update
+```
+
+## Deployment Using IAM Role
+
+You can specify an IAM role for the deployment using `--role` option or by setting `AWS_DEPLOYMENT_ROLE` environment variable.
+
+**Note:** You still need an aws user with AssumeRole permission for this to work
+
+```bash
+kes cf update --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
 ```
 
 ### Updating One Lambda Function
