@@ -14,7 +14,7 @@
     "AWS"
   ],
   "engines": {
-    "node": ">=7.10"
+    "node": ">=6.10"
   },
   "repository": "https://github.com/developmentseed/kes",
   "author": "Alireza Jazayeri <alireza@developmentseed.org>",
