@@ -92,6 +92,7 @@ program
 program
   .usage('TYPE COMMAND [options]')
   .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
+  .option('--role <role>', 'AWS role arn to be assumed for the deployment', null)
   .option('-c, --config <config>', 'Path to config file')
   .option('--stage-file <stageFile>', 'Path to config file')
   .option('--env-file <envFile>', 'Path to env file')
