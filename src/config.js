@@ -2,6 +2,7 @@
 
 const fs = require('fs');
 const has = require('lodash.has');
+const values = require('lodash.values');
 const startsWith = require('lodash.startswith');
 const trim = require('lodash.trim');
 const replace = require('lodash.replace');
@@ -161,8 +162,8 @@ class Config {
 
       return Object.assign(Config, {
         apiMethods,
-        apiResources: Object.values(apiResources),
-        apiMethodsOptions: Object.values(apiMethodsOptions),
+        apiResources: values(apiResources),
+        apiMethodsOptions: values(apiMethodsOptions),
         apiDependencies: Object.keys(apiDependencies).map(k => ({
           name: k,
           methods: apiDependencies[k]
