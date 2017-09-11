@@ -1,6 +1,6 @@
 {
   "name": "kes",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {
     "html-docs": "documentation build bin/cli.js -f html -o _docs --theme node_modules/documentation-devseed-theme",
@@ -14,7 +14,7 @@
     "AWS"
   ],
   "engines": {
-    "node": "6.10"
+    "node": ">=7.10"
   },
   "repository": "https://github.com/developmentseed/kes",
   "author": "Alireza Jazayeri <alireza@developmentseed.org>",
