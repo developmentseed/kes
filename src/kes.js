@@ -42,7 +42,7 @@ const utils = require('./utils');
 class Kes {
   constructor(options) {
     this.options = options;
-    this.region = get(options, 'region', 'us-east-1');
+    this.region = get(options, 'region');
     this.profile = get(options, 'profile', null);
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));

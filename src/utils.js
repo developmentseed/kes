@@ -29,8 +29,10 @@ function exec(cmd, verbose) {
  * @param {String} [region='us-east-1'] AWS region
  * @param {String} [profile=null] aws credentials profile name
  */
-function configureAws(region = 'us-east-1', profile = null, role = null) {
-  AWS.config.update({ region });
+function configureAws(region = null, profile = null, role = null) {
+  if (region) {
+    AWS.config.update({ region });
+  }
 
   if (profile) {
     AWS.config.credentials = new AWS.SharedIniFileCredentials({

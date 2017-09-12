@@ -99,7 +99,7 @@ program
   .option('--cf-file <cfFile>', 'Path to CloudFormation template')
   .option('--kes-class <kesClass>', 'Kes Class override', null)
   .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
-  .option('-r, --region <region>', 'AWS region', 'us-east-1')
+  .option('-r, --region <region>', 'AWS region', null)
   .option('--stack <stack>', 'stack name, defaults to the config value')
   .option('--stage <stage>', 'stage name, defaults to the config value');
 
