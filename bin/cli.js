@@ -9,12 +9,15 @@ const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
+const pckg = require('../package.json');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
 require('./readme');
 
 const success = (r) => process.exit(0);
+
+program.version(pckg.version);
 
 /**
  * @name failure
