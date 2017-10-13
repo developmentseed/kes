@@ -45,15 +45,22 @@ class Kes {
     this.region = get(options, 'region');
     this.profile = get(options, 'profile', null);
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
-    this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
-    this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
-    this.stageFile = get(options, 'stageFile', path.join(this.kesFolder, 'stage.yml'));
-    this.envFile = get(options, 'envFile', path.join(this.kesFolder, '.env'));
-    this.cfFile = get(options, 'cfFile', path.join(this.kesFolder, 'cloudformation.template.yml'));
 
-    //local env file
-    const configInstance = new Config(options.stack, options.stage, this.configFile, this.stageFile, this.envFile);
-    this.config = configInstance.parse();
+    // if config object is passed, do not parse config (useful for testing)
+    this.config = get(options, 'configObj', null);
+
+    if (!this.config) {
+      this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
+      this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
+      this.stageFile = get(options, 'stageFile', path.join(this.kesFolder, 'stage.yml'));
+      this.envFile = get(options, 'envFile', path.join(this.kesFolder, '.env'));
+      this.cfFile = get(options, 'cfFile', path.join(this.kesFolder, 'cloudformation.template.yml'));
+
+      //local env file
+      const configInstance = new Config(options.stack, options.stage, this.configFile, this.stageFile, this.envFile);
+      this.config = configInstance.parse();
+    }
+
     this.stage = this.config.stage || 'dev';
     this.stack = this.config.stackName;
     this.name = `${this.stack}-${this.stage}`;
