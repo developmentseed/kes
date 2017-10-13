@@ -115,7 +115,21 @@ program
       Kes = require(path.join(process.cwd(), kesClass));
     }
     else {
-      Kes = require('../index').Kes;
+      // check if there is kes.js in the kes-folder
+      try {
+        let kesFolder;
+        if (program.kesFolder) {
+          kesFolder = program.kesFolder;
+        }
+        else {
+          kesFolder = path.join(process.cwd(), '.kes');
+        }
+        Kes = require(path.join(process.cwd(), kesFolder, 'kes.js'));
+      }
+      catch (e) {
+        console.log(e);
+        Kes = require('../index').Kes;
+      }
     }
 
     const kes = new Kes(program);

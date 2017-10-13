@@ -241,6 +241,8 @@ class Config {
       config = merge(config, parsedConfig[this.deployment]);
     }
 
+    // doing this twice to ensure variables in child yml files are also parsed and replaced
+    config = this.mustacheRender(config, merge({}, config, this.envs));
     config = this.mustacheRender(config, merge({}, config, this.envs));
 
     if (this.stack) {
