@@ -127,7 +127,6 @@ program
         Kes = require(path.join(process.cwd(), kesFolder, 'kes.js'));
       }
       catch (e) {
-        console.log(e);
         Kes = require('../index').Kes;
       }
     }
