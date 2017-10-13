@@ -30,12 +30,11 @@ const utils = require('./utils');
  *
  * @param {Object} options a js object that includes required options.
  * @param {String} options.stack the stack name (required)
- * @param {String} [options.stage='dev'] the stage name
+ * @param {String} [options.deployment='dev'] the deployment name
  * @param {String} [options.region='us-east-1'] the aws region
  * @param {String} [options.profile=null] the profile name
  * @param {String} [options.kesFolder='.kes'] the path to the kes folder
  * @param {String} [options.configFile='config.yml'] the path to the config.yml
- * @param {String} [options.stageFile='stage.yml'] the path to the stage.yml
  * @param {String} [options.envFile='.env'] the path to the .env file
  * @param {String} [options.cfFile='cloudformation.template.yml'] the path to the CF template
  */
@@ -44,6 +43,7 @@ class Kes {
     this.options = options;
     this.region = get(options, 'region');
     this.profile = get(options, 'profile', null);
+    this.deployment = get(options, 'deployment', null);
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
 
     // if config object is passed, do not parse config (useful for testing)
@@ -52,21 +52,17 @@ class Kes {
     if (!this.config) {
       this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
       this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
-      this.stageFile = get(options, 'stageFile', path.join(this.kesFolder, 'stage.yml'));
       this.envFile = get(options, 'envFile', path.join(this.kesFolder, '.env'));
       this.cfFile = get(options, 'cfFile', path.join(this.kesFolder, 'cloudformation.template.yml'));
 
       //local env file
-      const configInstance = new Config(options.stack, options.stage, this.configFile, this.stageFile, this.envFile);
+      const configInstance = new Config(options.stack, this.deployment, this.configFile, this.envFile);
       this.config = configInstance.parse();
     }
 
-    this.stage = this.config.stage || 'dev';
     this.stack = this.config.stackName;
-    this.name = `${this.stack}-${this.stage}`;
-
     this.bucket = get(this.config, 'buckets.internal');
-    this.templateUrl = `https://s3.amazonaws.com/${this.bucket}/${this.name}/cloudformation.yml`;
+    this.templateUrl = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/cloudformation.yml`;
 
     utils.configureAws(this.region, this.profile, this.role);
   }
@@ -78,7 +74,7 @@ class Kes {
    * @return {Promise} returns the promise of an AWS response object
    */
   updateSingleLambda(name) {
-    const lambda = new Lambda(this.config, this.kesFolder, this.bucket, this.name);
+    const lambda = new Lambda(this.config, this.kesFolder, this.bucket, this.stack);
     return lambda.updateSingleLambda(name);
   }
 
@@ -114,7 +110,7 @@ class Kes {
 
     const destPath = path.join(this.kesFolder, 'cloudformation.yml');
 
-    const lambda = new Lambda(this.config, this.kesFolder, this.bucket, this.name);
+    const lambda = new Lambda(this.config, this.kesFolder, this.bucket, this.stack);
 
     return lambda.process().then((config) => {
       this.config = config;
@@ -158,7 +154,7 @@ class Kes {
       if (this.bucket) {
         return this.uploadToS3(
           this.bucket,
-          `${this.name}/cloudformation.yml`,
+          `${this.stack}/cloudformation.yml`,
           fs.readFileSync(path.join(this.kesFolder, 'cloudformation.yml'))
         );
       }
@@ -199,7 +195,7 @@ class Kes {
     }
 
     const params = {
-      StackName: this.name,
+      StackName: this.stack,
       Parameters: cfParams,
       Capabilities: capabilities
     };
@@ -214,7 +210,7 @@ class Kes {
     opFn = opFn.bind(cf);
     return opFn(params).promise().then(() => {
       console.log('Waiting for the CF operation to complete');
-      return cf.waitFor(wait, { StackName: this.name }).promise()
+      return cf.waitFor(wait, { StackName: this.stack }).promise()
         .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
         .catch(e => {
           if (e) {
@@ -248,7 +244,7 @@ class Kes {
    */
   validateTemplate() {
     console.log('Validating the template');
-    const url = `https://s3.amazonaws.com/${this.bucket}/${this.name}/cloudformation.yml`;
+    const url = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/cloudformation.yml`;
 
     const params = {};
 
@@ -274,7 +270,7 @@ class Kes {
     const cf = new AWS.CloudFormation();
 
     return cf.describeStacks({
-      StackName: `${this.name}`
+      StackName: `${this.stack}`
     }).promise();
   }
 

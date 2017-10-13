@@ -13,6 +13,8 @@
     -   [Deployment](#deployment)
         -   [create](#create)
         -   [update](#update)
+        -   [upsert](#upsert)
+        -   [Differnet deployment configurations](#differnet-deployment-configurations)
     -   [Deployment Using IAM Role](#deployment-using-iam-role)
         -   [Updating One Lambda Function](#updating-one-lambda-function)
 
@@ -31,31 +33,32 @@ It makes it much easier to deploy lambda functions and create API gateway resour
   $ kes -h
 
    Usage: kes TYPE COMMAND [options]
-   Commands:
-
-     cf [create|update|validate|compile]  CloudFormation Operations:
-       create    Creates the CF stack
-       update    Updates the CF stack
-       validate  Validates the CF stack
-       compile   Compiles the CF stack
-     lambda <lambdaName>                  uploads a given lambda function to Lambda service
 
    Start a Kes project
 
-   Options:
+ Options:
 
-     -h, --help                    output usage information
-     -p, --profile <profile>       AWS profile name to use for authentication
-     --role <role>                 AWS role arn to be assumed for the deployment
-     -c, --config <config>         Path to config file. (example: .kes/config.yml)
-     --stage-file <stageFile>      Path to staging file. (example: .kes/stage.yml)
-     --env-file <envFile>          Path to env file. (example: .kes/.env)
-     --cf-file <cfFile>            Path to CloudFormation template (example .kes/cloudformation.template.yml)
-     --kes-class <kesClass>        Kes Class override (example: .kes/kes.js)
-     -k, --kes-folder <kesFolder>  Path to config folder (example: .kes)
-     -r, --region <region>         AWS region
-     --stack <stack>               stack name, defaults to the config value
-     --stage <stage>               stage name, defaults to the config value
+ -V, --version                 output the version number
+ -p, --profile <profile>       AWS profile name to use for authentication
+ --role <role>                 AWS role arn to be assumed for the deployment
+ -c, --config <config>         Path to config file
+ --env-file <envFile>          Path to env file
+ --cf-file <cfFile>            Path to CloudFormation templateUrl
+ --kes-class <kesClass>        Kes Class override
+ -k, --kes-folder <kesFolder>  Path to config folder
+ -r, --region <region>         AWS region
+ --stack <stack>               stack name, defaults to the config value
+ -d, --deployment <deployment>  Deployment name, default to default
+ -h, --help                    output usage information
+
+ Commands:
+ cf [create|update|upsert|validate|compile]  CloudFormation Operations:
+   create    Creates the CF stack
+   update    Updates the CF stack
+   upsert    Creates the CF stack and Update if already exists
+   validate  Validates the CF stack
+   compile   Compiles the CF stack
+   lambda <lambdaName>                         uploads a given lambda function to Lambda service
 ```
 
 ## Setting Up the First Project
@@ -68,24 +71,23 @@ $ npm init
 
 This will create a `.kes` folder on your project folder. It will include the following files:
 
-| file                          | description                                                                                                                                                                                                                                                                               |
-| ----------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `.env`                        | This optional file can hold your project secrets and should not be committed                                                                                                                                                                                                              |
-| `cloudformation.template.yml` | A base CF template written with Mustache/Handlebar templating language                                                                                                                                                                                                                    |
-| `config.yml`                  | The main required configuration file for a kes deployment                                                                                                                                                                                                                                 |
-| `kes.js`                      | An optional Kes class override that can change how Kes class is used                                                                                                                                                                                                                      |
-| `stage.yml`                   | An optional stage configuration file that allow you to assign different values for each cloudformation deployment using the same template. For example, using the stage file you can assign a smaller ec2 instance for your test deployment and large one for your production deployment. |
+| file                          | description                                                                  |
+| ----------------------------- | ---------------------------------------------------------------------------- |
+| `.env`                        | This optional file can hold your project secrets and should not be committed |
+| `cloudformation.template.yml` | A base CF template written with Mustache/Handlebar templating language       |
+| `config.yml`                  | The main required configuration file for a kes deployment                    |
+| `kes.js`                      | An optional Kes class override that can change how Kes class is used         |
 
 The `cloudformation.template.yml` and `config.yml` are required files.
-The variables in `config.yml` are parsed and used to generate the `cloudformation.yml`
+The variables in `config.yml` are parsed and used to generate the `cloudformation.yml`. By default,
+the `default` section of the `config.yml` is parsed and used in `cloudformation.template.yml`. If
+another deployment is specified in the `config.yml` the values of that deployment overrides the
+values of `default`
 file which is sent to AWS CloudFormation to create and udpate the stack.
 
 ### CF Stack Name
 
-The Cloudformation stack name is made from the `stackName` and `stage` variables in `config.yml` with a
-dash in the middle.
-
-For example `my-stack` and `dev` creates `my-stack-dev` stack on cloudformation.
+The Cloudformation stack name is the same as `stackName` in `config.yml`.
 
 ### Parameters
 
@@ -93,16 +95,17 @@ To pass parameters to the CloudFormation template, use the `parameters` key in c
 
 ```yaml
 # config.yml
-stackName: myStack
-parameters:
-  - name: MyParameter
-    value: someValue
+default:
+  stackName: myStack
+  parameters:
+    - name: MyParameter
+      value: someValue
 ```
 
 ```yaml
 # cloudformation.template.yml
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'stack: {{stackName}} | stage: {{stage}} | deployed by Kes'
+Description: 'stack: {{stackName}} | deployed by Kes'
 Parameters:
   MyParameter:
     Type: String
@@ -115,12 +118,13 @@ To pass capabilities such as `CAPABILITY_IAM` use `capabilities` key:
 
 ```yaml
 # config.yml
-stackName: myStack
-parameters:
-  - name: MyParameter
-    value: someValue
-capabilities:
-  - CAPABILITY_IAM
+default:
+  stackName: myStack
+  parameters:
+    - name: MyParameter
+      value: someValue
+  capabilities:
+    - CAPABILITY_IAM
 ```
 
 ### Lambda Functions
@@ -137,32 +141,32 @@ or a zip file on aws.
 
 **Env Variables:**
 You can add env variables to each lambda function as shown in the example below.
-The `stackName` and `stage` are added automatically to all lambda functions
 
 **Example:**
 
 ```yaml
 # config.yml
-stackName: myStack
-parameters:
-  - name: MyParameter
-    value: someValue
-capabilities:
-  - CAPABILITY_IAM
+default:
+  stackName: myStack
+  parameters:
+    - name: MyParameter
+      value: someValue
+  capabilities:
+    - CAPABILITY_IAM
 
-lambdas:
-  - name: myLambda1
-    handler: myLambda.handler
-    timeout: 200
-    source: 'node_modules/someNpmPackage'
-  - name: myLambda2
-    handler: package.handler
-    timeout:100
-    s3Source:
-      bucket: mybucket
-      key: mylambda.zip
-    envs:
-      DEBUG: true
+  lambdas:
+    - name: myLambda1
+      handler: myLambda.handler
+      timeout: 200
+      source: 'node_modules/someNpmPackage'
+    - name: myLambda2
+      handler: package.handler
+      timeout:100
+      s3Source:
+        bucket: mybucket
+        key: mylambda.zip
+      envs:
+        DEBUG: true
 ```
 
 **Note:**
@@ -178,9 +182,10 @@ We use [Handlebar](http://handlebarsjs.com/) for templating a CF template.
 
 ```yaml
 # config.yml
-myArray:
-  - name: name1
-  - name: name2
+default:
+  myArray:
+    - name: name1
+    - name: name2
 ```
 
 ```yaml
@@ -197,10 +202,11 @@ Resources:
 
 ```yaml
 # config.yml
-myArray:
-  - name: name1
-    runtime: python2.7
-  - name: name2
+default:
+  myArray:
+    - name: name1
+      runtime: python2.7
+    - name: name2
 ```
 
 ```yaml
@@ -219,8 +225,9 @@ Resources:
 
 ```yaml
 # config.yml
-myArray:
-  - DEBUG: true
+default:
+  myArray:
+    - DEBUG: true
 ```
 
 ```yaml
@@ -252,6 +259,38 @@ To update an existing CF stack
 
 ```bash
  kes cf update
+```
+
+### upsert
+
+To create a stack or update it if it exists
+
+```bash
+ kes cf upsert
+```
+
+### Differnet deployment configurations
+
+You can configure different values for diferrent deployments. For example you might want to configure your test deployment
+differently from your staging and production deployments. Here is how to achieve it
+
+```yaml
+# config.yml
+default:
+  stackName: myStack-test
+  myArray:
+    - DEBUG: true
+
+staging:
+  stackName: myStack-staging
+  myArray:
+    - DEBUG: false
+```
+
+To deploy the `staging` run:
+
+```bash
+kes cf upsert --deployment staging
 ```
 
 ## Deployment Using IAM Role

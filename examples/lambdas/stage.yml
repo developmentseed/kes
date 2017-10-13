@@ -1,3 +1,0 @@
-default:
-  stage: dev
-  timeout: {{TIMEOUT}}

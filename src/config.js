@@ -8,6 +8,7 @@ const trim = require('lodash.trim');
 const replace = require('lodash.replace');
 const upperFirst = require('lodash.upperfirst');
 const capitalize = require('lodash.capitalize');
+const merge = require('lodash.merge');
 const yaml = require('js-yaml');
 const yamlinc = require('yaml-include');
 const Mustache = require('mustache');
@@ -15,25 +16,23 @@ const utils = require('./utils');
 
 /**
  * This class handles reading and parsing configuration files.
- * It primarily reads `stage.yml`, `config.yml` and `.env` files
+ * It primarily reads `config.yml` and `.env` files
  *
  * @example
- * const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/stage.yml', '.kes/.env');
+ * const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/.env');
  * const config = configurator.parse();
  *
  * @param {String} stack Stack name
- * @param {String} stage Stage name
+ * @param {String} deployment Deployment name
  * @param {String} configFile path to the config.yml file
- * @param {String} stageFile path to the stage.yml file (optional)
  * @param {String} envFile path to the .env file (optional)
  * @class Config
  */
 class Config {
-  constructor(stack, stage, configFile, stageFile, envFile) {
+  constructor(stack, deployment, configFile, envFile) {
     this.stack = stack;
-    this.stage = stage;
+    this.deployment = deployment;
     this.configFile = configFile;
-    this.stageFile = stageFile;
     this.envs = utils.loadLocalEnvs(envFile);
   }
 
@@ -208,81 +207,48 @@ class Config {
         }
 
         // lambda fullName
-        lambda.fullName = `${config.stackName}-${config.stage}-${lambda.name}`;
+        lambda.fullName = `${config.stackName}-${lambda.name}`;
       }
     }
 
     return config;
   }
 
-  /**
-   * reads and parses stage.yml, merges the variables under default with
-   * the specified stage and returns the it as a js object
-   *
-   * @private
-   * @return {Object} returns the content of config.yml as a js object
-   */
-  parseStage() {
-    let t;
-    try {
-      t = fs.readFileSync(this.stageFile);
-    }
-    catch (e) {
-      if (e.message.includes('no such file or directory')) {
-        console.log(`${this.stageFile} was not found. Skipping stage`);
-        return {};
-      }
-      throw e;
-    }
-
-    Mustache.escape = (text) => text;
-    const rendered = Mustache.render(t.toString(), this.envs);
-
-    // convert to object from yaml
-    const stageConfig = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
-
-    if (this.stage) {
-      Object.assign(stageConfig.default, stageConfig[this.stage]);
-    }
-    return stageConfig.default;
+  mustacheRender(obj, values) {
+    const tmp = JSON.stringify(obj);
+    const rendered = Mustache.render(tmp, values);
+    return JSON.parse(rendered);
   }
 
   /**
-   * Parses the config.yml to js Object after passing it through variables set
-   * in stage.yml
+   * Parses the config.yml
+   * It uses the default environment values under config.yml and overrides them with values of
+   * the select environment.
    *
    * @private
-   * @param {Object} stageConfig the stage.yml object
    * @return {Object} returns configuration object
    */
-  parseConfig(stageConfig) {
+  parseConfig() {
     const configText = fs.readFileSync(this.configFile, 'utf8');
 
-    Object.assign(stageConfig, this.envs);
     Mustache.escape = (text) => text;
-    let rendered = Mustache.render(configText.toString(), stageConfig);
 
     // load, dump, then load to make sure all yaml included files pass through mustach render
-    const tmp = yaml.safeLoad(rendered, { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+    const parsedConfig = yaml.safeLoad(configText.toString(), { schema: yamlinc.YAML_INCLUDE_SCHEMA });
 
-    const tmp2 = yaml.dump(tmp);
-    rendered = Mustache.render(tmp2, stageConfig);
+    let config = parsedConfig.default;
+    if (this.deployment && parsedConfig[this.deployment]) {
+      config = merge(config, parsedConfig[this.deployment]);
+    }
 
-    let config = yaml.safeLoad(rendered);
+    config = this.mustacheRender(config, merge({}, config, process.env));
 
     if (this.stack) {
       config.stackName = this.stack;
     }
 
-    if (this.stage) {
-      config.stage = this.stage;
-    }
-
-    Object.assign(config, stageConfig);
     config = this.constructor.configureLambda(config);
-    Object.assign(config, this.constructor.configureApiGateway(config));
-
-    return config;
+    return merge(config, this.constructor.configureApiGateway(config));
   }
 
   /**
@@ -290,14 +256,13 @@ class Config {
    * as a JS object.
    *
    * @example
-   * const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/stage.yml', 'path/to/.env');
+   * const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/.env');
    * config = configInstance.parse();
    *
    * @return {Object} the configuration object
    */
   parse() {
-    const stageConfig = this.parseStage();
-    return this.parseConfig(stageConfig);
+    return this.parseConfig();
   }
 }
 

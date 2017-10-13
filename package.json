@@ -23,12 +23,24 @@
     },
     "extends": "standard",
     "rules": {
-      "semi": [2, "always"],
+      "semi": [
+        2,
+        "always"
+      ],
       "space-before-function-paren": "off",
       "spaced-comment": "off",
       "no-extra-semi": 2,
-      "brace-style": ["error", "stroustrup"],
-      "semi-spacing": [2, { "before": false, "after": true }]
+      "brace-style": [
+        "error",
+        "stroustrup"
+      ],
+      "semi-spacing": [
+        2,
+        {
+          "before": false,
+          "after": true
+        }
+      ]
     }
   },
   "repository": "https://github.com/developmentseed/kes",
@@ -48,6 +60,7 @@
     "lodash.capitalize": "^4.2.1",
     "lodash.get": "^4.4.2",
     "lodash.has": "^4.5.2",
+    "lodash.merge": "^4.6.0",
     "lodash.replace": "^4.1.4",
     "lodash.startswith": "^4.2.1",
     "lodash.trim": "^4.5.1",

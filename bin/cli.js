@@ -46,10 +46,6 @@ const init = function () {
         message: colors.white('Name the CloudFormation stack:'),
         default: 'kes-cf-template'
       },
-      stage: {
-        message: colors.white('Name the deployment stage:'),
-        default: 'dev'
-      },
       bucket: {
         message: colors.white('Bucket name used for deployment (required):'),
         required: true
@@ -71,9 +67,8 @@ const init = function () {
     // copy simple config file and template
     const config = yaml.safeLoad(fs.readFileSync(
       path.join(__dirname, '..', 'examples/lambdas/config.yml'), 'utf8'));
-    config.stackName = result.stack;
-    config.stage = result.stage;
-    config.buckets.internal = result.bucket;
+    config.default.stackName = result.stack;
+    config.default.buckets.internal = result.bucket;
     fs.writeFileSync(path.join(kesFolder, 'config.yml'), yaml.safeDump(config));
 
     fs.createReadStream(
@@ -97,14 +92,13 @@ program
   .option('-p, --profile <profile>', 'AWS profile name to use for authentication', null)
   .option('--role <role>', 'AWS role arn to be assumed for the deployment', null)
   .option('-c, --config <config>', 'Path to config file')
-  .option('--stage-file <stageFile>', 'Path to config file')
   .option('--env-file <envFile>', 'Path to env file')
   .option('--cf-file <cfFile>', 'Path to CloudFormation template')
   .option('--kes-class <kesClass>', 'Kes Class override', null)
   .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
   .option('-r, --region <region>', 'AWS region', null)
   .option('--stack <stack>', 'stack name, defaults to the config value')
-  .option('--stage <stage>', 'stage name, defaults to the config value');
+  .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
   .command('cf [create|update|upsert|validate|compile]')
