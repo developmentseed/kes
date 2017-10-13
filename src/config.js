@@ -241,7 +241,7 @@ class Config {
       config = merge(config, parsedConfig[this.deployment]);
     }
 
-    config = this.mustacheRender(config, merge({}, config, process.env));
+    config = this.mustacheRender(config, merge({}, config, this.envs));
 
     if (this.stack) {
       config.stackName = this.stack;
