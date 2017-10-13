@@ -177,7 +177,7 @@ class Kes {
    */
   cloudFormation(op) {
     const cf = new AWS.CloudFormation();
-    let opFn = op === 'create' ? cf.createStack : cf.updateStack;
+    let opFn = op === 'create' || op === 'upsert' ? cf.createStack : cf.updateStack;
     const wait = op === 'create' ? 'stackCreateComplete' : 'stackUpdateComplete';
 
     const cfParams = [];
@@ -231,6 +231,10 @@ class Kes {
         return e.message;
       }
       else {
+        if (e.name && e.name === 'AlreadyExistsException' && op === 'upsert') {
+          return this.cloudFormation('update');
+        }
+
         console.log('There was an error creating/updating the CF stack');
         throw e;
       }
@@ -282,6 +286,16 @@ class Kes {
    */
   opsStack(ops) {
     return this.uploadCF().then(() => this.cloudFormation(ops));
+  }
+
+  /**
+   * Creates a CloudFormation stack for the class instance
+   * If exists, will update the existing one
+   *
+   * @returns {Promise} returns the promise of an AWS response object
+   */
+  upsertStack() {
+    return this.opsStack('upsert');
   }
 
   /**

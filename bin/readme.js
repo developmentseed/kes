@@ -12,31 +12,34 @@
  *   $ kes -h
  *
  *    Usage: kes TYPE COMMAND [options]
- *    Commands:
-
- *      cf [create|update|validate|compile]  CloudFormation Operations:
- *        create    Creates the CF stack
- *        update    Updates the CF stack
- *        validate  Validates the CF stack
- *        compile   Compiles the CF stack
- *      lambda <lambdaName>                  uploads a given lambda function to Lambda service
  *
  *    Start a Kes project
  *
- *    Options:
+ *  Options:
  *
- *      -h, --help                    output usage information
- *      -p, --profile <profile>       AWS profile name to use for authentication
- *      --role <role>                 AWS role arn to be assumed for the deployment
- *      -c, --config <config>         Path to config file. (example: .kes/config.yml)
- *      --stage-file <stageFile>      Path to staging file. (example: .kes/stage.yml)
- *      --env-file <envFile>          Path to env file. (example: .kes/.env)
- *      --cf-file <cfFile>            Path to CloudFormation template (example .kes/cloudformation.template.yml)
- *      --kes-class <kesClass>        Kes Class override (example: .kes/kes.js)
- *      -k, --kes-folder <kesFolder>  Path to config folder (example: .kes)
- *      -r, --region <region>         AWS region
- *      --stack <stack>               stack name, defaults to the config value
- *      --stage <stage>               stage name, defaults to the config value
+ *  -V, --version                 output the version number
+ *  -p, --profile <profile>       AWS profile name to use for authentication
+ *  --role <role>                 AWS role arn to be assumed for the deployment
+ *  -c, --config <config>         Path to config file
+ *  --stage-file <stageFile>      Path to config file
+ *  --env-file <envFile>          Path to env file
+ *  --cf-file <cfFile>            Path to CloudFormation templateUrl
+ *  --kes-class <kesClass>        Kes Class override
+ *  -k, --kes-folder <kesFolder>  Path to config folder
+ *  -r, --region <region>         AWS region
+ *  --stack <stack>               stack name, defaults to the config value
+ *  --stage <stage>               stage name, defaults to the config value
+ *  -h, --help                    output usage information
+ *
+ *  Commands:
+ *  cf [create|update|upsert|validate|compile]  CloudFormation Operations:
+ *    create    Creates the CF stack
+ *    update    Updates the CF stack
+ *    upsert    Creates the CF stack and Update if already exists
+ *    validate  Validates the CF stack
+ *    compile   Compiles the CF stack
+ *    lambda <lambdaName>                         uploads a given lambda function to Lambda service
+ *
  * ```
  *
  * ## Setting Up the First Project

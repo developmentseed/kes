@@ -107,10 +107,11 @@ program
   .option('--stage <stage>', 'stage name, defaults to the config value');
 
 program
-  .command('cf [create|update|validate|compile]')
+  .command('cf [create|update|upsert|validate|compile]')
   .description(`CloudFormation Operations:
   create    Creates the CF stack
   update    Updates the CF stack
+  upsert    Creates the CF stack and Update if already exists
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
   .action((cmd) => {
@@ -130,6 +131,9 @@ program
         break;
       case 'update':
         kes.updateStack().then(r => success(r)).catch(e => failure(e));
+        break;
+      case 'upsert':
+        kes.upsertStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'validate':
         kes.validateTemplate().then(r => success(r)).catch(e => failure(e));
