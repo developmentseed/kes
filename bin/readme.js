@@ -238,10 +238,10 @@
  *  kes cf upsert
  * ```
  *
- * ### Differnet deployment configurations
+ * ### Differenet deployment configurations
  *
- * You can configure different values for diferrent deployments. For example you might want to configure your test deployment
- * differently from your staging and production deployments. Here is how to achieve it
+ * You can configure different values for different deployments. For example you might want to configure your test deployment
+ * differently from your staging and production deployments. Here is how to achieve it:
  *
  * ```yaml
  * # config.yml
@@ -256,7 +256,7 @@
  *     - DEBUG: false
  * ```
  *
- * To deploy the `staging` run:
+ * To deploy a stack with the `staging` configuration run:
  *
  * ```bash
  * kes cf upsert --deployment staging
