@@ -174,7 +174,7 @@ class Kes {
   cloudFormation(op) {
     const cf = new AWS.CloudFormation();
     let opFn = op === 'create' || op === 'upsert' ? cf.createStack : cf.updateStack;
-    const wait = op === 'create' ? 'stackCreateComplete' : 'stackUpdateComplete';
+    const wait = op === 'create' || op === 'upsert' ? 'stackCreateComplete' : 'stackUpdateComplete';
 
     const cfParams = [];
     // add custom params from the config file if any
