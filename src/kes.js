@@ -200,6 +200,11 @@ class Kes {
       Capabilities: capabilities
     };
 
+    if (this.config.tags) {
+      const tagKeys = Object.getOwnPropertyNames(this.config.tags);
+      params.Tags = tagKeys.map((key) => ({ Key: key, Value: this.config.tags[key] }));
+    }
+
     if (this.bucket) {
       params.TemplateURL = this.templateUrl;
     }
