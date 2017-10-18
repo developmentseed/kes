@@ -1,0 +1,335 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'stack: {{stackName}} | deployed by Kes'
+Parameters:
+  SomeTestParameter:
+    Type: String
+    Description: 'This shows how to pass a parameter via kes'
+
+Resources:
+
+  StepRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: {{stackName}}-stepfunction
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: StepFunctionRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
+
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: {{stackName}}-lambda
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+              - lambda.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: Lambda
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - logs:DescribeLogStreams
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - lambda:GetFunction
+                  - lambda:invokeFunction
+                Resource: "*"
+
+
+  #################################################
+  # Custom Resource BEGIN
+  #################################################
+  CustomResource:
+    Type: Custom::Kes
+    Properties:
+      ServiceToken: !GetAtt CustomLambdaFunction.Arn
+      SomeTestParameter:
+        SomeValue: !Ref SomeTestParameter
+
+  #################################################
+  # Custom Resource END
+  #################################################
+
+  #################################################
+  # SNS config BEGIN
+  #################################################
+{{#each sns}}
+  {{name}}Sns:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      DisplayName: {{../stackName}}-{{name}}
+      Subscription:
+      {{#each subscriptions}}
+        - Endpoint: {{endpoint}}
+          Protocol: {{protocol}}
+      {{/each}}
+
+{{/each}}
+  #################################################
+  # SNS config END
+  #################################################
+
+  #################################################
+  # Step Functions config BEGIN
+  #################################################
+{{#each stepFunctions}}
+  {{../NoDash}}{{name}}StateMachine:
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString:
+        !Sub |
+          {{{ToJson definition}}}
+      RoleArn: !GetAtt StepRole.Arn
+
+{{/each}}
+  #################################################
+  # Step Functions config END
+  #################################################
+
+  #################################################
+  # SQS config BEGIN
+  #################################################
+{{#each sqs}}
+  {{name}}SQS:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: {{../stackName}}-{{name}}
+      ReceiveMessageWaitTimeSeconds: 20
+    {{#if retry}}
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt [{{name}}FailedSQS, Arn]
+        maxReceiveCount: {{retry}}
+    {{/if}}
+      VisibilityTimeout: {{visibilityTimeout}}
+
+{{#if retry}}
+  {{name}}FailedSQS:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: {{../stackName}}-{{name}}-failed
+
+{{/if}}
+{{/each}}
+  #################################################
+  # SQS config END
+  #################################################
+
+  #################################################
+  # DynamoDB config BEGIN
+  #################################################
+{{#each dynamos}}
+  {{name}}DynamoDB:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+    {{#each attributes}}
+      - AttributeName: {{name}}
+        AttributeType: {{type}}
+    {{/each}}
+      KeySchema:
+    {{#each attributes}}
+      - AttributeName: {{name}}
+        KeyType: {{schema}}
+    {{/each}}
+      ProvisionedThroughput:
+        ReadCapacityUnits: {{read}}
+        WriteCapacityUnits: {{write}}
+      TableName: {{../stackName}}-{{name}}
+      StreamSpecification:
+        StreamViewType: "NEW_IMAGE"
+
+{{/each}}
+
+  #################################################
+  # DyanmoDB config END
+  #################################################
+
+  #################################################
+  # APIGateway config BEGIN
+  #################################################
+{{# if apis}}
+{{# if apiMethods}}
+{{# each apiDependencies}}
+  ApiGatewayDeployment2{{name}}:
+    DependsOn:
+  {{#each methods}}
+    - {{name}}
+  {{/each}}
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      RestApiId:
+        Ref: {{name}}RestApi
+      StageName: dev
+{{/each}}
+
+{{#each apiMethods}}
+  {{name}}:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      ResourceId:
+        Ref: {{resource}}
+      RestApiId:
+        Ref: {{api}}RestApi
+      HttpMethod: {{method}}
+      AuthorizationType: NONE
+      Integration:
+        Type: AWS_PROXY
+        IntegrationHttpMethod: POST
+        Uri:
+          Fn::Join:
+          - ''
+          - - 'arn:aws:apigateway:'
+            - Ref: AWS::Region
+            - :lambda:path/2015-03-31/functions/
+            - Fn::GetAtt:
+              - {{lambda}}LambdaFunction
+              - Arn
+            - /invocations
+
+{{/each}}
+
+{{#each apiMethodsOptions}}
+  {{name}}:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: OPTIONS
+      Integration:
+        IntegrationResponses:
+        - ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: '''Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'''
+            method.response.header.Access-Control-Allow-Methods: '''OPTIONS,PUT,POST,GET,DELETE'''
+            method.response.header.Access-Control-Allow-Origin: '''*'''
+          ResponseTemplates:
+            application/json: ''
+          StatusCode: '200'
+        RequestTemplates:
+          application/json: '{statusCode:200}'
+        Type: MOCK
+      MethodResponses:
+      - ResponseModels: {}
+        ResponseParameters:
+          method.response.header.Access-Control-Allow-Headers: true
+          method.response.header.Access-Control-Allow-Methods: true
+          method.response.header.Access-Control-Allow-Origin: true
+        StatusCode: '200'
+      RequestParameters:
+        method.request.header.Authorization: true
+      ResourceId:
+        Ref: {{resource}}
+      RestApiId:
+        Ref: {{api}}RestApi
+
+{{/each}}
+
+{{#each apiResources}}
+  {{name}}:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+      {{#each parents}}
+        {{this}}
+      {{/each}}
+      PathPart: '{{pathPart}}'
+      RestApiId:
+        Ref: {{api}}RestApi
+
+{{/each}}
+
+{{#each apis}}
+  {{name}}RestApi:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Name: {{../stackName}}-{{name}}
+{{/each}}
+{{/if}}
+{{/if}}
+  #################################################
+  # APIGateway config END
+  #################################################
+
+  #################################################
+  # Lambda config BEGIN
+  #################################################
+{{#each lambdas}}
+  {{name}}LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket: {{bucket}}
+        S3Key: {{remote}}
+      FunctionName: {{../stackName}}-{{name}}
+    {{# if envs}}
+      Environment:
+        Variables:
+          stackName: {{../stackName}}
+        {{#each envs}}
+          {{@key}}: {{this}}
+        {{/each}}
+      {{/if}}
+      Handler: {{handler}}
+      MemorySize: {{memory}}
+      Role: !GetAtt LambdaRole.Arn
+      Runtime: {{# if runtime}}{{runtime}}{{else}}nodejs6.10{{/if}}
+      Timeout: {{timeout}}
+      Tags:
+        - Key: Project
+          Value: {{../stackName}}
+
+{{# if apiGateway }}
+  {{name}}LambdaPermissionApiGateway:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+        - {{name}}LambdaFunction
+        - Arn
+      Principal: apigateway.amazonaws.com
+{{/if}}
+
+{{/each}}
+  #################################################
+  # Lambda config END
+  #################################################
+
+Outputs:
+{{#each stepFunctions}}
+  {{name}}StateMachine:
+    Value: !Ref {{../resourcePrefixNoDash}}{{name}}StateMachine
+{{/each}}
+
+{{#each sqs}}
+  {{name}}SQSOutput:
+    Value: !Ref {{name}}SQS
+{{/each}}
+
+{{#each sns}}
+  {{name}}SnsArn:
+    Value: !Ref {{name}}Sns
+{{/each}}
