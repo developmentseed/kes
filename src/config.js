@@ -226,7 +226,7 @@ class Config {
         }
 
         if (!has(lambda, 'envs')) {
-          lambda.envs = [];
+          lambda.envs = {};
         }
 
         // lambda fullName
@@ -275,8 +275,6 @@ class Config {
       this.stack = config.stackName;
     }
 
-    this.bucket = config.buckets.internal;
-
     config = this.constructor.configureLambda(config);
     return merge(config, this.constructor.configureApiGateway(config));
   }
@@ -293,6 +291,7 @@ class Config {
    */
   parse() {
     const config = this.parseConfig();
+    this.bucket = get(config, 'buckets.internal');
 
     // merge with the instnace
     merge(this, config);
