@@ -10,6 +10,7 @@ const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
 const pckg = require('../package.json');
+const Config = require('../src/config');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
@@ -131,7 +132,8 @@ program
       }
     }
 
-    const kes = new Kes(program);
+    const config = new Config(program);
+    const kes = new Kes(config);
     switch (cmd) {
       case 'create':
         kes.createStack().then(r => success(r)).catch(e => failure(e));
@@ -159,7 +161,8 @@ program
   .action((cmd, options) => {
     if (cmd) {
       const Kes = require('../index').Kes;
-      const kes = new Kes(program);
+      const config = new Config(program);
+      const kes = new Kes(config);
       kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => failure(e));
     }
     else {
