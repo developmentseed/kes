@@ -31,7 +31,7 @@ const utils = require('./utils');
  *
  * @param {Object} options a js object that includes required options.
  * @param {String} [options.stack] the stack name
- * @param {String} [options.deployment='dev'] the deployment name
+ * @param {String} [options.deployment=null] the deployment name
  * @param {String} [options.region='us-east-1'] the aws region
  * @param {String} [options.profile=null] the profile name
  * @param {String} [options.kesFolder='.kes'] the path to the kes folder
@@ -46,7 +46,7 @@ class Config {
   constructor(options) {
     this.region = get(options, 'region');
     this.profile = get(options, 'profile', null);
-    this.deployment = get(options, 'deployment', null);
+    this.deployment = get(options, 'deployment');
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.stack = get(options, 'stack', null);
 
