@@ -65,6 +65,7 @@ class Kes {
     this.templateUrl = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/cloudformation.yml`;
 
     utils.configureAws(this.region, this.profile, this.role);
+    this.s3 = new AWS.S3();
   }
 
   /**
@@ -129,9 +130,8 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   uploadToS3(bucket, key, body) {
-    const s3 = new AWS.S3();
     console.log(`Uploaded: s3://${bucket}/${key}`);
-    return s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
+    return this.s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
   }
 
   /**
