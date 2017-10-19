@@ -175,7 +175,7 @@ class Kes {
     };
 
     if (this.config.tags) {
-      const tagKeys = Object.getOwnPropertyNames(this.config.tags);
+      const tagKeys = Object.keys(this.config.tags);
       params.Tags = tagKeys.map((key) => ({ Key: key, Value: this.config.tags[key] }));
     }
 
