@@ -28,7 +28,7 @@ jobs:
             kes cf compile --kes-folder examples/full
             kes cf validate --kes-folder examples/full
 
-            ava tests/test.*
+            npm run test
 
       - add_ssh_keys:
           fingerprints:
