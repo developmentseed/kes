@@ -24,6 +24,14 @@ jobs:
             kes cf compile
             kes cf validate
 
+            mkdir ~/example2
+            cp -r ~/examples/full ~/example2/.kes
+            cd ~/example2
+            kes cf compile
+            kes cf validate
+
+            ava tests/test.*
+
       - add_ssh_keys:
           fingerprints:
              - "8f:58:d1:7d:1f:b0:ed:cc:fd:c9:46:cb:ee:6b:40:86"
