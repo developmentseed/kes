@@ -25,7 +25,7 @@ jobs:
             kes cf validate
 
             mkdir ~/example2
-            cp -r ~/examples/full ~/example2/.kes
+            cp -r ~/kes/examples/full ~/example2/.kes
             cd ~/example2
             kes cf compile
             kes cf validate
