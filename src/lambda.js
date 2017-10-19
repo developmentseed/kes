@@ -23,8 +23,6 @@ class Lambda {
     this.bucket = get(config, 'bucket');
     this.key = path.join(this.config.stack, 'lambdas');
     this.grouped = {};
-
-    console.log(this.bucket);
   }
 
   /**
