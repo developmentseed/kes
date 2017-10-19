@@ -24,6 +24,12 @@ jobs:
             kes cf compile
             kes cf validate
 
+            cd ~/kes
+            kes cf compile --kes-folder examples/full
+            kes cf validate --kes-folder examples/full
+
+            npm run test
+
       - add_ssh_keys:
           fingerprints:
              - "8f:58:d1:7d:1f:b0:ed:cc:fd:c9:46:cb:ee:6b:40:86"

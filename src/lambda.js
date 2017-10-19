@@ -1,6 +1,7 @@
 'use strict';
 
 const AWS = require('aws-sdk');
+const get = require('lodash.get');
 const fs = require('fs-extra');
 const path = require('path');
 const { exec, getZipName } = require('./utils');
@@ -11,16 +12,16 @@ const { exec, getZipName } = require('./utils');
  * @param {Object} config the configuration object
  * @param {String} kesFolder the path to the `.kes` folder
  * @param {String} bucket the S3 bucket name
- * @param {String} key the main folder to store the data in the bucket (stack + stage)
+ * @param {String} key the main folder to store the data in the bucket (stack)
  */
 class Lambda {
-  constructor(config, kesFolder, bucket, key) {
+  constructor(config) {
     this.config = config;
-    this.kesFolder = kesFolder;
+    this.kesFolder = config.kesFolder;
     this.distFolder = path.join(this.kesFolder, 'dist');
     this.buildFolder = path.join(this.kesFolder, 'build');
-    this.bucket = bucket;
-    this.key = path.join(key, 'lambdas');
+    this.bucket = get(config, 'bucket');
+    this.key = path.join(this.config.stack, 'lambdas');
     this.grouped = {};
   }
 
@@ -226,12 +227,11 @@ class Lambda {
       throw new Error('Lambda function is not defined in config.yml');
     }
     const stack = this.config.stackName;
-    const stage = this.config.stage;
 
     console.log(`Updating ${lambda.name}`);
     lambda = this.zipLambda(lambda);
     return l.updateFunctionCode({
-      FunctionName: `${stack}-${stage}-${lambda.name}`,
+      FunctionName: `${stack}-${lambda.name}`,
       ZipFile: fs.readFileSync(lambda.local)
     }).promise()
     .then((r) => console.log(`Lambda function ${lambda.name} has been updated`));

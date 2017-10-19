@@ -13,6 +13,7 @@
     -   [validateTemplate](#validatetemplate)
     -   [describeCF](#describecf)
     -   [opsStack](#opsstack)
+    -   [upsertStack](#upsertstack)
     -   [createStack](#createstack)
     -   [updateStack](#updatestack)
 -   [Lambda](#lambda)
@@ -29,20 +30,19 @@
 ## Config
 
 This class handles reading and parsing configuration files.
-It primarily reads `stage.yml`, `config.yml` and `.env` files
+It primarily reads `config.yml` and `.env` files
 
 **Parameters**
 
 -   `stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
--   `stage` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stage name
+-   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
 -   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
--   `stageFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the stage.yml file (optional)
 -   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
 
 **Examples**
 
 ```javascript
-const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/stage.yml', '.kes/.env');
+const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/.env');
 const config = configurator.parse();
 ```
 
@@ -54,7 +54,7 @@ as a JS object.
 **Examples**
 
 ```javascript
-const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/stage.yml', 'path/to/.env');
+const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/.env');
 config = configInstance.parse();
 ```
 
@@ -70,12 +70,11 @@ and modify the behaviour of kes cli.
 
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
     -   `options.stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the stack name (required)
-    -   `options.stage` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the stage name (optional, default `'dev'`)
+    -   `options.deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `'dev'`)
     -   `options.region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the aws region (optional, default `'us-east-1'`)
     -   `options.profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the profile name (optional, default `null`)
     -   `options.kesFolder` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the kes folder (optional, default `'.kes'`)
     -   `options.configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
-    -   `options.stageFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the stage.yml (optional, default `'stage.yml'`)
     -   `options.envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
     -   `options.cfFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
 
@@ -170,6 +169,13 @@ Generic create/update  method for CloudFormation
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
+### upsertStack
+
+Creates a CloudFormation stack for the class instance
+If exists, will update the existing one
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+
 ### createStack
 
 Creates a CloudFormation stack for the class instance
@@ -191,7 +197,7 @@ Copy, zip and upload lambda functions to S3
 -   `config` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
 -   `kesFolder` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the `.kes` folder
 -   `bucket` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the S3 bucket name
--   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the main folder to store the data in the bucket (stack + stage)
+-   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the main folder to store the data in the bucket (stack)
 
 ### updateLambda
 

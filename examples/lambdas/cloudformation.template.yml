@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: '2010-09-09'
-Description: 'stack: {{stackName}} | stage: {{stage}} | deployed by Kes'
+Description: 'stack: {{stackName}} | deployed by Kes'
 
 Resources:
 
@@ -49,10 +49,9 @@ Resources:
       Code:
         S3Bucket: {{bucket}}
         S3Key: {{remote}}
-      FunctionName: {{../stackName}}-{{../stage}}-{{name}}
+      FunctionName: {{../stackName}}-{{name}}
       Environment:
         Variables:
-          stage: {{../stage}}
           stackName: {{../stackName}}
         {{#each envs}}
           {{@key}}: {{this}}
