@@ -1,6 +1,7 @@
 'use strict';
 
 const test = require('ava');
+const has = require('lodash.has');
 const { Config, utils } = require('../index');
 const AWS = require('aws-sdk');
 
@@ -42,6 +43,8 @@ test('create a config instance', (t) => {
   t.is(config.stack, 'my-kes-project');
   t.is(config.lambdas.length, 2);
   t.is(config.lambdas[0].fullName, 'my-kes-project-func1');
+
+  // make sure envs are added even if lambdas don't include them
   t.is(Object.keys(config.lambdas[0].envs).length, 0);
   t.is(config.lambdas[1].envs.CUSTOM_ENV, 'myValue');
 });
@@ -55,4 +58,31 @@ test('create a config instance with non default deployment', (t) => {
 
   t.is(config.stack, 'my-kes-project-prod');
   t.is(config.region, 'us-east-3');
+});
+
+test('test api gateway configuration', (t) => {
+  const config = new Config({
+    kesFolder: 'examples/full'
+  });
+
+  t.is(config.lambdas.length, 5);
+  t.true(has(config, 'apiMethods'));
+  t.true(has(config, 'apiResources'));
+  t.true(has(config, 'apiMethodsOptions'));
+  t.true(has(config, 'apiDependencies'));
+});
+
+test('passing variables as configuration values', (t) => {
+  const config1 = new Config({
+    kesFolder: 'examples/full'
+  });
+
+  t.is(config1.sqs[0].retry, '10');
+
+  const config2 = new Config({
+    kesFolder: 'examples/full',
+    deployment: 'staging'
+  });
+
+  t.is(config2.sqs[0].retry, '20');
 });

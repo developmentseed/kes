@@ -1,6 +1,7 @@
 default:
   stackName: kes-full-example
   noDash: KesFullExample
+  retryValue: 10
 
   buckets:
     internal: devseed-kes-deployment
@@ -21,7 +22,7 @@ default:
 
   sqs:
     - name: mySqs
-      retry: 10
+      retry: '{{retryValue}}'
       visibilityTimeout: 10
 
   dynamos:
@@ -91,3 +92,6 @@ default:
       timeout: 300
       memory: 512
       source: 'examples/code/lambda1/index.js'
+
+staging:
+  retryValue: 20
