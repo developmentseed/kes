@@ -1,0 +1,97 @@
+default:
+  stackName: kes-full-example
+  noDash: KesFullExample
+  retryValue: 10
+
+  buckets:
+    internal: devseed-kes-deployment
+    tests: myTestArtifacts
+
+  capabilities:
+    - CAPABILITY_NAMED_IAM
+
+  params:
+    - name: SomeTestParameter
+      value: someValue
+
+  sns:
+    - name: subscribeToLambda1
+      subscriptions:
+        - protocol: lambda
+          endpoint: '!GetAtt Lambda1LambdaFunction.Arn'
+
+  sqs:
+    - name: mySqs
+      retry: '{{retryValue}}'
+      visibilityTimeout: 10
+
+  dynamos:
+    - name: myTable
+      read: 5
+      write: 5
+      attributes:
+        - name: ID
+          type: S
+          schema: HASH
+        - name: date
+          type: N
+          schema: RANGE
+
+  apis:
+    - name: myApi
+
+  stepFunctions:
+    - name: step1
+      definition:
+        Comment: 'Example StepFunction'
+        StartAt: Step1
+        States:
+          Step1:
+            Type: Task
+            Resource: ${Lambda2LambdaFunction.Arn}
+            Next: Step2
+          Step2:
+            Type: Task
+            Resource: ${Lambda3LambdaFunction.Arn}
+            End: true
+
+  lambdas:
+    - name: Custom
+      handler: custom.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/custom/index.js'
+    - name: ApiLambda
+      handler: api.handler
+      timeout: 20
+      memory: 256
+      source: 'examples/code/api/index.js'
+      envs:
+        internal: '{{buckets.internal}}'
+      apiGateway:
+        - path: list
+          method: get
+          cors: true
+          api: myApi
+        - path: add
+          method: post
+          cors: true
+          api: myApi
+    - name: Lambda1
+      handler: lambda2.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/lambda1/index.js'
+    - name: Lambda2
+      handler: lambda2.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/lambda1/index.js'
+    - name: Lambda3
+      handler: lambda1.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/lambda1/index.js'
+
+staging:
+  retryValue: 20

@@ -1,6 +1,8 @@
 'use strict';
 
 const fs = require('fs');
+const path = require('path');
+const get = require('lodash.get');
 const has = require('lodash.has');
 const values = require('lodash.values');
 const startsWith = require('lodash.startswith');
@@ -19,21 +21,42 @@ const utils = require('./utils');
  * It primarily reads `config.yml` and `.env` files
  *
  * @example
- * const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/.env');
- * const config = configurator.parse();
+ * const config = new Config('mystack', 'dev', '.kes/config.yml', '.kes/.env');
  *
  * @param {String} stack Stack name
  * @param {String} deployment Deployment name
  * @param {String} configFile path to the config.yml file
  * @param {String} envFile path to the .env file (optional)
+ *
+ *
+ * @param {Object} options a js object that includes required options.
+ * @param {String} [options.stack] the stack name
+ * @param {String} [options.deployment=null] the deployment name
+ * @param {String} [options.region='us-east-1'] the aws region
+ * @param {String} [options.profile=null] the profile name
+ * @param {String} [options.kesFolder='.kes'] the path to the kes folder
+ * @param {String} [options.configFile='config.yml'] the path to the config.yml
+ * @param {String} [options.envFile='.env'] the path to the .env file
+ * @param {String} [options.cfFile='cloudformation.template.yml'] the path to the CF template
+
  * @class Config
  */
 class Config {
-  constructor(stack, deployment, configFile, envFile) {
-    this.stack = stack;
-    this.deployment = deployment;
-    this.configFile = configFile;
-    this.envs = utils.loadLocalEnvs(envFile);
+  //constructor(stack, deployment, configFile, envFile) {
+  constructor(options) {
+    this.region = get(options, 'region');
+    this.profile = get(options, 'profile', null);
+    this.deployment = get(options, 'deployment');
+    this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
+    this.stack = get(options, 'stack', null);
+
+    this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
+    this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
+    this.envFile = get(options, 'envFile', path.join(this.kesFolder, '.env'));
+    this.cfFile = get(options, 'cfFile', path.join(this.kesFolder, 'cloudformation.template.yml'));
+
+    this.envs = utils.loadLocalEnvs(this.envFile);
+    this.parse();
   }
 
   /**
@@ -203,7 +226,7 @@ class Config {
         }
 
         if (!has(lambda, 'envs')) {
-          lambda.envs = [];
+          lambda.envs = {};
         }
 
         // lambda fullName
@@ -248,6 +271,9 @@ class Config {
     if (this.stack) {
       config.stackName = this.stack;
     }
+    else {
+      this.stack = config.stackName;
+    }
 
     config = this.constructor.configureLambda(config);
     return merge(config, this.constructor.configureApiGateway(config));
@@ -264,7 +290,11 @@ class Config {
    * @return {Object} the configuration object
    */
   parse() {
-    return this.parseConfig();
+    const config = this.parseConfig();
+    this.bucket = get(config, 'buckets.internal');
+
+    // merge with the instnace
+    merge(this, config);
   }
 }
 

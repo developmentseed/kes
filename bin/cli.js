@@ -10,9 +10,11 @@ const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
 const pckg = require('../package.json');
+const Config = require('../src/config');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
+const distFolder = path.join(baseDir, 'dist');
 require('./readme');
 
 const success = (r) => process.exit(0);
@@ -59,15 +61,26 @@ const init = function () {
       process.exit(1);
     }
 
-    console.log(kesFolder);
     fs.mkdirSync(kesFolder);
-    fs.mkdirSync(path.join(baseDir, 'dist'));
+
+    // only create dist folder if it doesn't exist
+    try {
+      fs.statSync(distFolder)
+    } catch (e) {
+      fs.mkdirSync(distFolder);
+    }
+
     console.log(`.kes folder created at ${kesFolder}`);
 
     // copy simple config file and template
     const config = yaml.safeLoad(fs.readFileSync(
       path.join(__dirname, '..', 'examples/lambdas/config.yml'), 'utf8'));
     config.default.stackName = result.stack;
+
+    if (!config.default.buckets) {
+      config.default.buckets = {};
+    }
+
     config.default.buckets.internal = result.bucket;
     fs.writeFileSync(path.join(kesFolder, 'config.yml'), yaml.safeDump(config));
 
@@ -131,7 +144,8 @@ program
       }
     }
 
-    const kes = new Kes(program);
+    const config = new Config(program);
+    const kes = new Kes(config);
     switch (cmd) {
       case 'create':
         kes.createStack().then(r => success(r)).catch(e => failure(e));
@@ -159,7 +173,8 @@ program
   .action((cmd, options) => {
     if (cmd) {
       const Kes = require('../index').Kes;
-      const kes = new Kes(program);
+      const config = new Config(program);
+      const kes = new Kes(config);
       kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => failure(e));
     }
     else {
