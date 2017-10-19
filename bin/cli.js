@@ -14,6 +14,7 @@ const Config = require('../src/config');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
+const distFolder = path.join(baseDir, 'dist');
 require('./readme');
 
 const success = (r) => process.exit(0);
@@ -60,15 +61,26 @@ const init = function () {
       process.exit(1);
     }
 
-    console.log(kesFolder);
     fs.mkdirSync(kesFolder);
-    fs.mkdirSync(path.join(baseDir, 'dist'));
+
+    // only create dist folder if it doesn't exist
+    try {
+      fs.statSync(distFolder)
+    } catch (e) {
+      fs.mkdirSync(distFolder);
+    }
+
     console.log(`.kes folder created at ${kesFolder}`);
 
     // copy simple config file and template
     const config = yaml.safeLoad(fs.readFileSync(
       path.join(__dirname, '..', 'examples/lambdas/config.yml'), 'utf8'));
     config.default.stackName = result.stack;
+
+    if (!config.default.buckets) {
+      config.default.buckets = {};
+    }
+
     config.default.buckets.internal = result.bucket;
     fs.writeFileSync(path.join(kesFolder, 'config.yml'), yaml.safeDump(config));
 
