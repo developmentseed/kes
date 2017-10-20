@@ -38,12 +38,20 @@ It primarily reads `config.yml` and `.env` files
 -   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
 -   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
 -   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
+-   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
+    -   `options.stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** the stack name
+    -   `options.deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `null`)
+    -   `options.region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the aws region (optional, default `'us-east-1'`)
+    -   `options.profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the profile name (optional, default `null`)
+    -   `options.kesFolder` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the kes folder (optional, default `'.kes'`)
+    -   `options.configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
+    -   `options.envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
+    -   `options.cfFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
 
 **Examples**
 
 ```javascript
-const configurator = new Config('mystack', 'dev', '.kes/config.yml', '.kes/.env');
-const config = configurator.parse();
+const config = new Config('mystack', 'dev', '.kes/config.yml', '.kes/.env');
 ```
 
 ### parse
@@ -68,23 +76,16 @@ and modify the behaviour of kes cli.
 
 **Parameters**
 
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
-    -   `options.stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the stack name (required)
-    -   `options.deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `'dev'`)
-    -   `options.region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the aws region (optional, default `'us-east-1'`)
-    -   `options.profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the profile name (optional, default `null`)
-    -   `options.kesFolder` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the kes folder (optional, default `'.kes'`)
-    -   `options.configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
-    -   `options.envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
-    -   `options.cfFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
+-   `config` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an instance of the Config class (config.js)
 
 **Examples**
 
 ```javascript
-const { Kes } = require('kes');
+const { Kes, Config } = require('kes');
 
 const options = { stack: 'myStack' };
-const kes = new Kes(options);
+const config = new Config(options);
+const kes = new Kes(config);
 
 // create a new stack
 kes.createStack()

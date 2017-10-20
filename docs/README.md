@@ -8,13 +8,14 @@
         -   [CF Stack Name](#cf-stack-name)
         -   [Parameters](#parameters)
         -   [CF Capabailities](#cf-capabailities)
+        -   [CloudFormation Tagging](#cloudformation-tagging)
         -   [Lambda Functions](#lambda-functions)
         -   [Handlebar Helpers](#handlebar-helpers)
     -   [Deployment](#deployment)
         -   [create](#create)
         -   [update](#update)
         -   [upsert](#upsert)
-        -   [Differnet deployment configurations](#differnet-deployment-configurations)
+        -   [Differenet deployment configurations](#differenet-deployment-configurations)
     -   [Deployment Using IAM Role](#deployment-using-iam-role)
         -   [Updating One Lambda Function](#updating-one-lambda-function)
 
@@ -125,6 +126,18 @@ default:
       value: someValue
   capabilities:
     - CAPABILITY_IAM
+```
+
+### CloudFormation Tagging
+
+To manage tags associated with your CloudFormation stack, use the `tags` key:
+
+```yaml
+# config.yml
+default:
+  tags:
+    color: orange
+    tree: oak
 ```
 
 ### Lambda Functions
@@ -269,10 +282,10 @@ To create a stack or update it if it exists
  kes cf upsert
 ```
 
-### Differnet deployment configurations
+### Differenet deployment configurations
 
-You can configure different values for diferrent deployments. For example you might want to configure your test deployment
-differently from your staging and production deployments. Here is how to achieve it
+You can configure different values for different deployments. For example you might want to configure your test deployment
+differently from your staging and production deployments. Here is how to achieve it:
 
 ```yaml
 # config.yml
@@ -287,7 +300,7 @@ staging:
     - DEBUG: false
 ```
 
-To deploy the `staging` run:
+To deploy a stack with the `staging` configuration run:
 
 ```bash
 kes cf upsert --deployment staging

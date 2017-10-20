@@ -174,6 +174,16 @@ class Kes {
       Capabilities: capabilities
     };
 
+    if (this.config.tags) {
+      params.Tags = Object.keys(this.config.tags).map((key) => ({
+        Key: key,
+        Value: this.config.tags[key]
+      }));
+    }
+    else {
+      params.Tags = [];
+    }
+
     if (this.bucket) {
       params.TemplateURL = this.templateUrl;
     }

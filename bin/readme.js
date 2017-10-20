@@ -106,6 +106,18 @@
  *     - CAPABILITY_IAM
  * ```
  *
+ * ### CloudFormation Tagging
+ *
+ * To manage tags associated with your CloudFormation stack, use the `tags` key:
+ *
+ * ```yaml
+ * # config.yml
+ * default:
+ *   tags:
+ *     color: orange
+ *     tree: oak
+ * ```
+ *
  * ### Lambda Functions
  * To add lambda functions, use `lambdas` key and add them as array object.
  * The lambda function code can be either a folder or file on your computer
