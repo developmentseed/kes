@@ -29,7 +29,7 @@ function exec(cmd, verbose) {
  * @param {String} [region='us-east-1'] AWS region
  * @param {String} [profile=null] aws credentials profile name
  */
-function configureAws(region = null, profile = null, role = null) {
+function configureAws(region, profile, role) {
   if (region) {
     AWS.config.update({ region });
   }

@@ -2,7 +2,8 @@
 
 const test = require('ava');
 const has = require('lodash.has');
-const { Config, utils } = require('../index');
+const Config = require('../index').Config;
+const utils = require('../index').utils;
 const AWS = require('aws-sdk');
 
 test('should load local env variables', (t) => {
