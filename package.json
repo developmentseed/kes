@@ -15,7 +15,7 @@
     "AWS"
   ],
   "engines": {
-    "node": ">=6.10"
+    "node": ">=4.3"
   },
   "eslintConfig": {
     "env": {
