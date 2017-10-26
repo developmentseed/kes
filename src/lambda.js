@@ -4,7 +4,8 @@ const AWS = require('aws-sdk');
 const get = require('lodash.get');
 const fs = require('fs-extra');
 const path = require('path');
-const { exec, getZipName } = require('./utils');
+const exec = require('./utils').exec;
+const getZipName = require('./utils').getZipName;
 
 /**
  * Copy, zip and upload lambda functions to S3
@@ -60,7 +61,11 @@ class Lambda {
     return lambda;
   }
 
-  getHash(folderName, method = 'shasum') {
+  getHash(folderName, method) {
+    if (!method) {
+      method = 'shasum';
+    }
+
     const alternativeMethod = 'sha1sum';
     let hash = exec(`find ${path.join(this.distFolder, folderName)} -type f | \
                    xargs ${method} | ${method} | awk '{print $1}' ${''}`, false);
