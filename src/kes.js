@@ -231,16 +231,21 @@ class Kes {
     const url = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/cloudformation.yml`;
 
     const params = {};
+    const cf = new AWS.CloudFormation();
 
     if (this.bucket) {
+      // upload the template to the bucket first
       params.TemplateURL = url;
+
+      return this.uploadCF()
+        .then(() => cf.validateTemplate(params).promise())
+        .then(() => console.log('Template is valid'));
     }
     else {
       params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, 'cloudformation.yml')).toString();
     }
 
     // Build and upload the CF template
-    const cf = new AWS.CloudFormation();
     return cf.validateTemplate(params)
       .promise().then(() => console.log('Template is valid'));
   }

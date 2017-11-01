@@ -34,10 +34,6 @@ It primarily reads `config.yml` and `.env` files
 
 **Parameters**
 
--   `stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
--   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
--   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
--   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
     -   `options.stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** the stack name
     -   `options.deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `null`)
@@ -47,6 +43,10 @@ It primarily reads `config.yml` and `.env` files
     -   `options.configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
     -   `options.envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
     -   `options.cfFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
+-   `stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
+-   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
+-   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
+-   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
 
 **Examples**
 
@@ -318,4 +318,4 @@ of profile on ~/.aws/credentials file if necessary
 
 -   `region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** AWS region (optional, default `'us-east-1'`)
 -   `profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** aws credentials profile name (optional, default `null`)
--   `role`   (optional, default `null`)
+-   `role`  
