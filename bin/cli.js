@@ -163,7 +163,7 @@ program
         kes.compileCF().then(r => success(r)).catch(e => failure(e));
         break;
       default:
-        console.log('Wrong choice. Accepted arguments: [create|update|validate|compile|dlq]');
+        console.log('Wrong choice. Accepted arguments: [create|update|validate|compile]');
     }
   });
 
