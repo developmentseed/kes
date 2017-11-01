@@ -205,8 +205,7 @@ class Lambda {
         }).catch(e => reject(e));
       });
     }
-
-    return new Promise(resolve => resolve(this.config));
+    else return Promise.resolve(this.config);
   }
 
   /**
