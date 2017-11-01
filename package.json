@@ -82,6 +82,7 @@
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
+    "github-slugger": "^1.2.0",
     "vinyl": "^2.1.0"
   }
 }
