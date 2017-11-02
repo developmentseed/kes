@@ -5,7 +5,7 @@
   "scripts": {
     "html-docs": "documentation build bin/cli.js -f html -o _docs --theme node_modules/documentation-devseed-theme",
     "md-docs": "documentation build bin/readme.js -f md -o docs/README.md && documentation build src/** -f md -o docs/API.md",
-    "test": "ava tests/test.*"
+    "test": "ava"
   },
   "bin": {
     "kes": "./bin/cli.js"
@@ -44,6 +44,13 @@
       ]
     }
   },
+  "ava": {
+    "files": ["tests"],
+    "source": [
+      "**/*.js",
+      "package.json"
+    ]
+  }, 
   "repository": "https://github.com/developmentseed/kes",
   "author": "Alireza Jazayeri <alireza@developmentseed.org>",
   "license": "Apache-2.0",
