@@ -217,17 +217,8 @@ class Kes {
     return opFn(params).promise().then(() => {
       console.log('Waiting for the CF operation to complete');
       return this.cf.waitFor(wait, { StackName: this.stack }).promise()
-        .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
-        .catch(e => {
-          if (e) {
-            if (e.message.includes('Resource is not in the state')) {
-              console.log('CF create/update failed. Check the logs');
-            }
-            throw e;
-          }
-        });
-    })
-    .catch((e) => {
+                    .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
+    }).catch((e) => {
       if (e.message === 'No updates are to be performed.') {
         console.log(e.message);
         return e.message;
@@ -236,10 +227,9 @@ class Kes {
         if (e.name && e.name === 'AlreadyExistsException' && op === 'deploy') {
           return this.cloudFormation('update');
         }
-
         console.log('There was an error creating/updating the CF stack');
-        throw e;
       }
+      throw e;
     });
   }
 
