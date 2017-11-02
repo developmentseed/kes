@@ -129,8 +129,9 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   uploadToS3(bucket, key, body) {
-    console.log(`Uploaded: s3://${bucket}/${key}`);
-    return this.s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
+    return this.s3.upload({ Bucket: bucket, Key: key, Body: body })
+                  .promise()
+                  .then(() => console.log(`Uploaded: s3://${bucket}/${key}`));
   }
 
   /**
