@@ -10,6 +10,7 @@ const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
+const deprecate = require('deprecate');
 const pckg = require('../package.json');
 const Config = require('../src/config');
 
@@ -34,6 +35,43 @@ const failure = (e) => {
     console.log(e);
   }
   process.exit(1);
+};
+
+const determineKesClass = function () {
+  let Kes;
+
+  // if there is a kes class specified use that
+  const kesClass = get(program, 'kesClass');
+  if (kesClass) {
+    Kes = require(path.join(process.cwd(), kesClass));
+  }
+  else {
+    // check if there is kes.js in the kes-folder
+    try {
+      let kesFolder;
+      if (program.kesFolder) {
+        kesFolder = program.kesFolder;
+      }
+      else {
+        kesFolder = path.join(process.cwd(), '.kes');
+      }
+      Kes = require(path.join(process.cwd(), kesFolder, 'kes.js'));
+    }
+    catch (e) {
+      // check if there is a template and the template has kes class
+      const template = get(program, 'template', '/path/to/nowhere');
+      try {
+        const kesPath = path.join(process.cwd(), template, 'kes.js');
+        fs.lstatSync(kesPath);
+        Kes = require(kesPath);
+      }
+      catch (e) {
+        Kes = require('../index').Kes;
+      }
+    }
+  }
+
+  return Kes;
 };
 
 const init = function () {
@@ -108,6 +146,7 @@ program
   .option('-c, --config <config>', 'Path to config file')
   .option('--env-file <envFile>', 'Path to env file')
   .option('--cf-file <cfFile>', 'Path to CloudFormation template')
+  .option('-t, --template <template>', 'A kes application template used as the base for the configuration')
   .option('--kes-class <kesClass>', 'Kes Class override', null)
   .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
   .option('-r, --region <region>', 'AWS region', null)
@@ -115,47 +154,33 @@ program
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
-  .command('cf [create|update|upsert|validate|compile]')
+  .command('cf [create|update|upsert|deploy|validate|compile]')
   .description(`CloudFormation Operations:
-  create    Creates the CF stack
-  update    Updates the CF stack
-  upsert    Creates the CF stack and Update if already exists
+  create    Creates the CF stack (deprecated, start using deploy)
+  update    Updates the CF stack (deprecated, start using deploy)
+  upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+  deploy    Creates the CF stack and Update if already exists
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
   .action((cmd) => {
-    let Kes;
-    const kesClass = get(program, 'kesClass');
-    if (kesClass) {
-      Kes = require(path.join(process.cwd(), kesClass));
-    }
-    else {
-      // check if there is kes.js in the kes-folder
-      try {
-        let kesFolder;
-        if (program.kesFolder) {
-          kesFolder = program.kesFolder;
-        }
-        else {
-          kesFolder = path.join(process.cwd(), '.kes');
-        }
-        Kes = require(path.join(process.cwd(), kesFolder, 'kes.js'));
-      }
-      catch (e) {
-        Kes = require('../index').Kes;
-      }
-    }
-
+    const Kes = determineKesClass(program);
     const config = new Config(program);
     const kes = new Kes(config);
     switch (cmd) {
       case 'create':
+        deprecate('"kes cf create" command is deprecated. Use "kes cf deploy" instead')
         kes.createStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'update':
+        deprecate('"kes cf update" command is deprecated. Use "kes cf deploy" instead')
         kes.updateStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'upsert':
+        deprecate('"kes cf upsert" command is deprecated. Use "kes cf deploy" instead')
         kes.upsertStack().then(r => success(r)).catch(e => failure(e));
+        break;
+      case 'deploy':
+        kes.deployStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'validate':
         kes.validateTemplate().then(r => success(r)).catch(e => failure(e));
@@ -164,7 +189,7 @@ program
         kes.compileCF().then(r => success(r)).catch(e => failure(e));
         break;
       default:
-        console.log('Wrong choice. Accepted arguments: [create|update|validate|compile]');
+        console.log('Wrong choice. Accepted arguments: [create|update|upsert|deploy|validate|compile]');
     }
   });
 

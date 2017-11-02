@@ -50,6 +50,20 @@ class Config {
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.stack = get(options, 'stack', null);
 
+    // use template if provided
+    if (has(options, 'template')) {
+      const templatePath = get(options, 'template');
+      fs.lstatSync(templatePath);
+      this.template = {
+        kesFolder: templatePath,
+        configFile: path.join(templatePath, 'config.yml'),
+        cfFile: path.join(templatePath, 'cloudformation.template.yml')
+      };
+    }
+    else {
+      this.template = null;
+    }
+
     this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
     this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
     this.envFile = get(options, 'envFile', path.join(this.kesFolder, '.env'));
@@ -243,6 +257,14 @@ class Config {
     return JSON.parse(rendered);
   }
 
+  readConfigFile() {
+    if (this.template) {
+      return utils.mergeYamls(this.template.configFile, this.configFile);
+    }
+
+    return fs.readFileSync(this.configFile, 'utf8');
+  }
+
   /**
    * Parses the config.yml
    * It uses the default environment values under config.yml and overrides them with values of
@@ -252,8 +274,7 @@ class Config {
    * @return {Object} returns configuration object
    */
   parseConfig() {
-    const configText = fs.readFileSync(this.configFile, 'utf8');
-
+    const configText = this.readConfigFile();
     Mustache.escape = (text) => text;
 
     // load, dump, then load to make sure all yaml included files pass through mustach render

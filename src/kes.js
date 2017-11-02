@@ -22,8 +22,7 @@ const utils = require('./utils');
  * const kes = new Kes(config);
  *
  * // create a new stack
- * kes.createStack()
- *  .then(() => updateStack())
+ * kes.deployStack()
  *  .then(() => describeCF())
  *  .then(() => updateSingleLambda('myLambda'))
  *  .catch(e => console.log(e));
@@ -40,6 +39,7 @@ class Kes {
 
     utils.configureAws(this.config.region, this.config.profile, this.config.role);
     this.s3 = new AWS.S3();
+    this.cf = new AWS.CloudFormation();
   }
 
   /**
@@ -53,20 +53,8 @@ class Kes {
     return lambda.updateSingleLambda(name);
   }
 
-  /**
-   * Compiles a CloudFormation template in Yaml format.
-   *
-   * Reads the configuration yaml from `.kes/config.yml`.
-   *
-   * Writes the template to `.kes/cloudformation.yml`.
-   *
-   * Uses `.kes/cloudformation.template.yml` as the base template
-   * for generating the final CF template.
-   *
-   * @return {Promise} returns the promise of an AWS response object
-   */
-  compileCF() {
-    const t = fs.readFileSync(this.config.cfFile, 'utf8');
+  parseCF(cfFile) {
+    const t = fs.readFileSync(cfFile, 'utf8');
 
     Handlebars.registerHelper('ToMd5', function(value) {
       if (value) {
@@ -82,15 +70,51 @@ class Kes {
     });
 
     const template = Handlebars.compile(t);
+    return template(this.config);
+  }
 
-    const destPath = path.join(this.config.kesFolder, 'cloudformation.yml');
-
+  /**
+   * Compiles a CloudFormation template in Yaml format.
+   *
+   * Reads the configuration yaml from `.kes/config.yml`.
+   *
+   * Writes the template to `.kes/cloudformation.yml`.
+   *
+   * Uses `.kes/cloudformation.template.yml` as the base template
+   * for generating the final CF template.
+   *
+   * @return {Promise} returns the promise of an AWS response object
+   */
+  compileCF() {
     const lambda = new Lambda(this.config);
 
     return lambda.process().then((config) => {
       this.config = config;
+      let cf;
+
+      // if there is a template parse CF there first
+      if (this.config.template) {
+        let mainCF = this.parseCF(this.config.template.cfFile);
+
+        // check if there is a CF over
+        try {
+          fs.lstatSync(this.config.cfFile);
+          let overrideCF = this.parseCF(this.config.cfFile);
+
+          // merge the the two
+          cf = utils.mergeYamls(mainCF, overrideCF);
+        }
+        catch (e) {
+          cf = mainCF;
+        }
+      }
+      else {
+        cf = this.parseCF(this.config.cfFile);
+      }
+
+      const destPath = path.join(this.config.kesFolder, 'cloudformation.yml');
       console.log(`Template saved to ${destPath}`);
-      return fs.writeFileSync(destPath, template(this.config));
+      return fs.writeFileSync(destPath, cf);
     });
   }
 
@@ -104,8 +128,9 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   uploadToS3(bucket, key, body) {
-    console.log(`Uploaded: s3://${bucket}/${key}`);
-    return this.s3.upload({ Bucket: bucket, Key: key, Body: body }).promise();
+    return this.s3.upload({ Bucket: bucket, Key: key, Body: body })
+                  .promise()
+                  .then(() => console.log(`Uploaded: s3://${bucket}/${key}`));
   }
 
   /**
@@ -118,7 +143,7 @@ class Kes {
     return this.compileCF().then(() => {
       // make sure cloudformation template exists
       try {
-        fs.accessSync(path.join(this.config.cfFile));
+        fs.accessSync(path.join(this.config.kesFolder, 'cloudformation.yml'));
       }
       catch (e) {
         throw new Error('cloudformation.yml is missing.');
@@ -142,14 +167,9 @@ class Kes {
   /**
    * Calls CloudFormation's update-stack or create-stack methods
    *
-   * @param {String} op possible values are 'create' and 'update'
    * @returns {Promise} returns the promise of an AWS response object
    */
-  cloudFormation(op) {
-    const cf = new AWS.CloudFormation();
-    let opFn = op === 'create' || op === 'upsert' ? cf.createStack : cf.updateStack;
-    const wait = op === 'create' || op === 'upsert' ? 'stackCreateComplete' : 'stackUpdateComplete';
-
+  cloudFormation() {
     const cfParams = [];
     // add custom params from the config file if any
     if (this.config.params) {
@@ -163,10 +183,7 @@ class Kes {
       });
     }
 
-    let capabilities = [];
-    if (this.config.capabilities) {
-      capabilities = this.config.capabilities.map(c => c);
-    }
+    const capabilities = get(this.config, 'capabilities', []);
 
     const params = {
       StackName: this.stack,
@@ -191,34 +208,33 @@ class Kes {
       params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, 'cloudformation.yml')).toString();
     }
 
-    opFn = opFn.bind(cf);
-    return opFn(params).promise().then(() => {
-      console.log('Waiting for the CF operation to complete');
-      return cf.waitFor(wait, { StackName: this.stack }).promise()
-        .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
-        .catch(e => {
-          if (e) {
-            if (e.message.includes('Resource is not in the state')) {
-              console.log('CF create/update failed. Check the logs');
-            }
-            throw e;
-          }
-        });
-    })
-    .catch((e) => {
-      if (e.message === 'No updates are to be performed.') {
-        console.log(e.message);
-        return e.message;
-      }
-      else {
-        if (e.name && e.name === 'AlreadyExistsException' && op === 'upsert') {
-          return this.cloudFormation('update');
-        }
+    let wait = 'stackUpdateComplete';
 
-        console.log('There was an error creating/updating the CF stack');
+    // check if the stack exists
+    return this.cf.describeStacks({ StackName: this.stack }).promise()
+      .then(r => this.cf.updateStack(params).promise())
+      .catch(e => {
+        if (e.message.includes('does not exist')) {
+          wait = 'stackCreateComplete';
+          return this.cf.createStack(params).promise();
+        }
         throw e;
-      }
-    });
+      })
+      .then(() => {
+        console.log('Waiting for the CF operation to complete');
+        return this.cf.waitFor(wait, { StackName: this.stack }).promise();
+      })
+      .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
+      .catch((e) => {
+        if (e.message === 'No updates are to be performed.') {
+          console.log(e.message);
+          return e.message;
+        }
+        else {
+          console.log('There was an error deploying the CF stack');
+        }
+        throw e;
+      });
   }
 
   /**
@@ -231,14 +247,13 @@ class Kes {
     const url = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/cloudformation.yml`;
 
     const params = {};
-    const cf = new AWS.CloudFormation();
 
     if (this.bucket) {
       // upload the template to the bucket first
       params.TemplateURL = url;
 
       return this.uploadCF()
-        .then(() => cf.validateTemplate(params).promise())
+        .then(() => this.cf.validateTemplate(params).promise())
         .then(() => console.log('Template is valid'));
     }
     else {
@@ -246,7 +261,7 @@ class Kes {
     }
 
     // Build and upload the CF template
-    return cf.validateTemplate(params)
+    return this.cf.validateTemplate(params)
       .promise().then(() => console.log('Template is valid'));
   }
 
@@ -259,18 +274,27 @@ class Kes {
     const cf = new AWS.CloudFormation();
 
     return cf.describeStacks({
-      StackName: `${this.stack}`
+      StackName: this.stack
     }).promise();
   }
 
   /**
    * Generic create/update  method for CloudFormation
    *
-   * @param {String} op possible values are 'create' and 'update'
    * @returns {Promise} returns the promise of an AWS response object
    */
-  opsStack(ops) {
-    return this.uploadCF().then(() => this.cloudFormation(ops));
+  opsStack() {
+    return this.uploadCF().then(() => this.cloudFormation());
+  }
+
+  /**
+   * [Deprecated] Creates a CloudFormation stack for the class instance
+   * If exists, will update the existing one
+   *
+   * @returns {Promise} returns the promise of an AWS response object
+   */
+  upsertStack() {
+    return this.opsStack();
   }
 
   /**
@@ -279,26 +303,25 @@ class Kes {
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
-  upsertStack() {
-    return this.opsStack('upsert');
+  deployStack() {
+    return this.opsStack();
   }
-
   /**
-   * Creates a CloudFormation stack for the class instance
+   * [Deprecated] Creates a CloudFormation stack for the class instance
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
   createStack() {
-    return this.opsStack('create');
+    return this.opsStack();
   }
 
   /**
-   * Updates an existing CloudFormation stack for the class instance
+   * [Deprecated] Updates an existing CloudFormation stack for the class instance
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
   updateStack() {
-    return this.opsStack('update');
+    return this.opsStack();
   }
 }
 

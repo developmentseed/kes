@@ -1,6 +1,9 @@
 default:
   stackName: my-kes-project
 
+  capabilities:
+    - CAPABILITY_NAMED_IAM
+
   lambdas:
     - name: func1 # function name must match the lambda folder name in build directory
       handler: func1.handler

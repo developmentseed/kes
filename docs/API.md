@@ -14,6 +14,7 @@
     -   [describeCF](#describecf)
     -   [opsStack](#opsstack)
     -   [upsertStack](#upsertstack)
+    -   [deployStack](#deploystack)
     -   [createStack](#createstack)
     -   [updateStack](#updatestack)
 -   [Lambda](#lambda)
@@ -26,6 +27,8 @@
 -   [localRun](#localrun)
 -   [exec](#exec)
 -   [configureAws](#configureaws)
+-   [fileToString](#filetostring)
+-   [mergeYamls](#mergeyamls)
 
 ## Config
 
@@ -88,8 +91,7 @@ const config = new Config(options);
 const kes = new Kes(config);
 
 // create a new stack
-kes.createStack()
- .then(() => updateStack())
+kes.deployStack()
  .then(() => describeCF())
  .then(() => updateSingleLambda('myLambda'))
  .catch(e => console.log(e));
@@ -141,10 +143,6 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 Calls CloudFormation's update-stack or create-stack methods
 
-**Parameters**
-
--   `op` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** possible values are 'create' and 'update'
-
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### validateTemplate
@@ -163,14 +161,16 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 Generic create/update  method for CloudFormation
 
-**Parameters**
-
--   `ops`  
--   `op` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** possible values are 'create' and 'update'
-
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### upsertStack
+
+[Deprecated] Creates a CloudFormation stack for the class instance
+If exists, will update the existing one
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+
+### deployStack
 
 Creates a CloudFormation stack for the class instance
 If exists, will update the existing one
@@ -179,13 +179,13 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ### createStack
 
-Creates a CloudFormation stack for the class instance
+[Deprecated] Creates a CloudFormation stack for the class instance
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### updateStack
 
-Updates an existing CloudFormation stack for the class instance
+[Deprecated] Updates an existing CloudFormation stack for the class instance
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
@@ -319,3 +319,28 @@ of profile on ~/.aws/credentials file if necessary
 -   `region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** AWS region (optional, default `'us-east-1'`)
 -   `profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** aws credentials profile name (optional, default `null`)
 -   `role`  
+
+## fileToString
+
+Checks if the input is a file, if it is a file,
+it reads it and return the content, otherwise just pass
+the input as an output
+
+**Parameters**
+
+-   `file` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A file path or a string
+
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** String content of a given file
+
+## mergeYamls
+
+Merges two yaml files. The merge is done using lodash.merge
+and it happens recursively. Meaning that values of file2 will
+replace values of file 1 if they have the same key.
+
+**Parameters**
+
+-   `file1` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 1 or file 1 string
+-   `file2` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 2 or file 2 string
+
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Merged Yaml file in string format

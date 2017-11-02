@@ -12,12 +12,10 @@
         -   [Lambda Functions](#lambda-functions)
         -   [Handlebar Helpers](#handlebar-helpers)
     -   [Deployment](#deployment)
-        -   [create](#create)
-        -   [update](#update)
-        -   [upsert](#upsert)
         -   [Differenet deployment configurations](#differenet-deployment-configurations)
     -   [Deployment Using IAM Role](#deployment-using-iam-role)
         -   [Updating One Lambda Function](#updating-one-lambda-function)
+    -   [Use Templates](#use-templates)
 
 ## 
 
@@ -45,6 +43,7 @@ It makes it much easier to deploy lambda functions and create API gateway resour
  -c, --config <config>         Path to config file
  --env-file <envFile>          Path to env file
  --cf-file <cfFile>            Path to CloudFormation templateUrl
+ -t, --template <template>      A kes application template used as the base for the configuration
  --kes-class <kesClass>        Kes Class override
  -k, --kes-folder <kesFolder>  Path to config folder
  -r, --region <region>         AWS region
@@ -53,10 +52,11 @@ It makes it much easier to deploy lambda functions and create API gateway resour
  -h, --help                    output usage information
 
  Commands:
- cf [create|update|upsert|validate|compile]  CloudFormation Operations:
-   create    Creates the CF stack
-   update    Updates the CF stack
-   upsert    Creates the CF stack and Update if already exists
+ cf [deploy|validate|compile]  CloudFormation Operations:
+   create    Creates the CF stack (deprecated, start using deploy)
+   update    Updates the CF stack (deprecated, start using deploy)
+   upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+   deploy    Creates the CF stack and Update if already exists
    validate  Validates the CF stack
    compile   Compiles the CF stack
    lambda <lambdaName>                         uploads a given lambda function to Lambda service
@@ -258,28 +258,10 @@ Resources:
 
 ## Deployment
 
-### create
-
-To create a CF stack for the first time
+To create a CF stack or update and existing one run
 
 ```bash
- kes cf create
-```
-
-### update
-
-To update an existing CF stack
-
-```bash
- kes cf update
-```
-
-### upsert
-
-To create a stack or update it if it exists
-
-```bash
- kes cf upsert
+ kes cf deploy 
 ```
 
 ### Differenet deployment configurations
@@ -303,7 +285,7 @@ staging:
 To deploy a stack with the `staging` configuration run:
 
 ```bash
-kes cf upsert --deployment staging
+kes cf deploy --deployment staging
 ```
 
 ## Deployment Using IAM Role
@@ -313,7 +295,7 @@ You can specify an IAM role for the deployment using `--role` option or by setti
 **Note:** You still need an aws user with AssumeRole permission for this to work
 
 ```bash
-kes cf update --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
+kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
 ```
 
 ### Updating One Lambda Function
@@ -323,3 +305,15 @@ To update one lambda function outside of CF
 ```bash
  kes lambda myLambda
 ```
+
+## Use Templates
+
+Kes enables you to distribute your AWS applications built with kes using a concept called template. A template is essentially a `.kes` folder with
+a `cloudformation.template.yml`, a `config.yml` and a `kes.js` if needed.
+
+The user of a template can point to your template folder with the `--template` flag and the kes command will use the template to build the cloudformation.yml.
+
+The user still has the option of creating her own `config.yml` and `cloudformation.template.yml`. Any variables in these files will override existing ones
+in the template or append it if it doesn't exist.
+
+This setup gives users of the templates a great degree of flexibility and ownership.
