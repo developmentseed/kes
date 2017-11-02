@@ -23,6 +23,7 @@
  *  -c, --config <config>         Path to config file
  *  --env-file <envFile>          Path to env file
  *  --cf-file <cfFile>            Path to CloudFormation templateUrl
+ *  -t, --template <template>      A kes application template used as the base for the configuration
  *  --kes-class <kesClass>        Kes Class override
  *  -k, --kes-folder <kesFolder>  Path to config folder
  *  -r, --region <region>         AWS region
@@ -291,5 +292,16 @@
  * ```bash
  *  kes lambda myLambda
  * ```
+ *
+ * ## Use Templates
+ * Kes enables you to distribute your AWS applications built with kes using a concept called template. A template is essentially a `.kes` folder with
+ * a `cloudformation.template.yml`, a `config.yml` and a `kes.js` if needed.
+ *
+ * The user of a template can point to your template folder with the `--template` flag and the kes command will use the template to build the cloudformation.yml.
+ *
+ * The user still has the option of creating her own `config.yml` and `cloudformation.template.yml`. Any variables in these files will override existing ones
+ * in the template or append it if it doesn't exist.
+ *
+ * This setup gives users of the templates a great degree of flexibility and ownership.
  *
  */

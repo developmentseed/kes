@@ -26,6 +26,8 @@
 -   [localRun](#localrun)
 -   [exec](#exec)
 -   [configureAws](#configureaws)
+-   [fileToString](#filetostring)
+-   [mergeYamls](#mergeyamls)
 
 ## Config
 
@@ -34,10 +36,6 @@ It primarily reads `config.yml` and `.env` files
 
 **Parameters**
 
--   `stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
--   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
--   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
--   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
 -   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
     -   `options.stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** the stack name
     -   `options.deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `null`)
@@ -47,6 +45,10 @@ It primarily reads `config.yml` and `.env` files
     -   `options.configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
     -   `options.envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
     -   `options.cfFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
+-   `stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
+-   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
+-   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
+-   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
 
 **Examples**
 
@@ -318,4 +320,29 @@ of profile on ~/.aws/credentials file if necessary
 
 -   `region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** AWS region (optional, default `'us-east-1'`)
 -   `profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** aws credentials profile name (optional, default `null`)
--   `role`   (optional, default `null`)
+-   `role`  
+
+## fileToString
+
+Checks if the input is a file, if it is a file,
+it reads it and return the content, otherwise just pass
+the input as an output
+
+**Parameters**
+
+-   `file` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** A file path or a string
+
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** String content of a given file
+
+## mergeYamls
+
+Merges two yaml files. The merge is done using lodash.merge
+and it happens recursively. Meaning that values of file2 will
+replace values of file 1 if they have the same key.
+
+**Parameters**
+
+-   `file1` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 1 or file 1 string
+-   `file2` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 2 or file 2 string
+
+Returns **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Merged Yaml file in string format
