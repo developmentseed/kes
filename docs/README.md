@@ -12,9 +12,6 @@
         -   [Lambda Functions](#lambda-functions)
         -   [Handlebar Helpers](#handlebar-helpers)
     -   [Deployment](#deployment)
-        -   [create](#create)
-        -   [update](#update)
-        -   [upsert](#upsert)
         -   [Differenet deployment configurations](#differenet-deployment-configurations)
     -   [Deployment Using IAM Role](#deployment-using-iam-role)
         -   [Updating One Lambda Function](#updating-one-lambda-function)
@@ -55,10 +52,11 @@ It makes it much easier to deploy lambda functions and create API gateway resour
  -h, --help                    output usage information
 
  Commands:
- cf [create|update|upsert|validate|compile]  CloudFormation Operations:
-   create    Creates the CF stack
-   update    Updates the CF stack
-   upsert    Creates the CF stack and Update if already exists
+ cf [deploy|validate|compile]  CloudFormation Operations:
+   create    Creates the CF stack (deprecated, start using deploy)
+   update    Updates the CF stack (deprecated, start using deploy)
+   upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+   deploy    Creates the CF stack and Update if already exists
    validate  Validates the CF stack
    compile   Compiles the CF stack
    lambda <lambdaName>                         uploads a given lambda function to Lambda service
@@ -260,28 +258,10 @@ Resources:
 
 ## Deployment
 
-### create
-
-To create a CF stack for the first time
+To create a CF stack or update and existing one run
 
 ```bash
- kes cf create
-```
-
-### update
-
-To update an existing CF stack
-
-```bash
- kes cf update
-```
-
-### upsert
-
-To create a stack or update it if it exists
-
-```bash
- kes cf upsert
+ kes cf deploy 
 ```
 
 ### Differenet deployment configurations
@@ -305,7 +285,7 @@ staging:
 To deploy a stack with the `staging` configuration run:
 
 ```bash
-kes cf upsert --deployment staging
+kes cf deploy --deployment staging
 ```
 
 ## Deployment Using IAM Role
@@ -315,7 +295,7 @@ You can specify an IAM role for the deployment using `--role` option or by setti
 **Note:** You still need an aws user with AssumeRole permission for this to work
 
 ```bash
-kes cf update --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
+kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
 ```
 
 ### Updating One Lambda Function

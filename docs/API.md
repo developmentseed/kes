@@ -14,6 +14,7 @@
     -   [describeCF](#describecf)
     -   [opsStack](#opsstack)
     -   [upsertStack](#upsertstack)
+    -   [deployStack](#deploystack)
     -   [createStack](#createstack)
     -   [updateStack](#updatestack)
 -   [Lambda](#lambda)
@@ -174,6 +175,13 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ### upsertStack
 
+[Deprecated] Creates a CloudFormation stack for the class instance
+If exists, will update the existing one
+
+Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+
+### deployStack
+
 Creates a CloudFormation stack for the class instance
 If exists, will update the existing one
 
@@ -181,13 +189,13 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 ### createStack
 
-Creates a CloudFormation stack for the class instance
+[Deprecated] Creates a CloudFormation stack for the class instance
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### updateStack
 
-Updates an existing CloudFormation stack for the class instance
+[Deprecated] Updates an existing CloudFormation stack for the class instance
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 

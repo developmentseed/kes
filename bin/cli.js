@@ -10,6 +10,7 @@ const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
+const deprecate = require('deprecate');
 const pckg = require('../package.json');
 const Config = require('../src/config');
 
@@ -153,11 +154,12 @@ program
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
-  .command('cf [create|update|upsert|validate|compile]')
+  .command('cf [create|update|upsert|deploy|validate|compile]')
   .description(`CloudFormation Operations:
-  create    Creates the CF stack
-  update    Updates the CF stack
-  upsert    Creates the CF stack and Update if already exists
+  create    Creates the CF stack (deprecated, start using deploy)
+  update    Updates the CF stack (deprecated, start using deploy)
+  upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+  deploy    Creates the CF stack and Update if already exists
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
   .action((cmd) => {
@@ -166,13 +168,19 @@ program
     const kes = new Kes(config);
     switch (cmd) {
       case 'create':
+        deprecate('"kes cf create" command is deprecated. Use "kes cf deploy" instead')
         kes.createStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'update':
+        deprecate('"kes cf update" command is deprecated. Use "kes cf deploy" instead')
         kes.updateStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'upsert':
+        deprecate('"kes cf upsert" command is deprecated. Use "kes cf deploy" instead')
         kes.upsertStack().then(r => success(r)).catch(e => failure(e));
+        break;
+      case 'deploy':
+        kes.deployStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'validate':
         kes.validateTemplate().then(r => success(r)).catch(e => failure(e));

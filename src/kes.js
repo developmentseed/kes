@@ -171,8 +171,8 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   cloudFormation(op) {
-    let opFn = op === 'create' || op === 'upsert' ? this.cf.createStack : this.cf.updateStack;
-    const wait = op === 'create' || op === 'upsert' ? 'stackCreateComplete' : 'stackUpdateComplete';
+    let opFn = op === 'create' || op === 'deploy' ? this.cf.createStack : this.cf.updateStack;
+    const wait = op === 'create' || op === 'deploy' ? 'stackCreateComplete' : 'stackUpdateComplete';
 
     const cfParams = [];
     // add custom params from the config file if any
@@ -232,7 +232,7 @@ class Kes {
         return e.message;
       }
       else {
-        if (e.name && e.name === 'AlreadyExistsException' && op === 'upsert') {
+        if (e.name && e.name === 'AlreadyExistsException' && op === 'deploy') {
           return this.cloudFormation('update');
         }
 
@@ -294,17 +294,26 @@ class Kes {
   }
 
   /**
-   * Creates a CloudFormation stack for the class instance
+   * [Deprecated] Creates a CloudFormation stack for the class instance
    * If exists, will update the existing one
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
   upsertStack() {
-    return this.opsStack('upsert');
+    return this.opsStack('deploy');
   }
 
   /**
    * Creates a CloudFormation stack for the class instance
+   * If exists, will update the existing one
+   *
+   * @returns {Promise} returns the promise of an AWS response object
+   */
+  deployStack() {
+    return this.opsStack('deploy');
+  }
+  /**
+   * [Deprecated] Creates a CloudFormation stack for the class instance
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
@@ -313,7 +322,7 @@ class Kes {
   }
 
   /**
-   * Updates an existing CloudFormation stack for the class instance
+   * [Deprecated] Updates an existing CloudFormation stack for the class instance
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
