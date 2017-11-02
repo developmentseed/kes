@@ -187,10 +187,7 @@ class Kes {
       });
     }
 
-    let capabilities = [];
-    if (this.config.capabilities) {
-      capabilities = this.config.capabilities.map(c => c);
-    }
+    const capabilities = get(this.config, 'capabilities', []);
 
     const params = {
       StackName: this.stack,
