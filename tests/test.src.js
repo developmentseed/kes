@@ -113,3 +113,13 @@ test('passing variables as configuration values', (t) => {
 
   t.is(config2.sqs[0].retry, '20');
 });
+
+test('config with template', (t) => {
+  const config = new Config({
+    kesFolder: 'examples/app_using_template',
+    template: 'examples/template',
+    deployment: 'myDeployment'
+  });
+
+  t.is(config.stackName, 'myDeployment-using-template');
+});
