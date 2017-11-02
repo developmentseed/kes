@@ -17,3 +17,7 @@ Kes helps with managing and deploying AWS resources using CloudFormation. It mak
 
      $ npm install -g documentation
      $ npm run md-docs
+
+### Kes? What?
+
+This library is named after [Kes](https://en.wikipedia.org/wiki/Kes_(Star_Trek)) from Star Trek: Voyager.
