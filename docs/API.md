@@ -91,8 +91,7 @@ const config = new Config(options);
 const kes = new Kes(config);
 
 // create a new stack
-kes.createStack()
- .then(() => updateStack())
+kes.deployStack()
  .then(() => describeCF())
  .then(() => updateSingleLambda('myLambda'))
  .catch(e => console.log(e));
@@ -144,10 +143,6 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 
 Calls CloudFormation's update-stack or create-stack methods
 
-**Parameters**
-
--   `op` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** possible values are 'create' and 'update'
-
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### validateTemplate
@@ -165,11 +160,6 @@ Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Refe
 ### opsStack
 
 Generic create/update  method for CloudFormation
-
-**Parameters**
-
--   `ops`  
--   `op` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** possible values are 'create' and 'update'
 
 Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
