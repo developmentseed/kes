@@ -40,6 +40,7 @@ class Kes {
 
     utils.configureAws(this.config.region, this.config.profile, this.config.role);
     this.s3 = new AWS.S3();
+    this.cf = new AWS.CloudFormation();
   }
 
   /**
@@ -170,8 +171,7 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   cloudFormation(op) {
-    const cf = new AWS.CloudFormation();
-    let opFn = op === 'create' || op === 'upsert' ? cf.createStack : cf.updateStack;
+    let opFn = op === 'create' || op === 'upsert' ? this.cf.createStack : this.cf.updateStack;
     const wait = op === 'create' || op === 'upsert' ? 'stackCreateComplete' : 'stackUpdateComplete';
 
     const cfParams = [];
@@ -212,10 +212,10 @@ class Kes {
       params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, 'cloudformation.yml')).toString();
     }
 
-    opFn = opFn.bind(cf);
+    opFn = opFn.bind(this.cf);
     return opFn(params).promise().then(() => {
       console.log('Waiting for the CF operation to complete');
-      return cf.waitFor(wait, { StackName: this.stack }).promise()
+      return this.cf.waitFor(wait, { StackName: this.stack }).promise()
         .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
         .catch(e => {
           if (e) {
@@ -252,14 +252,13 @@ class Kes {
     const url = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/cloudformation.yml`;
 
     const params = {};
-    const cf = new AWS.CloudFormation();
 
     if (this.bucket) {
       // upload the template to the bucket first
       params.TemplateURL = url;
 
       return this.uploadCF()
-        .then(() => cf.validateTemplate(params).promise())
+        .then(() => this.cf.validateTemplate(params).promise())
         .then(() => console.log('Template is valid'));
     }
     else {
@@ -267,7 +266,7 @@ class Kes {
     }
 
     // Build and upload the CF template
-    return cf.validateTemplate(params)
+    return this.cf.validateTemplate(params)
       .promise().then(() => console.log('Template is valid'));
   }
 
