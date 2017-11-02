@@ -279,7 +279,7 @@ class Kes {
     const cf = new AWS.CloudFormation();
 
     return cf.describeStacks({
-      StackName: `${this.stack}`
+      StackName: this.stack
     }).promise();
   }
 
