@@ -53,20 +53,8 @@ class Kes {
     return lambda.updateSingleLambda(name);
   }
 
-  /**
-   * Compiles a CloudFormation template in Yaml format.
-   *
-   * Reads the configuration yaml from `.kes/config.yml`.
-   *
-   * Writes the template to `.kes/cloudformation.yml`.
-   *
-   * Uses `.kes/cloudformation.template.yml` as the base template
-   * for generating the final CF template.
-   *
-   * @return {Promise} returns the promise of an AWS response object
-   */
-  compileCF() {
-    const t = fs.readFileSync(this.config.cfFile, 'utf8');
+  parseCF(cfFile) {
+    const t = fs.readFileSync(cfFile, 'utf8');
 
     Handlebars.registerHelper('ToMd5', function(value) {
       if (value) {
@@ -82,15 +70,51 @@ class Kes {
     });
 
     const template = Handlebars.compile(t);
+    return template(this.config);
+  }
 
-    const destPath = path.join(this.config.kesFolder, 'cloudformation.yml');
-
+  /**
+   * Compiles a CloudFormation template in Yaml format.
+   *
+   * Reads the configuration yaml from `.kes/config.yml`.
+   *
+   * Writes the template to `.kes/cloudformation.yml`.
+   *
+   * Uses `.kes/cloudformation.template.yml` as the base template
+   * for generating the final CF template.
+   *
+   * @return {Promise} returns the promise of an AWS response object
+   */
+  compileCF() {
     const lambda = new Lambda(this.config);
 
     return lambda.process().then((config) => {
       this.config = config;
+      let cf;
+
+      // if there is a template parse CF there first
+      if (this.config.template) {
+        let mainCF = this.parseCF(this.config.template.cfFile);
+
+        // check if there is a CF over
+        try {
+          fs.lstatSync(this.config.cfFile);
+          let overrideCF = this.parseCF(this.config.cfFile);
+
+          // merge the the two
+          cf = utils.mergeYamls(mainCF, overrideCF);
+        }
+        catch (e) {
+          cf = mainCF;
+        }
+      }
+      else {
+        cf = this.parseCF(this.config.cfFile);
+      }
+
+      const destPath = path.join(this.config.kesFolder, 'cloudformation.yml');
       console.log(`Template saved to ${destPath}`);
-      return fs.writeFileSync(destPath, template(this.config));
+      return fs.writeFileSync(destPath, cf);
     });
   }
 
@@ -118,7 +142,7 @@ class Kes {
     return this.compileCF().then(() => {
       // make sure cloudformation template exists
       try {
-        fs.accessSync(path.join(this.config.cfFile));
+        fs.accessSync(path.join(this.config.kesFolder, 'cloudformation.yml'));
       }
       catch (e) {
         throw new Error('cloudformation.yml is missing.');
