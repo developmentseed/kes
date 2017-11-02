@@ -1,0 +1,4 @@
+secondKey: value5
+thirdKey: !!inc/file tests/data/file_include.yaml
+forthKey:
+  - value4

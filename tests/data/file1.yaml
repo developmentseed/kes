@@ -1,0 +1,8 @@
+firstKey: value1
+secondKey: value2
+thirdKey:
+  firstKey: value1
+forthKey:
+  - value1
+  - value2
+  - value3
