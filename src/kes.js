@@ -22,8 +22,7 @@ const utils = require('./utils');
  * const kes = new Kes(config);
  *
  * // create a new stack
- * kes.createStack()
- *  .then(() => updateStack())
+ * kes.deployStack()
  *  .then(() => describeCF())
  *  .then(() => updateSingleLambda('myLambda'))
  *  .catch(e => console.log(e));
@@ -168,13 +167,9 @@ class Kes {
   /**
    * Calls CloudFormation's update-stack or create-stack methods
    *
-   * @param {String} op possible values are 'create' and 'update'
    * @returns {Promise} returns the promise of an AWS response object
    */
-  cloudFormation(op) {
-    let opFn = op === 'create' || op === 'deploy' ? this.cf.createStack : this.cf.updateStack;
-    const wait = op === 'create' || op === 'deploy' ? 'stackCreateComplete' : 'stackUpdateComplete';
-
+  cloudFormation() {
     const cfParams = [];
     // add custom params from the config file if any
     if (this.config.params) {
@@ -213,24 +208,33 @@ class Kes {
       params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, 'cloudformation.yml')).toString();
     }
 
-    opFn = opFn.bind(this.cf);
-    return opFn(params).promise().then(() => {
-      console.log('Waiting for the CF operation to complete');
-      return this.cf.waitFor(wait, { StackName: this.stack }).promise()
-                    .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
-    }).catch((e) => {
-      if (e.message === 'No updates are to be performed.') {
-        console.log(e.message);
-        return e.message;
-      }
-      else {
-        if (e.name && e.name === 'AlreadyExistsException' && op === 'deploy') {
-          return this.cloudFormation('update');
+    let wait = 'stackUpdateComplete';
+
+    // check if the stack exists
+    return this.cf.describeStacks({ StackName: this.stack }).promise()
+      .then(r => this.cf.updateStack(params).promise())
+      .catch(e => {
+        if (e.message.includes('does not exist')) {
+          wait = 'stackCreateComplete';
+          return this.cf.createStack(params).promise();
         }
-        console.log('There was an error creating/updating the CF stack');
-      }
-      throw e;
-    });
+        throw e;
+      })
+      .then(() => {
+        console.log('Waiting for the CF operation to complete');
+        return this.cf.waitFor(wait, { StackName: this.stack }).promise();
+      })
+      .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
+      .catch((e) => {
+        if (e.message === 'No updates are to be performed.') {
+          console.log(e.message);
+          return e.message;
+        }
+        else {
+          console.log('There was an error deploying the CF stack');
+        }
+        throw e;
+      });
   }
 
   /**
@@ -277,11 +281,10 @@ class Kes {
   /**
    * Generic create/update  method for CloudFormation
    *
-   * @param {String} op possible values are 'create' and 'update'
    * @returns {Promise} returns the promise of an AWS response object
    */
-  opsStack(ops) {
-    return this.uploadCF().then(() => this.cloudFormation(ops));
+  opsStack() {
+    return this.uploadCF().then(() => this.cloudFormation());
   }
 
   /**
@@ -291,7 +294,7 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   upsertStack() {
-    return this.opsStack('deploy');
+    return this.opsStack();
   }
 
   /**
@@ -301,7 +304,7 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   deployStack() {
-    return this.opsStack('deploy');
+    return this.opsStack();
   }
   /**
    * [Deprecated] Creates a CloudFormation stack for the class instance
@@ -309,7 +312,7 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   createStack() {
-    return this.opsStack('create');
+    return this.opsStack();
   }
 
   /**
@@ -318,7 +321,7 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   updateStack() {
-    return this.opsStack('update');
+    return this.opsStack();
   }
 }
 
