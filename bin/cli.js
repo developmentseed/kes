@@ -2,6 +2,7 @@
 
 'use strict';
 
+require('./readme');
 const get = require('lodash.get');
 const fs = require('fs');
 const path = require('path');
@@ -15,7 +16,6 @@ const Config = require('../src/config');
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
 const distFolder = path.join(baseDir, 'dist');
-require('./readme');
 
 const success = (r) => process.exit(0);
 
