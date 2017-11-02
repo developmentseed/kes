@@ -9,6 +9,11 @@ jobs:
     steps:
       - checkout
 
+      # restore cache
+      - restore_cache:
+          keys:
+            - deploy-{{ .Branch }}-{{ checksum "package.json" }}
+
       - run:
           name: Install
           command: |
@@ -60,3 +65,8 @@ jobs:
               npm publish || echo 'npm publishing failed'
             fi
 
+      # save cahce
+      - save_cache:
+          key: deploy-{{ .Branch }}-{{ checksum "package.json" }}
+          paths:
+            - ~/kes/node_modules
