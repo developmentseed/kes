@@ -1,6 +1,6 @@
 {
   "name": "kes",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {
     "html-docs": "documentation build bin/cli.js -f html -o _docs --theme node_modules/documentation-devseed-theme",
@@ -62,11 +62,8 @@
     "commander": "^2.9.0",
     "deprecate": "^1.0.0",
     "dotenv": "^4.0.0",
-    "elasticsearch": "^12.1.3",
     "fs-extra": "^2.0.0",
     "handlebars": "^4.0.6",
-    "hapi": "^16.1.0",
-    "http-aws-es": "^1.1.3",
     "js-yaml": "^3.8.1",
     "lodash.capitalize": "^4.2.1",
     "lodash.get": "^4.4.2",
@@ -92,7 +89,6 @@
     "eslint-plugin-node": "^4.2.2",
     "eslint-plugin-promise": "^3.5.0",
     "eslint-plugin-standard": "^3.0.1",
-    "github-slugger": "^1.2.0",
-    "vinyl": "^2.1.0"
+    "github-slugger": "^1.2.0"
   }
 }
