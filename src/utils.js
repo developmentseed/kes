@@ -2,7 +2,7 @@
 
 const fs = require('fs-extra');
 const yaml = require('js-yaml');
-const yamlinc = require('yaml-include');
+const yamlfiles = require('yaml-files');
 const merge = require('lodash.merge');
 const dotenv = require('dotenv');
 const AWS = require('aws-sdk');
@@ -106,8 +106,8 @@ function fileToString(file) {
  */
 
 function mergeYamls(file1, file2) {
-  const obj1 = yaml.safeLoad(fileToString(file1), { schema: yamlinc.YAML_INCLUDE_SCHEMA });
-  const obj2 = yaml.safeLoad(fileToString(file2), { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+  const obj1 = yaml.safeLoad(fileToString(file1), { schema: yamlfiles.YAML_FILES_SCHEMA });
+  const obj2 = yaml.safeLoad(fileToString(file2), { schema: yamlfiles.YAML_FILES_SCHEMA });
 
   return yaml.safeDump(merge({}, obj1, obj2));
 }

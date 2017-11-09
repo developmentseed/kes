@@ -40,6 +40,7 @@ class Kes {
     utils.configureAws(this.config.region, this.config.profile, this.config.role);
     this.s3 = new AWS.S3();
     this.cf = new AWS.CloudFormation();
+    this.AWS = AWS;
   }
 
   /**
