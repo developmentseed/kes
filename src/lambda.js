@@ -196,11 +196,25 @@ class Lambda {
       fs.mkdirpSync(this.buildFolder);
 
       // zip and upload lambdas
-      const jobs = this.config.lambdas.map(l => this.zipAndUploadLambda(l));
+      let lambdas = this.config.lambdas;
+      if (!Array.isArray(this.config.lambdas)) {
+        lambdas = Object.keys(this.config.lambdas).map(name => {
+          const lambda = this.config.lambdas[name];
+          lambda.name = name;
+          return lambda;
+        });
+      }
+      const jobs = lambdas.map(l => this.zipAndUploadLambda(l));
 
       return new Promise((resolve, reject) => {
         Promise.all(jobs).then(lambdas => {
-          this.config.lambdas = lambdas;
+          if (Array.isArray(this.config.lambdas)) {
+            this.config.lambdas = lambdas;
+            return resolve(this.config);
+          }
+          const tmp = {};
+          lambdas.forEach(l => (tmp[l.name] = l));
+          this.config.lambdas = tmp;
           return resolve(this.config);
         }).catch(e => reject(e));
       });
@@ -222,9 +236,9 @@ class Lambda {
     fs.mkdirpSync(this.buildFolder);
 
     let lambda;
-    this.config.lambdas.forEach(l => {
-      if (l.name === name) {
-        lambda = l;
+    Object.keys(this.config.lambdas).forEach(n => {
+      if (n === name) {
+        lambda = this.config.lambdas(n);
       }
     });
 
@@ -233,13 +247,13 @@ class Lambda {
     }
     const stack = this.config.stackName;
 
-    console.log(`Updating ${lambda.name}`);
+    console.log(`Updating ${name}`);
     lambda = this.zipLambda(lambda);
     return l.updateFunctionCode({
-      FunctionName: `${stack}-${lambda.name}`,
+      FunctionName: `${stack}-${name}`,
       ZipFile: fs.readFileSync(lambda.local)
     }).promise()
-    .then((r) => console.log(`Lambda function ${lambda.name} has been updated`));
+    .then((r) => console.log(`Lambda function ${name} has been updated`));
   }
 }
 

@@ -12,7 +12,7 @@ const upperFirst = require('lodash.upperfirst');
 const capitalize = require('lodash.capitalize');
 const merge = require('lodash.merge');
 const yaml = require('js-yaml');
-const yamlinc = require('yaml-include');
+const yamlfiles = require('yaml-files');
 const Mustache = require('mustache');
 const utils = require('./utils');
 
@@ -99,7 +99,16 @@ class Config {
 
       // We loop through all the lambdas in config.yml
       // To construct the API resources and methods
-      for (const lambda of config.lambdas) {
+      let lambdas = config.lambdas;
+      if (!Array.isArray(config.lambdas)) {
+        lambdas = Object.keys(config.lambdas).map(name => {
+          const lambda = config.lambdas[name];
+          lambda.name = name;
+          return lambda;
+        });
+      }
+
+      for (const lambda of lambdas) {
         // We only care about lambdas that have apigateway config
         if (lambda.hasOwnProperty('apiGateway')) {
           //loop the apiGateway definition
@@ -223,7 +232,16 @@ class Config {
   static configureLambda(config) {
     if (config.lambdas) {
       // Add default memory and timeout to all lambdas
-      for (const lambda of config.lambdas) {
+      let lambdas = config.lambdas;
+      if (!Array.isArray(config.lambdas)) {
+        lambdas = Object.keys(config.lambdas).map(name => {
+          const lambda = config.lambdas[name];
+          lambda.name = name;
+          return lambda;
+        });
+      }
+
+      for (const lambda of lambdas) {
         if (!has(lambda, 'memory')) {
           lambda.memory = 1024;
         }
@@ -278,7 +296,7 @@ class Config {
     Mustache.escape = (text) => text;
 
     // load, dump, then load to make sure all yaml included files pass through mustach render
-    const parsedConfig = yaml.safeLoad(configText.toString(), { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+    const parsedConfig = yaml.safeLoad(configText.toString(), { schema: yamlfiles.YAML_FILES_SCHEMA });
 
     let config = parsedConfig.default;
     if (this.deployment && parsedConfig[this.deployment]) {
