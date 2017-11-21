@@ -88,7 +88,7 @@ function fileToString(file) {
     }
   }
   catch (e) {
-    if (!e.message.includes('ENOENT')) {
+    if (!e.message.includes('ENOENT') && !e.message.includes('name too long, lstat')) {
       throw e;
     }
   }
