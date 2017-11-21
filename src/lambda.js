@@ -238,7 +238,7 @@ class Lambda {
     let lambda;
     Object.keys(this.config.lambdas).forEach(n => {
       if (n === name) {
-        lambda = this.config.lambdas(n);
+        lambda = this.config.lambdas[n];
       }
     });
 
