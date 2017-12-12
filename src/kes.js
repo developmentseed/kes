@@ -1,6 +1,7 @@
 'use strict';
 
 const get = require('lodash.get');
+const moment = require('moment');
 const Handlebars = require('handlebars');
 const forge = require('node-forge');
 const AWS = require('aws-sdk');
@@ -41,6 +42,7 @@ class Kes {
     this.s3 = new AWS.S3();
     this.cf = new AWS.CloudFormation();
     this.AWS = AWS;
+    this.startTime = moment();
   }
 
   /**
@@ -227,14 +229,47 @@ class Kes {
       })
       .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
       .catch((e) => {
+        const errorsWithDetail = [
+          'CREATE_FAILED',
+          'UPDATE_ROLLBACK_COMPLETE',
+          'ROLLBACK_COMPLETE',
+          'UPDATE_ROLLBACK_FAILED'
+        ];
+        const errorRequiresDetail = errorsWithDetail.filter(i => e.message.includes(i));
+
         if (e.message === 'No updates are to be performed.') {
           console.log(e.message);
           return e.message;
         }
+        else if (errorRequiresDetail.length > 0) {
+          console.log('There was an error deploying the CF stack');
+          console.log(e.message);
+
+          // get the error info here
+          return this.cf.describeStackEvents({ StackName: this.stack }).promise();
+        }
         else {
           console.log('There was an error deploying the CF stack');
+          throw e;
         }
-        throw e;
+      })
+      .then((r) => {
+        if (r && r.StackEvents) {
+
+          console.log('Here is the list of failures in chronological order:');
+          r.StackEvents.forEach((s) => {
+            if (s.ResourceStatus &&
+                  s.ResourceStatus.includes('FAILED') &&
+                  moment(s.Timestamp) > this.startTime) {
+              console.log(`${s.Timestamp} | ` +
+                          `${s.ResourceStatus} | ` +
+                          `${s.ResourceType} | ` +
+                          `${s.LogicalResourceId} | ` +
+                          `${s.ResourceStatusReason}`);
+            }
+          });
+          throw new Error('CloudFormation Deployment failed');
+        }
       });
   }
 

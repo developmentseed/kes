@@ -27,7 +27,6 @@ program.version(pckg.version);
  * @private
  */
 const failure = (e) => {
-  console.log(e);
   if (e.message) {
     console.log(e.message);
   }
