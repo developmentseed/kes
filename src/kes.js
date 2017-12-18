@@ -42,6 +42,7 @@ class Kes {
     this.s3 = new AWS.S3();
     this.cf = new AWS.CloudFormation();
     this.AWS = AWS;
+    this.Lambda = Lambda;
     this.startTime = moment();
   }
 
@@ -89,7 +90,7 @@ class Kes {
    * @return {Promise} returns the promise of an AWS response object
    */
   compileCF() {
-    const lambda = new Lambda(this.config);
+    const lambda = new this.Lambda(this.config);
 
     return lambda.process().then((config) => {
       this.config = config;
