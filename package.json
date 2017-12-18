@@ -57,6 +57,7 @@
   "author": "Alireza Jazayeri <alireza@developmentseed.org>",
   "license": "Apache-2.0",
   "dependencies": {
+    "archiver": "^2.1.0",
     "aws-sdk": "^2.14.0",
     "colors": "^1.1.2",
     "commander": "^2.9.0",
