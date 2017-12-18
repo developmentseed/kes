@@ -53,7 +53,7 @@ class Kes {
    * @return {Promise} returns the promise of an AWS response object
    */
   updateSingleLambda(name) {
-    const lambda = new Lambda(this.config);
+    const lambda = new this.Lambda(this.config);
     return lambda.updateSingleLambda(name);
   }
 
