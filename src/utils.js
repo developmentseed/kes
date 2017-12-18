@@ -17,7 +17,10 @@ const execSync = require('child_process').execSync;
  *                        root of the zip file or relative to your path on the local machine
  * @return {Promise}
  */
-function zip(zipFile, srcList, dstPath = false) {
+function zip(zipFile, srcList, dstPath) {
+  if (!dstPath) {
+    dstPath = false;
+  }
   const output = fs.createWriteStream(zipFile);
   const archive = archiver('zip', {
     zlib: { level: 9 } // Sets the compression level.
