@@ -5,7 +5,6 @@ const get = require('lodash.get');
 const fs = require('fs-extra');
 const path = require('path');
 const utils = require('./utils');
-const getZipName = require('./utils').getZipName;
 
 /**
  * Copy, zip and upload lambda functions to S3
@@ -41,11 +40,11 @@ class Lambda {
       lambda.bucket = this.bucket;
 
       // local zip
-      const zipFile = getZipName(lambda.handler) + '.zip';
+      const zipFile = `${lambda.hash}.zip`;
       lambda.local = path.join(this.buildFolder, zipFile);
 
       // remote address
-      lambda.remote = path.join(this.key, lambda.hash, zipFile);
+      lambda.remote = path.join(this.key, zipFile);
     }
     else if (lambda.s3Source) {
       lambda.remote = lambda.s3Source.key;
