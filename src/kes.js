@@ -232,6 +232,7 @@ class Kes {
       .catch((e) => {
         const errorsWithDetail = [
           'CREATE_FAILED',
+          'Resource is not in the state stackUpdateComplete',
           'UPDATE_ROLLBACK_COMPLETE',
           'ROLLBACK_COMPLETE',
           'UPDATE_ROLLBACK_FAILED'
