@@ -174,6 +174,9 @@ class Lambda {
         });
       }
 
+      // install npm packages
+      lambdas.filter(l => l.npmSource).forEach(l => utils.exec(`npm install ${l.npmSource.name}@${l.npmSource.version}`));
+
       // build lambda path for lambdas that are zipped and uploaded
       lambdas = lambdas.map(l => this.buildS3Path(l));
 
