@@ -125,6 +125,13 @@
  * The lambda function code can be either a folder or file on your computer
  * or a zip file on aws.
  *
+ * **Note:** In version 2.0.0 of kes, the lambda packaging is handled natively in nodejs.
+ * If you point the `source` to a directory, the directory is saved at the root of the zip
+ * package. This changes how handler path should be setup.
+ *
+ * For example, if the `index.js` is located at `/path/to/package/index.js` and
+ * `source: /path/to/package/index.js`, the handler should be `handler: index.handler`.
+ *
  * **Required Fields:**
  *   - name
  *   - handler
@@ -147,7 +154,7 @@
  *
  *   lambdas:
  *     - name: myLambda1
- *       handler: myLambda.handler
+ *       handler: index.handler
  *       timeout: 200
  *       source: 'node_modules/someNpmPackage'
  *     - name: myLambda2
