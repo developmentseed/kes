@@ -1,12 +1,68 @@
 'use strict';
 
 const fs = require('fs-extra');
+const archiver = require('archiver');
 const yaml = require('js-yaml');
 const yamlfiles = require('yaml-files');
 const merge = require('lodash.merge');
 const dotenv = require('dotenv');
 const AWS = require('aws-sdk');
 const execSync = require('child_process').execSync;
+
+/**
+ * Zips a list of files or directories
+ * @param  {string} zipFile filename and path where the zip file is stored
+ * @param  {array} srcList array of files and directories paths
+ * @param  {type} dstPath for directories whether to put the directories at
+ *                        root of the zip file or relative to your path on the local machine
+ * @return {Promise}
+ */
+function zip(zipFile, srcList, dstPath) {
+  if (!dstPath) {
+    dstPath = false;
+  }
+  const output = fs.createWriteStream(zipFile);
+  const archive = archiver('zip', {
+    zlib: { level: 9 } // Sets the compression level.
+  });
+
+  return new Promise((resolve, reject) => {
+    output.on('close', function() {
+      return resolve();
+    });
+
+    archive.on('warning', function(err) {
+      if (err.code === 'ENOENT') {
+        console.log(err);
+      }
+      else {
+        return reject(err);
+      }
+    });
+
+    archive.on('error', function(err) {
+      return reject(err);
+    });
+
+    archive.pipe(output);
+
+    srcList.forEach((src) => {
+      const stat = fs.lstatSync(src);
+
+      if (stat.isFile()) {
+        archive.file(src);
+      }
+      else if (stat.isDirectory()) {
+        archive.directory(src, dstPath);
+      }
+      else {
+        return reject(new Error('Invalid path'));
+      }
+    });
+
+    archive.finalize();
+  });
+}
 
 /**
  * Executes shell commands synchronously and logs the
@@ -118,5 +174,6 @@ module.exports = {
   fileToString,
   getZipName,
   configureAws,
-  loadLocalEnvs
+  loadLocalEnvs,
+  zip
 };

@@ -42,6 +42,7 @@ class Kes {
     this.s3 = new AWS.S3();
     this.cf = new AWS.CloudFormation();
     this.AWS = AWS;
+    this.Lambda = Lambda;
     this.startTime = moment();
   }
 
@@ -52,7 +53,7 @@ class Kes {
    * @return {Promise} returns the promise of an AWS response object
    */
   updateSingleLambda(name) {
-    const lambda = new Lambda(this.config);
+    const lambda = new this.Lambda(this.config);
     return lambda.updateSingleLambda(name);
   }
 
@@ -89,7 +90,7 @@ class Kes {
    * @return {Promise} returns the promise of an AWS response object
    */
   compileCF() {
-    const lambda = new Lambda(this.config);
+    const lambda = new this.Lambda(this.config);
 
     return lambda.process().then((config) => {
       this.config = config;
@@ -231,6 +232,7 @@ class Kes {
       .catch((e) => {
         const errorsWithDetail = [
           'CREATE_FAILED',
+          'Resource is not in the state stackUpdateComplete',
           'UPDATE_ROLLBACK_COMPLETE',
           'ROLLBACK_COMPLETE',
           'UPDATE_ROLLBACK_FAILED'
@@ -255,7 +257,6 @@ class Kes {
       })
       .then((r) => {
         if (r && r.StackEvents) {
-
           console.log('Here is the list of failures in chronological order:');
           r.StackEvents.forEach((s) => {
             if (s.ResourceStatus &&

@@ -1,0 +1,5 @@
+## v2.0.0
+- Use native nodejs compression to zip lambda packages
+- Update how lambda packages are compressed (this is a breaking change that requires updating handler and source)
+- Accept node packages name and version in the lambda config
+- small bug fixes
