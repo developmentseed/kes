@@ -167,15 +167,15 @@ program
     const kes = new Kes(config);
     switch (cmd) {
       case 'create':
-        deprecate('"kes cf create" command is deprecated. Use "kes cf deploy" instead')
+        deprecate('"kes cf create" command is deprecated. Use "kes cf deploy" instead');
         kes.createStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'update':
-        deprecate('"kes cf update" command is deprecated. Use "kes cf deploy" instead')
+        deprecate('"kes cf update" command is deprecated. Use "kes cf deploy" instead');
         kes.updateStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'upsert':
-        deprecate('"kes cf upsert" command is deprecated. Use "kes cf deploy" instead')
+        deprecate('"kes cf upsert" command is deprecated. Use "kes cf deploy" instead');
         kes.upsertStack().then(r => success(r)).catch(e => failure(e));
         break;
       case 'deploy':

@@ -256,7 +256,6 @@ class Kes {
       })
       .then((r) => {
         if (r && r.StackEvents) {
-
           console.log('Here is the list of failures in chronological order:');
           r.StackEvents.forEach((s) => {
             if (s.ResourceStatus &&

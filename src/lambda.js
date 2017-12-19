@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const get = require('lodash.get');
 const fs = require('fs-extra');
 const path = require('path');
-const { exec, zip } = require('./utils');
+const utils = require('./utils');
 const getZipName = require('./utils').getZipName;
 
 /**
@@ -66,7 +66,7 @@ class Lambda {
     }
 
     const alternativeMethod = 'sha1sum';
-    let hash = exec(`find ${folderName} -type f | \
+    let hash = utils.exec(`find ${folderName} -type f | \
                    xargs ${method} | ${method} | awk '{print $1}' ${''}`, false);
 
     hash = hash.toString().replace(/\n/, '');
@@ -90,7 +90,7 @@ class Lambda {
    */
   zipLambda(lambda) {
     console.log(`Zipping ${lambda.local}`);
-    return zip(lambda.local, [lambda.source]).then(() => {
+    return utils.zip(lambda.local, [lambda.source]).then(() => {
       console.log(`Zipped ${lambda.local}`);
       return lambda;
     });
@@ -166,7 +166,7 @@ class Lambda {
 
       let lambdas = this.config.lambdas;
 
-      // if the lambdas is not an array but a object, convert it to a list 
+      // if the lambdas is not an array but a object, convert it to a list
       if (!Array.isArray(this.config.lambdas)) {
         lambdas = Object.keys(this.config.lambdas).map(name => {
           const lambda = this.config.lambdas[name];
