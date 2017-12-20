@@ -57,15 +57,15 @@ default:
 
   lambdas:
     - name: Custom
-      handler: custom.handler
+      handler: index.handler
       timeout: 300
       memory: 512
-      source: 'examples/code/custom/index.js'
+      source: 'examples/code/custom/'
     - name: ApiLambda
-      handler: api.handler
+      handler: index.handler
       timeout: 20
       memory: 256
-      source: 'examples/code/api/index.js'
+      source: 'examples/code/api/'
       envs:
         internal: '{{buckets.internal}}'
       apiGateway:
@@ -78,20 +78,20 @@ default:
           cors: true
           api: myApi
     - name: Lambda1
-      handler: lambda2.handler
+      handler: index.handler
       timeout: 300
       memory: 512
-      source: 'examples/code/lambda1/index.js'
+      source: 'examples/code/lambda1/'
     - name: Lambda2
-      handler: lambda2.handler
+      handler: index.handler
       timeout: 300
       memory: 512
-      source: 'examples/code/lambda1/index.js'
+      source: 'examples/code/lambda1/'
     - name: Lambda3
-      handler: lambda1.handler
+      handler: index.handler
       timeout: 300
       memory: 512
-      source: 'examples/code/lambda1/index.js'
+      source: 'examples/code/lambda1/'
 
 staging:
   retryValue: 20
