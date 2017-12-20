@@ -89,6 +89,12 @@ class Lambda {
    */
   zipLambda(lambda) {
     console.log(`Zipping ${lambda.local}`);
+
+    // skip if the file with the same hash is zipped
+    if (fs.existsSync(lambda.local)) {
+      return Promise.resolve(lambda);
+    }
+
     return utils.zip(lambda.local, [lambda.source]).then(() => {
       console.log(`Zipped ${lambda.local}`);
       return lambda;
@@ -157,9 +163,6 @@ class Lambda {
    */
   process() {
     if (this.config.lambdas) {
-      // remove the build folder if exists
-      fs.removeSync(this.buildFolder);
-
       // create the lambda folder
       fs.mkdirpSync(this.buildFolder);
 
