@@ -52,7 +52,7 @@ function zip(zipFile, srcList, dstPath) {
       if (stat.isFile()) {
         archive.file(src);
       }
-      else if (stat.isDirectory()) {
+      else if (stat.isDirectory() || stat.isSymbolicLink()) {
         archive.directory(src, dstPath);
       }
       else {
