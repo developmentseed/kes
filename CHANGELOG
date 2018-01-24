@@ -1,3 +1,17 @@
+## v2.0.3
+
+- support symlink for lambda zipping
+
+## v2.0.2
+
+- only zip lambdas that are not already zipped
+update examples
+
+## v2.0.1
+
+- only zip lambdas that are not already zipped
+- update examples
+
 ## v2.0.0
 - Use native nodejs compression to zip lambda packages
 - Update how lambda packages are compressed (this is a breaking change that requires updating handler and source)
