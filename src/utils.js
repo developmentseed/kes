@@ -1,6 +1,8 @@
 'use strict';
 
 const fs = require('fs-extra');
+const get = require('lodash.get');
+const path = require('path');
 const archiver = require('archiver');
 const yaml = require('js-yaml');
 const yamlfiles = require('yaml-files');
@@ -168,6 +170,64 @@ function mergeYamls(file1, file2) {
   return yaml.safeDump(merge({}, obj1, obj2));
 }
 
+/**
+ * Based on the information passed from the CLI by the commander
+ * module this function determines whether to use the default Kes class
+ * or use the override class provided by the user
+ * @param {object} options The options passed by the commander library
+ * @returns {Class} Kes class
+ */
+function determineKesClass(options) {
+  let Kes;
+
+  // if there is a kes class specified use that
+  const kesClass = get(options, 'kesClass');
+  if (kesClass) {
+    Kes = require(`${path.join(process.cwd(), kesClass)}`);
+  }
+  else {
+    // check if there is kes.js in the kes-folder
+    try {
+      let kesFolder;
+      if (options.kesFolder) {
+        kesFolder = options.kesFolder;
+      }
+      else {
+        kesFolder = path.join(process.cwd(), '.kes');
+      }
+      Kes = require(`${path.join(process.cwd(), kesFolder, 'kes.js')}`);
+    }
+    catch (e) {
+      // check if there is a template and the template has kes class
+      const template = get(options, 'template', '/path/to/nowhere');
+      try {
+        const kesPath = path.join(process.cwd(), template, 'kes.js');
+        fs.lstatSync(kesPath);
+        Kes = require(`${kesPath}`);
+      }
+      catch (e) {
+        Kes = require('./kes').Kes;
+      }
+    }
+  }
+
+  return Kes;
+}
+
+/**
+ * In case of error logs the error and exit with error 1
+ * @param {Error} e error object
+ */
+function failure(e) {
+  if (e.message) {
+    console.log(e.message);
+  }
+  else {
+    console.log(e);
+  }
+  process.exit(1);
+}
+
 module.exports = {
   exec,
   mergeYamls,
@@ -175,5 +235,7 @@ module.exports = {
   getZipName,
   configureAws,
   loadLocalEnvs,
+  determineKesClass,
+  failure,
   zip
 };
