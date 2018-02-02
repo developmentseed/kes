@@ -3,75 +3,30 @@
 'use strict';
 
 require('./readme');
-const get = require('lodash.get');
 const fs = require('fs');
 const path = require('path');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
-const deprecate = require('deprecate');
+const kes = require('../index');
 const pckg = require('../package.json');
-const Config = require('../src/config');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
 const distFolder = path.join(baseDir, 'dist');
 
-const success = (r) => process.exit(0);
-
 program.version(pckg.version);
 
-/**
- * @name failure
- * @private
- */
-const failure = (e) => {
-  if (e.message) {
-    console.log(e.message);
-  }
-  else {
-    console.log(e);
-  }
-  process.exit(1);
-};
-
-const determineKesClass = function () {
-  let Kes;
-
-  // if there is a kes class specified use that
-  const kesClass = get(program, 'kesClass');
-  if (kesClass) {
-    Kes = require(path.join(process.cwd(), kesClass));
-  }
-  else {
-    // check if there is kes.js in the kes-folder
-    try {
-      let kesFolder;
-      if (program.kesFolder) {
-        kesFolder = program.kesFolder;
-      }
-      else {
-        kesFolder = path.join(process.cwd(), '.kes');
-      }
-      Kes = require(path.join(process.cwd(), kesFolder, 'kes.js'));
+function extractCommanderOptions(program) {
+  const options = {};
+  Object.keys(program).forEach(property => {
+    if (typeof program[property] === 'string') {
+      options[property] = program[property];
     }
-    catch (e) {
-      // check if there is a template and the template has kes class
-      const template = get(program, 'template', '/path/to/nowhere');
-      try {
-        const kesPath = path.join(process.cwd(), template, 'kes.js');
-        fs.lstatSync(kesPath);
-        Kes = require(kesPath);
-      }
-      catch (e) {
-        Kes = require('../index').Kes;
-      }
-    }
-  }
-
-  return Kes;
-};
+  });
+  return options;
+}
 
 const init = function () {
   if (fs.existsSync(kesFolder)) {
@@ -161,50 +116,16 @@ program
   deploy    Creates the CF stack and Update if already exists
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
-  .action((cmd) => {
-    const Kes = determineKesClass(program);
-    const config = new Config(program);
-    const kes = new Kes(config);
-    switch (cmd) {
-      case 'create':
-        deprecate('"kes cf create" command is deprecated. Use "kes cf deploy" instead');
-        kes.createStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'update':
-        deprecate('"kes cf update" command is deprecated. Use "kes cf deploy" instead');
-        kes.updateStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'upsert':
-        deprecate('"kes cf upsert" command is deprecated. Use "kes cf deploy" instead');
-        kes.upsertStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'deploy':
-        kes.deployStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'validate':
-        kes.validateTemplate().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'compile':
-        kes.compileCF().then(r => success(r)).catch(e => failure(e));
-        break;
-      default:
-        console.log('Wrong choice. Accepted arguments: [create|update|upsert|deploy|validate|compile]');
-    }
+  .action((cmd, o) => {
+    const options = extractCommanderOptions(program);
+    kes.buildCf(options ,cmd);
   });
 
 program
   .command('lambda <lambdaName>')
   .description('uploads a given lambda function to Lambda service')
   .action((cmd, options) => {
-    if (cmd) {
-      const Kes = require('../index').Kes;
-      const config = new Config(program);
-      const kes = new Kes(config);
-      kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => failure(e));
-    }
-    else {
-      console.log('Lambda name is missing');
-    }
+    kes.buildLambda(program, cmd);
   });
 
 program
