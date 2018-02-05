@@ -17,9 +17,10 @@ const utils = require('./utils');
 class Lambda {
   constructor(config) {
     this.config = config;
+    this.cf_basename = path.basename(config.cfFile, '.template.yml');
     this.kesFolder = config.kesFolder;
     this.distFolder = path.join(this.kesFolder, 'dist');
-    this.buildFolder = path.join(this.kesFolder, 'build');
+    this.buildFolder = path.join(this.kesFolder, 'build', this.cf_basename);
     this.bucket = get(config, 'bucket');
     this.key = path.join(this.config.stack, 'lambdas');
     this.grouped = {};

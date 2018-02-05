@@ -1,0 +1,12 @@
+default:
+
+  sqs:
+    - name: mySqs
+      retry: '{{parent.retryValue}}'
+      visibilityTimeout: 10
+  
+  sns:
+    - name: subscribeToLambda1
+      subscriptions:
+        - protocol: lambda
+          endpoint: '!Ref Lambda1Arn'
