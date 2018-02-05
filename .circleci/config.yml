@@ -32,8 +32,10 @@ jobs:
             cd ~/kes
             kes cf compile --kes-folder examples/full
             kes cf validate --kes-folder examples/full
+            kes cf validate --kes-folder examples/nested
 
             kes cf validate --kes-folder examples/app_using_template --template examples/template
+
 
             npm run test
 
