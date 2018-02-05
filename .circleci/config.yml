@@ -31,8 +31,8 @@ jobs:
             mkdir ~/example1
             cp -r examples/lambdas ~/example1/.kes
             cd ~/example1/
-            ./bin/cli.js cf compile
-            ./bin/cli.js cf validate
+            ~/kes/bin/cli.js cf compile
+            ~/kes/bin/cli.js cf validate
 
             cd ~/kes
             ./bin/cli.js cf compile --kes-folder examples/full
