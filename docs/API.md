@@ -4,6 +4,7 @@
 
 -   [Config](#config)
     -   [parse](#parse)
+    -   [flatten](#flatten)
 -   [Kes](#kes)
     -   [updateSingleLambda](#updatesinglelambda)
     -   [compileCF](#compilecf)
@@ -31,6 +32,8 @@
 -   [configureAws](#configureaws)
 -   [fileToString](#filetostring)
 -   [mergeYamls](#mergeyamls)
+-   [determineKesClass](#determinekesclass)
+-   [failure](#failure)
 
 ## Config
 
@@ -72,6 +75,13 @@ config = configInstance.parse();
 ```
 
 Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
+
+### flatten
+
+Return a javascript object (not a class instance) of the
+config class
+
+Returns **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** a javascript object version of the class
 
 ## Kes
 
@@ -367,3 +377,23 @@ replace values of file 1 if they have the same key.
 -   `file2` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 2 or file 2 string
 
 Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Merged Yaml file in string format
+
+## determineKesClass
+
+Based on the information passed from the CLI by the commander
+module this function determines whether to use the default Kes class
+or use the override class provided by the user
+
+**Parameters**
+
+-   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** The options passed by the commander library
+
+Returns **Class** Kes class
+
+## failure
+
+In case of error logs the error and exit with error 1
+
+**Parameters**
+
+-   `e` **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** error object

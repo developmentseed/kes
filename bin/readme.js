@@ -244,7 +244,7 @@
  *
  * To create a CF stack or update and existing one run
  * ```bash
- *  kes cf deploy 
+ *  kes cf deploy
  * ```
  *
  * ### Differenet deployment configurations
@@ -300,4 +300,48 @@
  *
  * This setup gives users of the templates a great degree of flexibility and ownership.
  *
+ * ## Nested Templates
+ * Kes supports use of [Cloudformation Nested Templates](https://aws.amazon.com/blogs/devops/use-nested-stacks-to-create-reusable-templates-and-support-role-specialization/).
+ * To use nested templates, create a separate `template.yml` and `config.yml` files for each nested template using the same rules explained above.
+ * Then include references in your main `config.yml`.
+ *
+ * All nested templates will receive the parent configuration under the `parent` key.
+ *
+ * ### Example
+ * ```yaml
+ * # config.yml
+ * default:
+ *   stackName: myStack-test
+ *   myArray:
+ *     - DEBUG: true
+ *   nested_templates:
+ *     myNestedTemplate:
+ *       cfFile: /path/to/myNestedTemplate.template.yml
+ *       configFile: /path/to/myNestedConfig.yml
+ *
+ * staging:
+ *   stackName: myStack-staging
+ *   myArray:
+ *     - DEBUG: false
+ * ```
+ *
+ * ```yaml
+ * # myNestedConfig.yml
+ * default:
+ *   timeout: 300
+ * ```
+ *
+ * ```yaml
+ * # myNestedTemplate.template.yml
+ * Resources:
+ *
+ * {{# each parent.myArray}}
+ *   Lambda:
+ *     Type: SomeAWSResource
+ *     Properties:
+ *       Timeout: {{../timeout}}
+ *       Environments:
+ *         - {{@key}}: {{this}}
+ * {{/each}}
+ * ```
  */
