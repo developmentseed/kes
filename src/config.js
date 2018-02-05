@@ -49,6 +49,7 @@ class Config {
     this.deployment = get(options, 'deployment');
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.stack = get(options, 'stack', null);
+    this.parent = get(options, 'parent', null);
 
     // use template if provided
     if (has(options, 'template')) {
@@ -138,6 +139,8 @@ class Config {
               name = upperFirst(name);
               segmentNames.push(name);
 
+              let firstParent = false;
+
               // the first segment is always have rootresourceid as parent
               if (index === 0) {
                 parents = [
@@ -145,6 +148,7 @@ class Config {
                   `- ${api.api}RestApi`,
                   '- RootResourceId'
                 ];
+                firstParent = true;
               }
               else {
                 // This logic finds the parents of other segments
@@ -162,6 +166,7 @@ class Config {
                 name: `ApiGateWayResource${name}`,
                 pathPart: segment,
                 parents: parents,
+                firstParent,
                 api: api.api
               };
             });
@@ -299,6 +304,12 @@ class Config {
     const parsedConfig = yaml.safeLoad(configText.toString(), { schema: yamlfiles.YAML_FILES_SCHEMA });
 
     let config = parsedConfig.default;
+
+    // add parent to the config
+    if (this.parent) {
+      config.parent = this.parent;
+    }
+
     if (this.deployment && parsedConfig[this.deployment]) {
       config = merge(config, parsedConfig[this.deployment]);
     }
@@ -334,6 +345,20 @@ class Config {
 
     // merge with the instnace
     merge(this, config);
+  }
+
+  /**
+   * Return a javascript object (not a class instance) of the
+   * config class
+   *
+   * @return {object} a javascript object version of the class
+   */
+  flatten() {
+    const newObj = {};
+    Object.keys(this).forEach((k) => {
+      newObj[k] = this[k];
+    });
+    return newObj;
   }
 }
 
