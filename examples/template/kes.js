@@ -1,6 +1,6 @@
 'use strict';
 
-const Kes = require('../../index').Kes;
+const { Kes } = require('../../index');
 
 class BetterKes extends Kes {
   opsStack(ops) {

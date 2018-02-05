@@ -2,39 +2,31 @@
 
 'use strict';
 
-const get = require('lodash.get');
+require('./readme');
 const fs = require('fs');
 const path = require('path');
 const colors = require('colors/safe');
 const yaml = require('js-yaml');
 const prompt = require('prompt');
 const program = require('commander');
+const kes = require('../index');
 const pckg = require('../package.json');
-const Config = require('../src/config');
 
 const baseDir = process.cwd();
 const kesFolder = path.join(baseDir, '.kes');
 const distFolder = path.join(baseDir, 'dist');
-require('./readme');
-
-const success = (r) => process.exit(0);
 
 program.version(pckg.version);
 
-/**
- * @name failure
- * @private
- */
-const failure = (e) => {
-  console.log(e);
-  if (e.message) {
-    console.log(e.message);
-  }
-  else {
-    console.log(e);
-  }
-  process.exit(1);
-};
+function extractCommanderOptions(program) {
+  const options = {};
+  Object.keys(program).forEach(property => {
+    if (typeof program[property] === 'string') {
+      options[property] = program[property];
+    }
+  });
+  return options;
+}
 
 const init = function () {
   if (fs.existsSync(kesFolder)) {
@@ -65,8 +57,9 @@ const init = function () {
 
     // only create dist folder if it doesn't exist
     try {
-      fs.statSync(distFolder)
-    } catch (e) {
+      fs.statSync(distFolder);
+    }
+    catch (e) {
       fs.mkdirSync(distFolder);
     }
 
@@ -107,6 +100,7 @@ program
   .option('-c, --config <config>', 'Path to config file')
   .option('--env-file <envFile>', 'Path to env file')
   .option('--cf-file <cfFile>', 'Path to CloudFormation template')
+  .option('-t, --template <template>', 'A kes application template used as the base for the configuration')
   .option('--kes-class <kesClass>', 'Kes Class override', null)
   .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
   .option('-r, --region <region>', 'AWS region', null)
@@ -114,72 +108,24 @@ program
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
-  .command('cf [create|update|upsert|validate|compile]')
+  .command('cf [create|update|upsert|deploy|validate|compile]')
   .description(`CloudFormation Operations:
-  create    Creates the CF stack
-  update    Updates the CF stack
-  upsert    Creates the CF stack and Update if already exists
+  create    Creates the CF stack (deprecated, start using deploy)
+  update    Updates the CF stack (deprecated, start using deploy)
+  upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+  deploy    Creates the CF stack and Update if already exists
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
-  .action((cmd) => {
-    let Kes;
-    const kesClass = get(program, 'kesClass');
-    if (kesClass) {
-      Kes = require(path.join(process.cwd(), kesClass));
-    }
-    else {
-      // check if there is kes.js in the kes-folder
-      try {
-        let kesFolder;
-        if (program.kesFolder) {
-          kesFolder = program.kesFolder;
-        }
-        else {
-          kesFolder = path.join(process.cwd(), '.kes');
-        }
-        Kes = require(path.join(process.cwd(), kesFolder, 'kes.js'));
-      }
-      catch (e) {
-        Kes = require('../index').Kes;
-      }
-    }
-
-    const config = new Config(program);
-    const kes = new Kes(config);
-    switch (cmd) {
-      case 'create':
-        kes.createStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'update':
-        kes.updateStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'upsert':
-        kes.upsertStack().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'validate':
-        kes.validateTemplate().then(r => success(r)).catch(e => failure(e));
-        break;
-      case 'compile':
-        kes.compileCF().then(r => success(r)).catch(e => failure(e));
-        break;
-      default:
-        console.log('Wrong choice. Accepted arguments: [create|update|validate|compile]');
-    }
+  .action((cmd, o) => {
+    const options = extractCommanderOptions(program);
+    kes.buildCf(options ,cmd);
   });
 
 program
   .command('lambda <lambdaName>')
   .description('uploads a given lambda function to Lambda service')
   .action((cmd, options) => {
-    if (cmd) {
-      const Kes = require('../index').Kes;
-      const config = new Config(program);
-      const kes = new Kes(config);
-      kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => failure(e));
-    }
-    else {
-      console.log('Lambda name is missing');
-    }
+    kes.buildLambda(program, cmd);
   });
 
 program

@@ -92,6 +92,3 @@ default:
       timeout: 300
       memory: 512
       source: 'examples/code/lambda1/'
-
-staging:
-  retryValue: 20

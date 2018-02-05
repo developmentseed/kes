@@ -1,0 +1,67 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'stack: {{stackName}} | deployed by Kes'
+Parameters:
+  Lambda1Arn:
+    Type: String
+    Description: arn of lambda 1
+
+Resources:
+
+  #################################################
+  # SNS config BEGIN
+  #################################################
+{{#each sns}}
+  {{name}}Sns:
+    Type: "AWS::SNS::Topic"
+    Properties:
+      DisplayName: {{../stackName}}-{{name}}
+      Subscription:
+      {{#each subscriptions}}
+        - Endpoint: {{endpoint}}
+          Protocol: {{protocol}}
+      {{/each}}
+
+{{/each}}
+  #################################################
+  # SNS config END
+  #################################################
+
+  #################################################
+  # SQS config BEGIN
+  #################################################
+{{#each sqs}}
+  {{name}}SQS:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: {{../stackName}}-{{name}}
+      ReceiveMessageWaitTimeSeconds: 20
+    {{#if retry}}
+      RedrivePolicy:
+        deadLetterTargetArn: !GetAtt [{{name}}FailedSQS, Arn]
+        maxReceiveCount: {{retry}}
+    {{/if}}
+      VisibilityTimeout: {{visibilityTimeout}}
+
+{{#if retry}}
+  {{name}}FailedSQS:
+    Type: AWS::SQS::Queue
+    Properties:
+      QueueName: {{../stackName}}-{{name}}-failed
+
+{{/if}}
+{{/each}}
+  #################################################
+  # SQS config END
+  #################################################
+
+Outputs:
+
+{{#each sqs}}
+  {{name}}SQSOutput:
+    Value: !Ref {{name}}SQS
+{{/each}}
+
+{{#each sns}}
+  {{name}}SnsArn:
+    Value: !Ref {{name}}Sns
+{{/each}}

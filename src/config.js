@@ -12,7 +12,7 @@ const upperFirst = require('lodash.upperfirst');
 const capitalize = require('lodash.capitalize');
 const merge = require('lodash.merge');
 const yaml = require('js-yaml');
-const yamlinc = require('yaml-include');
+const yamlfiles = require('yaml-files');
 const Mustache = require('mustache');
 const utils = require('./utils');
 
@@ -49,6 +49,21 @@ class Config {
     this.deployment = get(options, 'deployment');
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.stack = get(options, 'stack', null);
+    this.parent = get(options, 'parent', null);
+
+    // use template if provided
+    if (has(options, 'template')) {
+      const templatePath = get(options, 'template');
+      fs.lstatSync(templatePath);
+      this.template = {
+        kesFolder: templatePath,
+        configFile: path.join(templatePath, 'config.yml'),
+        cfFile: path.join(templatePath, 'cloudformation.template.yml')
+      };
+    }
+    else {
+      this.template = null;
+    }
 
     this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
     this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
@@ -85,7 +100,16 @@ class Config {
 
       // We loop through all the lambdas in config.yml
       // To construct the API resources and methods
-      for (const lambda of config.lambdas) {
+      let lambdas = config.lambdas;
+      if (!Array.isArray(config.lambdas)) {
+        lambdas = Object.keys(config.lambdas).map(name => {
+          const lambda = config.lambdas[name];
+          lambda.name = name;
+          return lambda;
+        });
+      }
+
+      for (const lambda of lambdas) {
         // We only care about lambdas that have apigateway config
         if (lambda.hasOwnProperty('apiGateway')) {
           //loop the apiGateway definition
@@ -115,6 +139,8 @@ class Config {
               name = upperFirst(name);
               segmentNames.push(name);
 
+              let firstParent = false;
+
               // the first segment is always have rootresourceid as parent
               if (index === 0) {
                 parents = [
@@ -122,6 +148,7 @@ class Config {
                   `- ${api.api}RestApi`,
                   '- RootResourceId'
                 ];
+                firstParent = true;
               }
               else {
                 // This logic finds the parents of other segments
@@ -139,6 +166,7 @@ class Config {
                 name: `ApiGateWayResource${name}`,
                 pathPart: segment,
                 parents: parents,
+                firstParent,
                 api: api.api
               };
             });
@@ -209,7 +237,16 @@ class Config {
   static configureLambda(config) {
     if (config.lambdas) {
       // Add default memory and timeout to all lambdas
-      for (const lambda of config.lambdas) {
+      let lambdas = config.lambdas;
+      if (!Array.isArray(config.lambdas)) {
+        lambdas = Object.keys(config.lambdas).map(name => {
+          const lambda = config.lambdas[name];
+          lambda.name = name;
+          return lambda;
+        });
+      }
+
+      for (const lambda of lambdas) {
         if (!has(lambda, 'memory')) {
           lambda.memory = 1024;
         }
@@ -243,6 +280,14 @@ class Config {
     return JSON.parse(rendered);
   }
 
+  readConfigFile() {
+    if (this.template) {
+      return utils.mergeYamls(this.template.configFile, this.configFile);
+    }
+
+    return fs.readFileSync(this.configFile, 'utf8');
+  }
+
   /**
    * Parses the config.yml
    * It uses the default environment values under config.yml and overrides them with values of
@@ -252,14 +297,19 @@ class Config {
    * @return {Object} returns configuration object
    */
   parseConfig() {
-    const configText = fs.readFileSync(this.configFile, 'utf8');
-
+    const configText = this.readConfigFile();
     Mustache.escape = (text) => text;
 
     // load, dump, then load to make sure all yaml included files pass through mustach render
-    const parsedConfig = yaml.safeLoad(configText.toString(), { schema: yamlinc.YAML_INCLUDE_SCHEMA });
+    const parsedConfig = yaml.safeLoad(configText.toString(), { schema: yamlfiles.YAML_FILES_SCHEMA });
 
     let config = parsedConfig.default;
+
+    // add parent to the config
+    if (this.parent) {
+      config.parent = this.parent;
+    }
+
     if (this.deployment && parsedConfig[this.deployment]) {
       config = merge(config, parsedConfig[this.deployment]);
     }
@@ -295,6 +345,20 @@ class Config {
 
     // merge with the instnace
     merge(this, config);
+  }
+
+  /**
+   * Return a javascript object (not a class instance) of the
+   * config class
+   *
+   * @return {object} a javascript object version of the class
+   */
+  flatten() {
+    const newObj = {};
+    Object.keys(this).forEach((k) => {
+      newObj[k] = this[k];
+    });
+    return newObj;
   }
 }
 

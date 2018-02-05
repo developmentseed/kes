@@ -1,6 +1,7 @@
 'use strict';
 
 const test = require('ava');
+const yaml = require('js-yaml');
 const has = require('lodash.has');
 const Config = require('../index').Config;
 const utils = require('../index').utils;
@@ -23,6 +24,31 @@ test('Get the filename from the handler', (t) => {
 
   r = utils.getZipName('my-lambda.jpg.zip');
   t.is(r, 'my-lambda');
+});
+
+test('Test reading a file as string', (t) => {
+  let r = utils.fileToString('README.md');
+  t.true(r.includes('# Kes'));
+
+  r = utils.fileToString('some random text');
+  t.is(r, 'some random text');
+});
+
+test('Test merging yaml files', (t) => {
+  let merged = utils.mergeYamls('tests/data/file1.yaml', 'tests/data/file2.yaml');
+  let obj = yaml.safeLoad(merged);
+
+  t.is(obj.secondKey, 'value5');
+  t.is(obj.forthKey.length, 3);
+  t.is(obj.forthKey[0], 'value4');
+  t.is(obj.thirdKey.firstKey, 'value10');
+
+  merged = utils.mergeYamls('tests/data/file2.yaml', 'tests/data/file1.yaml');
+  obj = yaml.safeLoad(merged);
+
+  t.is(obj.secondKey, 'value2');
+  t.is(obj.forthKey.length, 3);
+  t.is(obj.forthKey[0], 'value1');
 });
 
 test('configuring aws', (t) => {
@@ -86,4 +112,14 @@ test('passing variables as configuration values', (t) => {
   });
 
   t.is(config2.sqs[0].retry, '20');
+});
+
+test('config with template', (t) => {
+  const config = new Config({
+    kesFolder: 'examples/app_using_template',
+    template: 'examples/template',
+    deployment: 'myDeployment'
+  });
+
+  t.is(config.stackName, 'myDeployment-using-template');
 });

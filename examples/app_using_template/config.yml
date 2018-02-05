@@ -1,0 +1,7 @@
+myDeployment:
+  stackName: myDeployment-using-template
+  noDash: myDeployment
+
+  buckets:
+    internal: devseed-kes-deployment
+    tests: myTestArtifacts

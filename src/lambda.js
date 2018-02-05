@@ -4,8 +4,7 @@ const AWS = require('aws-sdk');
 const get = require('lodash.get');
 const fs = require('fs-extra');
 const path = require('path');
-const exec = require('./utils').exec;
-const getZipName = require('./utils').getZipName;
+const utils = require('./utils');
 
 /**
  * Copy, zip and upload lambda functions to S3
@@ -18,56 +17,56 @@ const getZipName = require('./utils').getZipName;
 class Lambda {
   constructor(config) {
     this.config = config;
+    this.cf_basename = path.basename(config.cfFile, '.template.yml');
     this.kesFolder = config.kesFolder;
     this.distFolder = path.join(this.kesFolder, 'dist');
-    this.buildFolder = path.join(this.kesFolder, 'build');
+    this.buildFolder = path.join(this.kesFolder, 'build', this.cf_basename);
     this.bucket = get(config, 'bucket');
     this.key = path.join(this.config.stack, 'lambdas');
     this.grouped = {};
   }
 
   /**
-   * Creates a hash of keys and bucket names for the lambdas
-   * in the deployment based on their source path
+   * Adds hash value, bucket name, and remote and local paths
+   * for lambdas that have source value.
    *
-   * @private
-   * @param {String} local the path to the lambda zip file on the host machine
-   * @param {String} key the key to the lambda zip on S3
-   * @param {String} source the path to the original code
-   *
-   * @return {Object}
+   * If a s3Source is usaed, only add remote and bucket values
+   * @param  {object} lambda the lambda object
+   * @return {object} the lambda object
    */
-  updateGroup(local, key, source) {
-    const tmp = {
-      local,
-      remote: key,
-      bucket: this.bucket
-    };
+  buildS3Path(lambda) {
+    if (lambda.source) {
+      // get hash
+      lambda.hash = this.getHash(lambda.source).toString();
+      lambda.bucket = this.bucket;
 
-    this.grouped[source] = tmp;
-    return tmp;
-  }
+      // local zip
+      const zipFile = `${lambda.hash}.zip`;
+      lambda.local = path.join(this.buildFolder, zipFile);
 
-  /**
-   * Updates the lambda object with the bucket, s3 zip file path and
-   * local zip file location
-   *
-   * @param {Object} lambda the lambda object
-   * @returns {Object} returns the updated lambda object
-   */
-  updateLambda(lambda) {
-    const tmp = this.grouped[lambda.source];
-    Object.assign(lambda, tmp);
+      // remote address
+      lambda.remote = path.join(this.key, zipFile);
+    }
+    else if (lambda.s3Source) {
+      lambda.remote = lambda.s3Source.key;
+      lambda.bucket = lambda.s3Source.bucket;
+    }
     return lambda;
   }
 
+  /**
+   * calculate the hash value for a given path
+   * @param  {string} folderName directory path
+   * @param  {string} method  hash type, default to shasum
+   * @return {buffer} hash value
+   */
   getHash(folderName, method) {
     if (!method) {
       method = 'shasum';
     }
 
     const alternativeMethod = 'sha1sum';
-    let hash = exec(`find ${path.join(this.distFolder, folderName)} -type f | \
+    let hash = utils.exec(`find ${folderName} -type f | \
                    xargs ${method} | ${method} | awk '{print $1}' ${''}`, false);
 
     hash = hash.toString().replace(/\n/, '');
@@ -84,32 +83,23 @@ class Lambda {
   }
 
   /**
-   * Copy source code of a given lambda function, zips it, calculate
-   * the hash of the source code and updates the lambda object with
-   * the hash, local and remote locations of the code
+   * zip a given lambda function source code
    *
    * @param {Object} lambda the lambda object
-   * @returns {Object} returns the updated lambda object
+   * @returns {Promise} returns the promise of the lambda object
    */
   zipLambda(lambda) {
-    // if lambda share source with another lambda,
-    // check if there is already a hash, if so, set the hash and return
-    if (this.grouped[lambda.source]) {
-      return lambda;
+    console.log(`Zipping ${lambda.local}`);
+
+    // skip if the file with the same hash is zipped
+    if (fs.existsSync(lambda.local)) {
+      return Promise.resolve(lambda);
     }
 
-    const folderName = getZipName(lambda.handler);
-    const lambdaPath = path.join(this.distFolder, folderName);
-    exec(`mkdir -p ${lambdaPath}; cp -r ${lambda.source} ${lambdaPath}/`);
-    exec(`cd ${this.distFolder} && zip -r ../build/${folderName} ${folderName}`);
-
-    const zipFile = `${folderName}.zip`;
-    const hash = this.getHash(folderName);
-
-    const key = path.join(this.key, hash.toString(), zipFile);
-    const localPath = path.join(this.buildFolder, zipFile);
-
-    return Object.assign(lambda, this.updateGroup(localPath, key, lambda.source));
+    return utils.zip(lambda.local, [lambda.source]).then(() => {
+      console.log(`Zipped ${lambda.local}`);
+      return lambda;
+    });
   }
 
   /**
@@ -154,26 +144,11 @@ class Lambda {
    * is already zipped and uploaded, it skips the step only updates the
    * lambda config object.
    *
-   * If the lambda config includes a link to zip file on S3, it skips
-   * the whole step.
-   *
    * @param {Object} lambda the lambda object.
    * @returns {Promise} returns the promise of updated lambda object
    */
   zipAndUploadLambda(lambda) {
-    if (lambda.source) {
-      if (this.grouped[lambda.source]) {
-        return new Promise(resolve => resolve(this.updateLambda(lambda)));
-      }
-      lambda = this.zipLambda(lambda);
-      return this.uploadLambda(lambda);
-    }
-    else if (lambda.s3Source) {
-      lambda.remote = lambda.s3Source.key;
-      lambda.bucket = lambda.s3Source.bucket;
-      return new Promise(resolve => resolve(lambda));
-    }
-    return new Promise(resolve => resolve(lambda));
+    return this.zipLambda(lambda).then(l => this.uploadLambda(l));
   }
 
   /**
@@ -189,20 +164,45 @@ class Lambda {
    */
   process() {
     if (this.config.lambdas) {
-      // remove the build folder if exists
-      fs.removeSync(this.buildFolder);
-
       // create the lambda folder
       fs.mkdirpSync(this.buildFolder);
 
-      // zip and upload lambdas
-      const jobs = this.config.lambdas.map(l => this.zipAndUploadLambda(l));
+      let lambdas = this.config.lambdas;
 
-      return new Promise((resolve, reject) => {
-        Promise.all(jobs).then(lambdas => {
+      // if the lambdas is not an array but a object, convert it to a list
+      if (!Array.isArray(this.config.lambdas)) {
+        lambdas = Object.keys(this.config.lambdas).map(name => {
+          const lambda = this.config.lambdas[name];
+          lambda.name = name;
+          return lambda;
+        });
+      }
+
+      // install npm packages
+      lambdas.filter(l => l.npmSource).forEach(l => utils.exec(`npm install ${l.npmSource.name}@${l.npmSource.version}`));
+
+      // build lambda path for lambdas that are zipped and uploaded
+      lambdas = lambdas.map(l => this.buildS3Path(l));
+
+      // zip and upload only unique hashes
+      let uniqueHashes = {};
+      lambdas.filter(l => l.source).forEach(l => {
+        uniqueHashes[l.hash] = l;
+      });
+      const jobs = Object.keys(uniqueHashes).map(l => this.zipAndUploadLambda(uniqueHashes[l]));
+
+      return Promise.all(jobs).then(() => {
+        // we handle lambdas as both arrays and key/objects
+        // below condition is intended to for cases where
+        // the lambda is returned as a lsit
+        if (Array.isArray(this.config.lambdas)) {
           this.config.lambdas = lambdas;
-          return resolve(this.config);
-        }).catch(e => reject(e));
+          return this.config;
+        }
+        const tmp = {};
+        lambdas.forEach(l => (tmp[l.name] = l));
+        this.config.lambdas = tmp;
+        return this.config;
       });
     }
     else return Promise.resolve(this.config);
@@ -221,9 +221,9 @@ class Lambda {
     fs.mkdirpSync(this.buildFolder);
 
     let lambda;
-    this.config.lambdas.forEach(l => {
-      if (l.name === name) {
-        lambda = l;
+    Object.keys(this.config.lambdas).forEach(n => {
+      if (n === name) {
+        lambda = this.config.lambdas[n];
       }
     });
 
@@ -231,14 +231,14 @@ class Lambda {
       throw new Error('Lambda function is not defined in config.yml');
     }
     const stack = this.config.stackName;
+    lambda = this.buildS3Path(lambda);
 
-    console.log(`Updating ${lambda.name}`);
-    lambda = this.zipLambda(lambda);
-    return l.updateFunctionCode({
-      FunctionName: `${stack}-${lambda.name}`,
+    console.log(`Updating ${name}`);
+    return this.zipLambda(lambda).then(lambda => l.updateFunctionCode({
+      FunctionName: `${stack}-${name}`,
       ZipFile: fs.readFileSync(lambda.local)
-    }).promise()
-    .then((r) => console.log(`Lambda function ${lambda.name} has been updated`));
+    }).promise())
+    .then((r) => console.log(`Lambda function ${name} has been updated`));
   }
 }
 

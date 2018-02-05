@@ -1,7 +1,12 @@
 default:
-  stackName: kes-full-example
-  noDash: KesFullExample
+  stackName: kes-nested-example
+  noDash: KesNestedExample
   retryValue: 10
+
+  nested_templates:
+    myNestedTemplate:
+      cfFile: examples/nested/nested.template.yml
+      configFile: examples/nested/nested.config.yml
 
   buckets:
     internal: devseed-kes-deployment
@@ -13,17 +18,6 @@ default:
   params:
     - name: SomeTestParameter
       value: someValue
-
-  sns:
-    - name: subscribeToLambda1
-      subscriptions:
-        - protocol: lambda
-          endpoint: '!GetAtt Lambda1LambdaFunction.Arn'
-
-  sqs:
-    - name: mySqs
-      retry: '{{retryValue}}'
-      visibilityTimeout: 10
 
   dynamos:
     - name: myTable

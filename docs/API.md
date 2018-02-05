@@ -4,6 +4,7 @@
 
 -   [Config](#config)
     -   [parse](#parse)
+    -   [flatten](#flatten)
 -   [Kes](#kes)
     -   [updateSingleLambda](#updatesinglelambda)
     -   [compileCF](#compilecf)
@@ -14,18 +15,25 @@
     -   [describeCF](#describecf)
     -   [opsStack](#opsstack)
     -   [upsertStack](#upsertstack)
+    -   [deployStack](#deploystack)
     -   [createStack](#createstack)
     -   [updateStack](#updatestack)
 -   [Lambda](#lambda)
-    -   [updateLambda](#updatelambda)
+    -   [buildS3Path](#builds3path)
+    -   [getHash](#gethash)
     -   [zipLambda](#ziplambda)
     -   [uploadLambda](#uploadlambda)
     -   [zipAndUploadLambda](#zipanduploadlambda)
     -   [process](#process)
     -   [updateSingleLambda](#updatesinglelambda-1)
 -   [localRun](#localrun)
+-   [zip](#zip)
 -   [exec](#exec)
 -   [configureAws](#configureaws)
+-   [fileToString](#filetostring)
+-   [mergeYamls](#mergeyamls)
+-   [determineKesClass](#determinekesclass)
+-   [failure](#failure)
 
 ## Config
 
@@ -34,19 +42,19 @@ It primarily reads `config.yml` and `.env` files
 
 **Parameters**
 
--   `stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
--   `deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
--   `configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
--   `envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
--   `options` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
-    -   `options.stack` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)?** the stack name
-    -   `options.deployment` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `null`)
-    -   `options.region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the aws region (optional, default `'us-east-1'`)
-    -   `options.profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the profile name (optional, default `null`)
-    -   `options.kesFolder` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the kes folder (optional, default `'.kes'`)
-    -   `options.configFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
-    -   `options.envFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
-    -   `options.cfFile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
+-   `options` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** a js object that includes required options.
+    -   `options.stack` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)?** the stack name
+    -   `options.deployment` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the deployment name (optional, default `null`)
+    -   `options.region` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the aws region (optional, default `'us-east-1'`)
+    -   `options.profile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the profile name (optional, default `null`)
+    -   `options.kesFolder` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the kes folder (optional, default `'.kes'`)
+    -   `options.configFile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the config.yml (optional, default `'config.yml'`)
+    -   `options.envFile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the .env file (optional, default `'.env'`)
+    -   `options.cfFile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the CF template (optional, default `'cloudformation.template.yml'`)
+-   `stack` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Stack name
+-   `deployment` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Deployment name
+-   `configFile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the config.yml file
+-   `envFile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** path to the .env file (optional)
 
 **Examples**
 
@@ -66,7 +74,14 @@ const configInstance = new Config(null, null, 'path/to/config.yml', 'path/to/.en
 config = configInstance.parse();
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
+
+### flatten
+
+Return a javascript object (not a class instance) of the
+config class
+
+Returns **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** a javascript object version of the class
 
 ## Kes
 
@@ -76,7 +91,7 @@ and modify the behaviour of kes cli.
 
 **Parameters**
 
--   `config` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** an instance of the Config class (config.js)
+-   `config` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** an instance of the Config class (config.js)
 
 **Examples**
 
@@ -88,8 +103,7 @@ const config = new Config(options);
 const kes = new Kes(config);
 
 // create a new stack
-kes.createStack()
- .then(() => updateStack())
+kes.deployStack()
  .then(() => describeCF())
  .then(() => updateSingleLambda('myLambda'))
  .catch(e => console.log(e));
@@ -101,9 +115,9 @@ Updates code of a deployed lambda function
 
 **Parameters**
 
--   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the lambda function defined in config.yml
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the name of the lambda function defined in config.yml
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### compileCF
 
@@ -116,7 +130,7 @@ Writes the template to `.kes/cloudformation.yml`.
 Uses `.kes/cloudformation.template.yml` as the base template
 for generating the final CF template.
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### uploadToS3
 
@@ -125,69 +139,67 @@ It uploads a given string to a S3 object.
 
 **Parameters**
 
--   `bucket` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the s3 bucket name
--   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path and name of the object
--   `body` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the content of the object
+-   `bucket` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the s3 bucket name
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path and name of the object
+-   `body` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the content of the object
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### uploadCF
 
 Uploads the Cloud Formation template to a given S3 location
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### cloudFormation
 
 Calls CloudFormation's update-stack or create-stack methods
 
-**Parameters**
-
--   `op` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** possible values are 'create' and 'update'
-
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### validateTemplate
 
 Validates the CF template
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### describeCF
 
 Describes the cloudformation stack deployed
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### opsStack
 
 Generic create/update  method for CloudFormation
 
-**Parameters**
-
--   `ops`  
--   `op` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** possible values are 'create' and 'update'
-
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### upsertStack
+
+[Deprecated] Creates a CloudFormation stack for the class instance
+If exists, will update the existing one
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+
+### deployStack
 
 Creates a CloudFormation stack for the class instance
 If exists, will update the existing one
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### createStack
 
-Creates a CloudFormation stack for the class instance
+[Deprecated] Creates a CloudFormation stack for the class instance
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ### updateStack
 
-Updates an existing CloudFormation stack for the class instance
+[Deprecated] Updates an existing CloudFormation stack for the class instance
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
 ## Lambda
 
@@ -195,33 +207,44 @@ Copy, zip and upload lambda functions to S3
 
 **Parameters**
 
--   `config` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
--   `kesFolder` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the `.kes` folder
--   `bucket` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the S3 bucket name
--   `key` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the main folder to store the data in the bucket (stack)
+-   `config` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the configuration object
+-   `kesFolder` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the path to the `.kes` folder
+-   `bucket` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the S3 bucket name
+-   `key` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the main folder to store the data in the bucket (stack)
 
-### updateLambda
+### buildS3Path
 
-Updates the lambda object with the bucket, s3 zip file path and
-local zip file location
+Adds hash value, bucket name, and remote and local paths
+for lambdas that have source value.
+
+If a s3Source is usaed, only add remote and bucket values
 
 **Parameters**
 
--   `lambda` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object
+-   `lambda` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns the updated lambda object
+Returns **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object
+
+### getHash
+
+calculate the hash value for a given path
+
+**Parameters**
+
+-   `folderName` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** directory path
+-   `method` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** hash type, default to shasum
+
+Returns **[buffer](https://nodejs.org/api/buffer.html)** hash value
 
 ### zipLambda
 
-Copy source code of a given lambda function, zips it, calculate
-the hash of the source code and updates the lambda object with
-the hash, local and remote locations of the code
+zip a given lambda function source code
 
 **Parameters**
 
--   `lambda` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object
+-   `lambda` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns the updated lambda object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of the lambda object
 
 ### uploadLambda
 
@@ -230,12 +253,12 @@ if the zip file already exists on S3 it skips the upload
 
 **Parameters**
 
--   `lambda` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object. It must have the following properties
-    -   `lambda.bucket` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the s3 buckt name
-    -   `lambda.remote` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the lambda code's key (path and filename) on s3
-    -   `lambda.local` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** the zip files location on local machine
+-   `lambda` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object. It must have the following properties
+    -   `lambda.bucket` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the s3 buckt name
+    -   `lambda.remote` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the lambda code's key (path and filename) on s3
+    -   `lambda.local` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** the zip files location on local machine
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of updated lambda object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of updated lambda object
 
 ### zipAndUploadLambda
 
@@ -243,14 +266,11 @@ Zips and Uploads a lambda function. If the source of the function
 is already zipped and uploaded, it skips the step only updates the
 lambda config object.
 
-If the lambda config includes a link to zip file on S3, it skips
-the whole step.
-
 **Parameters**
 
--   `lambda` **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object.
+-   `lambda` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** the lambda object.
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of updated lambda object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of updated lambda object
 
 ### process
 
@@ -262,7 +282,7 @@ lambda config object.
 If the lambda config includes a link to zip file on S3, it skips
 the whole step.
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of updated configuration object
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of updated configuration object
 
 ### updateSingleLambda
 
@@ -270,9 +290,9 @@ Uploads the zip code of a single lambda function to AWS Lambda
 
 **Parameters**
 
--   `name` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** name of the lambda function
+-   `name` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** name of the lambda function
 
-Returns **[Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns AWS response for lambda code update operation
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns AWS response for lambda code update operation
 
 ## localRun
 
@@ -280,7 +300,7 @@ A simple helper for running a function if `local` is passed as argument
 
 **Parameters**
 
--   `func` **[Function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/function)** A javascript function
+-   `func` **[Function](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function)** A javascript function
 
 **Examples**
 
@@ -295,7 +315,20 @@ localRun(() => {
 // my function
 ```
 
-Returns **[Object](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns the result of the function call
+Returns **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** returns the result of the function call
+
+## zip
+
+Zips a list of files or directories
+
+**Parameters**
+
+-   `zipFile` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** filename and path where the zip file is stored
+-   `srcList` **[array](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array)** array of files and directories paths
+-   `dstPath` **type** for directories whether to put the directories at
+                           root of the zip file or relative to your path on the local machine
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** 
 
 ## exec
 
@@ -304,8 +337,8 @@ stdout to console.
 
 **Parameters**
 
--   `cmd` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** Bash command
--   `verbose` **[Boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether to post stdout to console (optional, default `true`)
+-   `cmd` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Bash command
+-   `verbose` **[Boolean](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean)** whether to post stdout to console (optional, default `true`)
 
 Returns **[Buffer](https://nodejs.org/api/buffer.html)** The command's stdout in for of Buffer
 
@@ -316,6 +349,51 @@ of profile on ~/.aws/credentials file if necessary
 
 **Parameters**
 
--   `region` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** AWS region (optional, default `'us-east-1'`)
--   `profile` **[String](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String)** aws credentials profile name (optional, default `null`)
--   `role`   (optional, default `null`)
+-   `region` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** AWS region (optional, default `'us-east-1'`)
+-   `profile` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** aws credentials profile name (optional, default `null`)
+-   `role`  
+
+## fileToString
+
+Checks if the input is a file, if it is a file,
+it reads it and return the content, otherwise just pass
+the input as an output
+
+**Parameters**
+
+-   `file` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** A file path or a string
+
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** String content of a given file
+
+## mergeYamls
+
+Merges two yaml files. The merge is done using lodash.merge
+and it happens recursively. Meaning that values of file2 will
+replace values of file 1 if they have the same key.
+
+**Parameters**
+
+-   `file1` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 1 or file 1 string
+-   `file2` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 2 or file 2 string
+
+Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Merged Yaml file in string format
+
+## determineKesClass
+
+Based on the information passed from the CLI by the commander
+module this function determines whether to use the default Kes class
+or use the override class provided by the user
+
+**Parameters**
+
+-   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** The options passed by the commander library
+
+Returns **Class** Kes class
+
+## failure
+
+In case of error logs the error and exit with error 1
+
+**Parameters**
+
+-   `e` **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** error object
