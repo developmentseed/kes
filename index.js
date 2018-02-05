@@ -14,35 +14,40 @@ const success = (r) => process.exit(0);
  * @param {object} config Kes config object
  * @param {object} KesClass the Kes Class
  * @param {object} options The options passed by the commander library
- * @return {Promise.<array} returns a promise of an array of CF urls uploaded to S3
+ * @return {Promise} returns a promise of an updated Kes config object
  */
 function buildNestedCfs(config, KesClass, options) {
   if (config.nested_templates) {
+    const nested = config.nested_templates;
     console.log('Nested templates are found!');
-    const ps = config.nested_templates.map((nested) => {
-      console.log(`Compiling ${nested.cfFile}`);
+    const ps = Object.keys(nested).map((name) => {
+      console.log(`Compiling nested template for ${name}`);
 
       const newOptions = Object.assign({}, options);
-      newOptions.cfFile = nested.cfFile;
-      newOptions.configFile = nested.configFile;
+      newOptions.cfFile = nested[name].cfFile;
+      newOptions.configFile = nested[name].configFile;
 
       // no templates are used in nested stacks
       delete newOptions.template;
 
       // use the parent stackname
       newOptions.stack = config.stack;
+      newOptions.parent = config;
       const nestedConfig = new Config(newOptions);
-      nestedConfig.parent = config;
 
+      // get the bucket name from the parent
       if (!nestedConfig.bucket) {
         nestedConfig.bucket = config.buckets.internal;
       }
+
       const kes = new KesClass(nestedConfig);
-      return kes.uploadCF();
+      return kes.uploadCF().then((uri) => {
+        config.nested_templates[name].url = uri;
+      });
     });
-    return Promise.all(ps);
+    return Promise.all(ps).then(() => config);
   }
-  return Promise.resolve([]);
+  return Promise.resolve(config);
 }
 
 /**
@@ -55,14 +60,11 @@ function buildNestedCfs(config, KesClass, options) {
  */
 function buildCf(options, cmd) {
   const KesClass = utils.determineKesClass(options);
-  const config = new Config(options);
+  const parentConfig = new Config(options);
 
-  buildNestedCfs(config, KesClass, options).then((nestedPaths) => {
+  buildNestedCfs(parentConfig, KesClass, options).then((config) => {
     console.log('\nCompiling the main template');
 
-    if (nestedPaths && nestedPaths.length > 0) {
-      config.nested_template_paths = nestedPaths;
-    }
     const kes = new KesClass(config);
     switch (cmd) {
       case 'create':
