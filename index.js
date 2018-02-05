@@ -40,6 +40,9 @@ function buildNestedCfs(config, KesClass, options) {
         nestedConfig.bucket = config.buckets.internal;
       }
 
+      // add nested deployment name
+      nestedConfig.nested_cf_name = name;
+
       const kes = new KesClass(nestedConfig);
       return kes.uploadCF().then((uri) => {
         config.nested_templates[name].url = uri;

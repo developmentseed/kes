@@ -38,9 +38,14 @@ class Kes {
     this.bucket = get(config, 'bucket');
 
     // template name
-    this.cf_basename = path.basename(config.cfFile, '.template.yml');
+    if (config.parent) {
+      this.cf_template_name = `${config.nested_cf_name}.yml`;
+    }
+    else {
+      this.cf_template_name = `${path.basename(config.cfFile, '.template.yml')}.yml`;
+    }
 
-    this.templateUrl = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/${this.cf_basename}.yml`;
+    this.templateUrl = `https://s3.amazonaws.com/${this.bucket}/${this.stack}/${this.cf_template_name}`;
 
     utils.configureAws(this.config.region, this.config.profile, this.config.role);
     this.s3 = new AWS.S3();
@@ -120,7 +125,7 @@ class Kes {
         cf = this.parseCF(this.config.cfFile);
       }
 
-      const destPath = path.join(this.config.kesFolder, `${this.cf_basename}.yml`);
+      const destPath = path.join(this.config.kesFolder, this.cf_template_name);
       console.log(`Template saved to ${destPath}`);
       return fs.writeFileSync(destPath, cf);
     });
@@ -155,18 +160,18 @@ class Kes {
     return this.compileCF().then(() => {
       // make sure cloudformation template exists
       try {
-        fs.accessSync(path.join(this.config.kesFolder, `${this.cf_basename}.yml`));
+        fs.accessSync(path.join(this.config.kesFolder, this.cf_template_name));
       }
       catch (e) {
-        throw new Error(`${this.cf_basename}.yml is missing.`);
+        throw new Error(`${this.cf_template_name} is missing.`);
       }
 
       // upload CF template to S3
       if (this.bucket) {
         return this.uploadToS3(
           this.bucket,
-          `${this.stack}/${this.cf_basename}.yml`,
-          fs.readFileSync(path.join(this.config.kesFolder, `${this.cf_basename}.yml`))
+          `${this.stack}/${this.cf_template_name}`,
+          fs.readFileSync(path.join(this.config.kesFolder, this.cf_template_name))
         );
       }
       else {
@@ -217,7 +222,7 @@ class Kes {
       params.TemplateURL = this.templateUrl;
     }
     else {
-      params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, `${this.cf_basename}.yml`)).toString();
+      params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, this.cf_template_name)).toString();
     }
 
     let wait = 'stackUpdateComplete';
@@ -302,7 +307,7 @@ class Kes {
         .then(() => console.log('Template is valid'));
     }
     else {
-      params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, `${this.cf_basename}.yml`)).toString();
+      params.TemplateBody = fs.readFileSync(path.join(this.config.kesFolder, this.cf_template_name)).toString();
     }
 
     // Build and upload the CF template
