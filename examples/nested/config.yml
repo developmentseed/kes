@@ -1,0 +1,93 @@
+default:
+  stackName: kes-nested-example
+  noDash: KesNestedExample
+  retryValue: 10
+
+  nested_templates:
+    myNestedTemplate:
+      cfFile: examples/nested/nested.template.yml
+      configFile: examples/nested/nested.config.yml
+
+  buckets:
+    internal: devseed-kes-deployment
+    tests: myTestArtifacts
+
+  capabilities:
+    - CAPABILITY_NAMED_IAM
+
+  params:
+    - name: SomeTestParameter
+      value: someValue
+
+  dynamos:
+    - name: myTable
+      read: 5
+      write: 5
+      attributes:
+        - name: ID
+          type: S
+          schema: HASH
+        - name: date
+          type: N
+          schema: RANGE
+
+  apis:
+    - name: myApi
+
+  stepFunctions:
+    - name: step1
+      definition:
+        Comment: 'Example StepFunction'
+        StartAt: Step1
+        States:
+          Step1:
+            Type: Task
+            Resource: ${Lambda2LambdaFunction.Arn}
+            Next: Step2
+          Step2:
+            Type: Task
+            Resource: ${Lambda3LambdaFunction.Arn}
+            End: true
+
+  lambdas:
+    - name: Custom
+      handler: index.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/custom/'
+    - name: ApiLambda
+      handler: index.handler
+      timeout: 20
+      memory: 256
+      source: 'examples/code/api/'
+      envs:
+        internal: '{{buckets.internal}}'
+      apiGateway:
+        - path: list
+          method: get
+          cors: true
+          api: myApi
+        - path: add
+          method: post
+          cors: true
+          api: myApi
+    - name: Lambda1
+      handler: index.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/lambda1/'
+    - name: Lambda2
+      handler: index.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/lambda1/'
+    - name: Lambda3
+      handler: index.handler
+      timeout: 300
+      memory: 512
+      source: 'examples/code/lambda1/'
+
+staging:
+  retryValue: 20
+  buckets:
+    internal: cumulus-devseed-internal
