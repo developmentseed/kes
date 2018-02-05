@@ -89,5 +89,3 @@ default:
 
 staging:
   retryValue: 20
-  buckets:
-    internal: cumulus-devseed-internal
