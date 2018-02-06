@@ -205,8 +205,7 @@ class Lambda {
         return this.config;
       });
     }
-
-    return new Promise(resolve => resolve(this.config));
+    else return Promise.resolve(this.config);
   }
 
   /**
