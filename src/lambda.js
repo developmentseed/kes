@@ -41,7 +41,7 @@ class Lambda {
       lambda.bucket = this.bucket;
 
       // local zip
-      const zipFile = `${lambda.hash}.zip`;
+      const zipFile = `${lambda.hash}-${lambda.name}.zip`;
       lambda.local = path.join(this.buildFolder, zipFile);
 
       // remote address
