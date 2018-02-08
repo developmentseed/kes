@@ -40,8 +40,13 @@ class Lambda {
       lambda.hash = this.getHash(lambda.source).toString();
       lambda.bucket = this.bucket;
 
+      if (!this.grouped.hasOwnProperty(lambda.hash)) {
+        this.grouped[lambda.hash] = lambda.name;
+      }
+
       // local zip
-      const zipFile = `${lambda.hash}-${lambda.name}.zip`;
+      const lambdaName = this.grouped[lambda.hash];
+      const zipFile = `${lambda.hash}-${lambdaName}.zip`;
       lambda.local = path.join(this.buildFolder, zipFile);
 
       // remote address
