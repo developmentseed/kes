@@ -1,6 +1,7 @@
 'use strict';
 
 const deprecate = require('deprecate');
+const pLimit = require('p-limit');
 const Kes = require('./src/kes');
 const Config = require('./src/config');
 const utils = require('./src/utils');
@@ -17,10 +18,11 @@ const success = (r) => process.exit(0);
  * @return {Promise} returns a promise of an updated Kes config object
  */
 function buildNestedCfs(config, KesClass, options) {
+  const limit = pLimit(1);
   if (config.nested_templates) {
     const nested = config.nested_templates;
     console.log('Nested templates are found!');
-    const ps = Object.keys(nested).map((name) => {
+    const ps = Object.keys(nested).map((name) => limit(() => {
       console.log(`Compiling nested template for ${name}`);
 
       const newOptions = Object.assign({}, options);
@@ -47,7 +49,7 @@ function buildNestedCfs(config, KesClass, options) {
       return kes.uploadCF().then((uri) => {
         config.nested_templates[name].url = uri;
       });
-    });
+    }));
     return Promise.all(ps).then(() => config);
   }
   return Promise.resolve(config);
