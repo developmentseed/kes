@@ -64,7 +64,7 @@ function buildNestedCfs(config, KesClass, options) {
  * @return {undefined}
  */
 function buildCf(options, cmd) {
-  const KesClass = utils.determineKesClass(options);
+  const KesClass = utils.determineKesClass(options, Kes);
   const parentConfig = new Config(options);
 
   buildNestedCfs(parentConfig, KesClass, options).then((config) => {
@@ -107,7 +107,7 @@ function buildCf(options, cmd) {
  */
 function buildLambda(options, cmd) {
   if (cmd) {
-    const KesClass = utils.determineKesClass(options);
+    const KesClass = utils.determineKesClass(options, Kes);
     const config = new Config(options);
     const kes = new KesClass(config);
     kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => utils.failure(e));

@@ -387,6 +387,7 @@ or use the override class provided by the user
 **Parameters**
 
 -   `options` **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** The options passed by the commander library
+-   `Kes` **Class** the default kes class
 
 Returns **Class** Kes class
 

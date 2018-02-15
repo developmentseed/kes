@@ -175,11 +175,10 @@ function mergeYamls(file1, file2) {
  * module this function determines whether to use the default Kes class
  * or use the override class provided by the user
  * @param {object} options The options passed by the commander library
+ * @param {Class} Kes the default kes class
  * @returns {Class} Kes class
  */
-function determineKesClass(options) {
-  let Kes;
-
+function determineKesClass(options, Kes) {
   // if there is a kes class specified use that
   const kesClass = get(options, 'kesClass');
   if (kesClass) {
@@ -206,7 +205,7 @@ function determineKesClass(options) {
         Kes = require(`${kesPath}`);
       }
       catch (e) {
-        Kes = require('./kes').Kes;
+        // do nothing
       }
     }
   }

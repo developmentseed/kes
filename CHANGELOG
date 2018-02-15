@@ -1,3 +1,7 @@
+## v2.1.2
+
+- fix a bug where determineKesClass failed to return the default class
+
 ## v2.1.1
 
 - fix a bug where uploaded lambda file was corrupted due to race condition
