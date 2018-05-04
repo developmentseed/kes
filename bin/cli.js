@@ -21,7 +21,7 @@ program.version(pckg.version);
 function extractCommanderOptions(program) {
   const options = {};
   Object.keys(program).forEach(property => {
-    if (typeof program[property] === 'string') {
+    if (typeof program[property] === 'string' || typeof program[property] === 'boolean') {
       options[property] = program[property];
     }
   });
@@ -108,6 +108,7 @@ program
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
+  .option('--showOutputs', 'Show the list of a CloudFormation template outputs')
   .command('cf [create|update|upsert|deploy|validate|compile]')
   .description(`CloudFormation Operations:
   create    Creates the CF stack (deprecated, start using deploy)
@@ -118,7 +119,7 @@ program
   compile   Compiles the CF stack`)
   .action((cmd, o) => {
     const options = extractCommanderOptions(program);
-    kes.buildCf(options ,cmd);
+    kes.buildCf(options, cmd);
   });
 
 program

@@ -29,6 +29,7 @@
  *  -r, --region <region>         AWS region
  *  --stack <stack>               stack name, defaults to the config value
  *  -d, --deployment <deployment>  Deployment name, default to default
+ *  --showOutputs                  Show the list of a CloudFormation template outputs
  *  -h, --help                    output usage information
  *
  *  Commands:
@@ -65,7 +66,7 @@
  * the `default` section of the `config.yml` is parsed and used in `cloudformation.template.yml`. If
  * another deployment is specified in the `config.yml` the values of that deployment overrides the
  * values of `default`
- * file which is sent to AWS CloudFormation to create and udpate the stack.
+ * file which is sent to AWS CloudFormation to create and update the stack.
  *
  * ### CF Stack Name
  * The Cloudformation stack name is the same as `stackName` in `config.yml`.
@@ -247,7 +248,7 @@
  *  kes cf deploy
  * ```
  *
- * ### Differenet deployment configurations
+ * ### Different deployment configurations
  *
  * You can configure different values for different deployments. For example you might want to configure your test deployment
  * differently from your staging and production deployments. Here is how to achieve it:

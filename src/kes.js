@@ -118,6 +118,11 @@ class Kes {
           cf = utils.mergeYamls(mainCF, overrideCF);
         }
         catch (e) {
+          if (!e.message.includes('ENOENT')) {
+            console.log(`compiling the override template at ${this.config.cfFile} failed:`);
+            console.log(e);
+            console.log(`Using the main CF template at ${this.config.template}`);
+          }
           cf = mainCF;
         }
       }
@@ -145,7 +150,7 @@ class Kes {
                   .promise()
                   .then(() => {
                     const httpUrl = `http://${bucket}.s3.amazonaws.com/${key}`;
-                    console.log(`Uploaded: s3://${bucket}/${key}`)
+                    console.log(`Uploaded: s3://${bucket}/${key}`);
                     return httpUrl;
                   });
   }
@@ -334,7 +339,20 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   opsStack() {
-    return this.uploadCF().then(() => this.cloudFormation());
+    return this.uploadCF()
+      .then(() => this.cloudFormation())
+      .then(() => {
+        if (this.config.showOutputs) {
+          return this.describeCF();
+        }
+        return Promise.resolve();
+      })
+      .then((r) => {
+        if (r) {
+          console.log('\nList of the CloudFormation outputs:\n');
+          r.Stacks[0].Outputs.map((o) => console.log(`${o.OutputKey}: ${o.OutputValue}`));
+        }
+      });
   }
 
   /**

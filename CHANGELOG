@@ -1,3 +1,8 @@
+## v2.2.0
+
+- show proper logs when the template merging fails due to a yaml 
+- a new flag `--showOutputs` will show the output of a CloudFormation template
+
 ## v2.1.2
 
 - fix a bug where determineKesClass failed to return the default class

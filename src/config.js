@@ -50,6 +50,7 @@ class Config {
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.stack = get(options, 'stack', null);
     this.parent = get(options, 'parent', null);
+    this.showOutputs = get(options, 'showOutputs', false);
 
     // use template if provided
     if (has(options, 'template')) {

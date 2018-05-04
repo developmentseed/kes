@@ -102,7 +102,7 @@ function buildCf(options, cmd) {
 /**
  * Builds and uploads a lambda function based on the options passed by the commander
  * @param {object} options Options passed by the commander library
- * @param {string} cmd the argument selected in the CLI, e.g. lambda name 
+ * @param {string} cmd the argument selected in the CLI, e.g. lambda name
  * @return {undefined}
  */
 function buildLambda(options, cmd) {
