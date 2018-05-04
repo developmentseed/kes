@@ -50,7 +50,9 @@ function buildNestedCfs(config, KesClass, options) {
         config.nested_templates[name].url = uri;
       });
     }));
-    return Promise.all(ps).then(() => config);
+    return Promise.all(ps)
+      .then(() => config)
+      .catch(utils.failure);
   }
   return Promise.resolve(config);
 }
