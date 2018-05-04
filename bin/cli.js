@@ -105,16 +105,18 @@ program
   .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
   .option('-r, --region <region>', 'AWS region', null)
   .option('--stack <stack>', 'stack name, defaults to the config value')
+  .option('--showOutputs', 'Show the list of a CloudFormation template outputs')
+  .option('--yes', 'Skip all confirmation prompts')
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
-  .option('--showOutputs', 'Show the list of a CloudFormation template outputs')
-  .command('cf [create|update|upsert|deploy|validate|compile]')
+  .command('cf [create|update|upsert|deploy|validate|compile|delete]')
   .description(`CloudFormation Operations:
   create    Creates the CF stack (deprecated, start using deploy)
   update    Updates the CF stack (deprecated, start using deploy)
   upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
   deploy    Creates the CF stack and Update if already exists
+  delete    Delete the CF stack
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
   .action((cmd, o) => {

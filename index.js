@@ -68,7 +68,6 @@ function buildCf(options, cmd) {
   const parentConfig = new Config(options);
 
   buildNestedCfs(parentConfig, KesClass, options).then((config) => {
-    console.log('\nCompiling the main template');
 
     const kes = new KesClass(config);
     switch (cmd) {
@@ -92,6 +91,9 @@ function buildCf(options, cmd) {
         break;
       case 'compile':
         kes.compileCF().then(r => success(r)).catch(e => utils.failure(e));
+        break;
+      case 'delete':
+        kes.deleteStack().then(r => success(r)).catch(e => utils.failure(e));
         break;
       default:
         console.log('Wrong choice. Accepted arguments: [create|update|upsert|deploy|validate|compile]');

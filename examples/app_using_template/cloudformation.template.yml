@@ -2,5 +2,6 @@ Outputs:
 # this is not in the original template. we are adding it here to override
 {{#each apis}}
   {{Name}}Endpoint:
-    Value: !Ref {{name}}RestApi
+    Value: 
+      Ref: {{name}}RestApi
 {{/each}}

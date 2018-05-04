@@ -2,6 +2,7 @@
 
 - show proper logs when the template merging fails due to a yaml 
 - a new flag `--showOutputs` will show the output of a CloudFormation template
+- add cloudformation delete functionality
 
 ## v2.1.2
 

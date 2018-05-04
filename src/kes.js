@@ -7,6 +7,7 @@ const forge = require('node-forge');
 const AWS = require('aws-sdk');
 const path = require('path');
 const fs = require('fs-extra');
+const inquirer = require('inquirer');
 const Lambda = require('./lambda');
 const utils = require('./utils');
 
@@ -120,8 +121,7 @@ class Kes {
         catch (e) {
           if (!e.message.includes('ENOENT')) {
             console.log(`compiling the override template at ${this.config.cfFile} failed:`);
-            console.log(e);
-            console.log(`Using the main CF template at ${this.config.template}`);
+            throw e;
           }
           cf = mainCF;
         }
@@ -187,6 +187,24 @@ class Kes {
   }
 
   /**
+   * Wait for the current stack and log the current outcome
+   * 
+   * @returns {Promise} undefined
+   */
+  waitFor(wait) {
+    console.log('Waiting for the CF operation to complete');
+    return this.cf.waitFor(wait, { StackName: this.stack }).promise()
+      .then(r => {
+        if (r && r.Stacks && r.Stacks[0] && r.Stacks[0].StackStatus) {
+          console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`);
+        }
+        else {
+          console.log(`CF operation is completed`);
+        }
+      });
+  }
+
+  /**
    * Calls CloudFormation's update-stack or create-stack methods
    *
    * @returns {Promise} returns the promise of an AWS response object
@@ -242,11 +260,7 @@ class Kes {
         }
         throw e;
       })
-      .then(() => {
-        console.log('Waiting for the CF operation to complete');
-        return this.cf.waitFor(wait, { StackName: this.stack }).promise();
-      })
-      .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
+      .then(() => this.waitFor(wait))
       .catch((e) => {
         const errorsWithDetail = [
           'CREATE_FAILED',
@@ -334,6 +348,19 @@ class Kes {
   }
 
   /**
+   * Deletes the current stack
+   * 
+   * @returns {Promise} undefined
+   */
+  deleteCF() {
+    return this.cf.deleteStack({
+      StackName: this.stack
+    }).promise()
+    .then(() => this.waitFor('stackDeleteComplete'))
+    .then(() => console.log(`${this.stack} is successfully deleted`));
+  }
+
+  /**
    * Generic create/update  method for CloudFormation
    *
    * @returns {Promise} returns the promise of an AWS response object
@@ -348,7 +375,7 @@ class Kes {
         return Promise.resolve();
       })
       .then((r) => {
-        if (r) {
+        if (r && r.Stacks[0] && r.Stacks[0].Outputs) {
           console.log('\nList of the CloudFormation outputs:\n');
           r.Stacks[0].Outputs.map((o) => console.log(`${o.OutputKey}: ${o.OutputValue}`));
         }
@@ -390,6 +417,30 @@ class Kes {
    */
   updateStack() {
     return this.opsStack();
+  }
+
+  /**
+   * Deletes the main stack
+   *
+   * @returns {Promise} returns the promise of an AWS response object
+   */
+  deleteStack() {
+    if (this.config.yes) {
+      return this.deleteCF();
+    }
+    return inquirer.prompt(
+      [{
+        type: 'confirm',
+        name: 'delete',
+        message:`Are you sure you want to delete ${this.stack}? This operation is not reversable`
+      }]
+    ).then(answers => {
+      if (answers.delete) {
+        return this.deleteCF();
+      }
+      console.log('Operation canceled');
+      return Promise.resolve();
+    });
   }
 }
 

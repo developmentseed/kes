@@ -28,16 +28,18 @@
  *  -k, --kes-folder <kesFolder>  Path to config folder
  *  -r, --region <region>         AWS region
  *  --stack <stack>               stack name, defaults to the config value
- *  -d, --deployment <deployment>  Deployment name, default to default
  *  --showOutputs                  Show the list of a CloudFormation template outputs
+ *  --yes                          Skip all confirmation prompts
+ *  -d, --deployment <deployment>  Deployment name, default to default
  *  -h, --help                    output usage information
  *
  *  Commands:
  *  cf [deploy|validate|compile]  CloudFormation Operations:
  *    create    Creates the CF stack (deprecated, start using deploy)
  *    update    Updates the CF stack (deprecated, start using deploy)
- *    upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+ *    upsert    Creates the CF stack and Update if already exists (deprecated, start using deploy)
  *    deploy    Creates the CF stack and Update if already exists
+ *    delete    Delete the CF stack
  *    validate  Validates the CF stack
  *    compile   Compiles the CF stack
  *    lambda <lambdaName>                         uploads a given lambda function to Lambda service
@@ -246,6 +248,13 @@
  * To create a CF stack or update and existing one run
  * ```bash
  *  kes cf deploy
+ * ```
+ *
+ * ### Delete an existing stack
+ *
+ * To delete an existing stack:
+ * ```bash
+ *   kes cf delete
  * ```
  *
  * ### Different deployment configurations
