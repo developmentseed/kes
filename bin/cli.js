@@ -114,7 +114,7 @@ program
   .description(`CloudFormation Operations:
   create    Creates the CF stack (deprecated, start using deploy)
   update    Updates the CF stack (deprecated, start using deploy)
-  upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+  upsert    Creates the CF stack and Update if already exists (deprecated, start using deploy)
   deploy    Creates the CF stack and Update if already exists
   delete    Delete the CF stack
   validate  Validates the CF stack

@@ -289,7 +289,7 @@
  * **Note:** You still need an aws user with AssumeRole permission for this to work
  *
  * ```bash
- * kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
+ * kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeploymentRole
  * ```
  *
  * ### Updating One Lambda Function

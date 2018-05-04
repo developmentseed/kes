@@ -68,7 +68,6 @@ function buildCf(options, cmd) {
   const parentConfig = new Config(options);
 
   buildNestedCfs(parentConfig, KesClass, options).then((config) => {
-
     const kes = new KesClass(config);
     switch (cmd) {
       case 'create':

@@ -234,7 +234,7 @@ class Config {
    * @private
    * @static
    * @param  {Object} config The configuration object
-   * @return {Object} Returns the updated configruation object
+   * @return {Object} Returns the updated configuration object
    */
   static configureLambda(config) {
     if (config.lambdas) {

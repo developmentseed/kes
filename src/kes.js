@@ -14,7 +14,7 @@ const utils = require('./utils');
 /**
  * The main Kes class. This class is used in the command module to create
  * the CLI interface for kes. This class can be extended in order to override
- * and modify the behaviour of kes cli.
+ * and modify the behavior of kes cli.
  *
  * @example
  * const { Kes, Config } = require('kes');
@@ -188,7 +188,7 @@ class Kes {
 
   /**
    * Wait for the current stack and log the current outcome
-   * 
+   *
    * @returns {Promise} undefined
    */
   waitFor(wait) {
@@ -349,7 +349,7 @@ class Kes {
 
   /**
    * Deletes the current stack
-   * 
+   *
    * @returns {Promise} undefined
    */
   deleteCF() {
@@ -432,7 +432,7 @@ class Kes {
       [{
         type: 'confirm',
         name: 'delete',
-        message:`Are you sure you want to delete ${this.stack}? This operation is not reversable`
+        message: `Are you sure you want to delete ${this.stack}? This operation is not reversible`
       }]
     ).then(answers => {
       if (answers.delete) {
