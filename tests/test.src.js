@@ -68,22 +68,22 @@ test('create a config instance', (t) => {
   });
 
   t.is(config.stack, 'my-kes-project');
-  t.is(config.lambdas.length, 2);
-  t.is(config.lambdas[0].fullName, 'my-kes-project-func1');
+  t.is(Object.keys(config.lambdas).length, 2);
+  t.is(config.lambdas.func1.fullName, 'my-kes-project-func1');
 
   // make sure envs are added even if lambdas don't include them
-  t.is(Object.keys(config.lambdas[0].envs).length, 0);
-  t.is(config.lambdas[1].envs.CUSTOM_ENV, 'myValue');
+  t.is(Object.keys(config.lambdas.func1.envs).length, 0);
+  t.is(config.lambdas.func2.envs.CUSTOM_ENV, 'myValue');
 });
 
 test('create a config instance with non default deployment', (t) => {
   const config = new Config({
     kesFolder: 'examples/lambdas',
-    deployment: 'production',
+    deployment: 'kesTestDeployment',
     region: 'us-east-3'
   });
 
-  t.is(config.stack, 'my-kes-project-prod');
+  t.is(config.stack, 'kes-test-project-prod');
   t.is(config.region, 'us-east-3');
 });
 
@@ -118,8 +118,10 @@ test('config with template', (t) => {
   const config = new Config({
     kesFolder: 'examples/app_using_template',
     template: 'examples/template',
-    deployment: 'myDeployment'
+    deployment: 'kesTestDeployment'
   });
 
-  t.is(config.stackName, 'myDeployment-using-template');
+  t.is(config.stackName, 'kes-test-using-template');
+  t.is(config.bucket, 'devseed-kes-deployment');
+  t.is(config.bucket, config.system_bucket);
 });

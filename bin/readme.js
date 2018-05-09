@@ -28,6 +28,8 @@
  *  -k, --kes-folder <kesFolder>  Path to config folder
  *  -r, --region <region>         AWS region
  *  --stack <stack>               stack name, defaults to the config value
+ *  --showOutputs                  Show the list of a CloudFormation template outputs
+ *  --yes                          Skip all confirmation prompts
  *  -d, --deployment <deployment>  Deployment name, default to default
  *  -h, --help                    output usage information
  *
@@ -35,8 +37,9 @@
  *  cf [deploy|validate|compile]  CloudFormation Operations:
  *    create    Creates the CF stack (deprecated, start using deploy)
  *    update    Updates the CF stack (deprecated, start using deploy)
- *    upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+ *    upsert    Creates the CF stack and Update if already exists (deprecated, start using deploy)
  *    deploy    Creates the CF stack and Update if already exists
+ *    delete    Delete the CF stack
  *    validate  Validates the CF stack
  *    compile   Compiles the CF stack
  *    lambda <lambdaName>                         uploads a given lambda function to Lambda service
@@ -65,7 +68,7 @@
  * the `default` section of the `config.yml` is parsed and used in `cloudformation.template.yml`. If
  * another deployment is specified in the `config.yml` the values of that deployment overrides the
  * values of `default`
- * file which is sent to AWS CloudFormation to create and udpate the stack.
+ * file which is sent to AWS CloudFormation to create and update the stack.
  *
  * ### CF Stack Name
  * The Cloudformation stack name is the same as `stackName` in `config.yml`.
@@ -247,7 +250,14 @@
  *  kes cf deploy
  * ```
  *
- * ### Differenet deployment configurations
+ * ### Delete an existing stack
+ *
+ * To delete an existing stack:
+ * ```bash
+ *   kes cf delete
+ * ```
+ *
+ * ### Different deployment configurations
  *
  * You can configure different values for different deployments. For example you might want to configure your test deployment
  * differently from your staging and production deployments. Here is how to achieve it:
@@ -279,7 +289,7 @@
  * **Note:** You still need an aws user with AssumeRole permission for this to work
  *
  * ```bash
- * kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
+ * kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeploymentRole
  * ```
  *
  * ### Updating One Lambda Function

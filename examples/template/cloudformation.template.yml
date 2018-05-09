@@ -17,7 +17,7 @@ Resources:
           - Effect: Allow
             Principal:
               Service:
-                - !Sub states.${AWS::Region}.amazonaws.com
+                - Fn::Sub: states.${AWS::Region}.amazonaws.com
             Action: sts:AssumeRole
       Path: "/"
       Policies:
@@ -67,9 +67,13 @@ Resources:
   CustomResource:
     Type: Custom::Kes
     Properties:
-      ServiceToken: !GetAtt CustomLambdaFunction.Arn
+      ServiceToken: 
+        Fn::GetAtt:
+          - CustomLambdaFunction
+          - Arn
       SomeTestParameter:
-        SomeValue: !Ref SomeTestParameter
+        SomeValue:
+          Ref: SomeTestParameter
 
   #################################################
   # Custom Resource END
@@ -85,8 +89,11 @@ Resources:
       DisplayName: {{../stackName}}-{{name}}
       Subscription:
       {{#each subscriptions}}
-        - Endpoint: {{endpoint}}
-          Protocol: {{protocol}}
+        - Protocol: {{protocol}}
+          Endpoint:
+            Fn::GetAtt:
+              - {{name}}LambdaFunction
+              - Arn
       {{/each}}
 
 {{/each}}
@@ -102,9 +109,12 @@ Resources:
     Type: AWS::StepFunctions::StateMachine
     Properties:
       DefinitionString:
-        !Sub |
+        Fn::Sub: |
           {{{ToJson definition}}}
-      RoleArn: !GetAtt StepRole.Arn
+      RoleArn:
+        Fn::GetAtt:
+          - StepRole
+          - Arn
 
 {{/each}}
   #################################################
@@ -122,7 +132,10 @@ Resources:
       ReceiveMessageWaitTimeSeconds: 20
     {{#if retry}}
       RedrivePolicy:
-        deadLetterTargetArn: !GetAtt [{{name}}FailedSQS, Arn]
+        deadLetterTargetArn:
+          Fn::GetAtt:
+            - {{name}}FailedSQS
+            - Arn
         maxReceiveCount: {{retry}}
     {{/if}}
       VisibilityTimeout: {{visibilityTimeout}}
@@ -294,7 +307,10 @@ Resources:
       {{/if}}
       Handler: {{handler}}
       MemorySize: {{memory}}
-      Role: !GetAtt LambdaRole.Arn
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
       Runtime: {{# if runtime}}{{runtime}}{{else}}nodejs6.10{{/if}}
       Timeout: {{timeout}}
       Tags:
@@ -321,15 +337,18 @@ Resources:
 Outputs:
 {{#each stepFunctions}}
   {{name}}StateMachine:
-    Value: !Ref {{../resourcePrefixNoDash}}{{name}}StateMachine
+    Value:
+      Ref: {{../resourcePrefixNoDash}}{{name}}StateMachine
 {{/each}}
 
 {{#each sqs}}
   {{name}}SQSOutput:
-    Value: !Ref {{name}}SQS
+    Value:
+      Ref: {{name}}SQS
 {{/each}}
 
 {{#each sns}}
   {{name}}SnsArn:
-    Value: !Ref {{name}}Sns
+    Value:
+      Ref: {{name}}Sns
 {{/each}}

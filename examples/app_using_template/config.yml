@@ -1,7 +1,13 @@
-myDeployment:
-  stackName: myDeployment-using-template
+kesTestDeployment:
+  stackName: kes-test-using-template
   noDash: myDeployment
+  system_bucket: devseed-kes-deployment 
 
   buckets:
-    internal: devseed-kes-deployment
     tests: myTestArtifacts
+  
+  lambdas:
+    func3: # function name must match the lambda folder name in build directory
+      handler: index.handler
+      timeout: 300
+      source: 'examples/code/lambda1/'

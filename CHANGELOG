@@ -1,3 +1,10 @@
+## v2.2.0
+
+- show proper logs when the template merging fails due to a yaml 
+- a new flag `--showOutputs` will show the output of a CloudFormation template
+- add cloudformation delete functionality
+- support `system_bucket` as the variable for for holding the bucket name used in deployment
+
 ## v2.1.2
 
 - fix a bug where determineKesClass failed to return the default class

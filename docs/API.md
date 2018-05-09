@@ -10,14 +10,17 @@
     -   [compileCF](#compilecf)
     -   [uploadToS3](#uploadtos3)
     -   [uploadCF](#uploadcf)
+    -   [waitFor](#waitfor)
     -   [cloudFormation](#cloudformation)
     -   [validateTemplate](#validatetemplate)
     -   [describeCF](#describecf)
+    -   [deleteCF](#deletecf)
     -   [opsStack](#opsstack)
     -   [upsertStack](#upsertstack)
     -   [deployStack](#deploystack)
     -   [createStack](#createstack)
     -   [updateStack](#updatestack)
+    -   [deleteStack](#deletestack)
 -   [Lambda](#lambda)
     -   [buildS3Path](#builds3path)
     -   [getHash](#gethash)
@@ -34,6 +37,8 @@
 -   [mergeYamls](#mergeyamls)
 -   [determineKesClass](#determinekesclass)
 -   [failure](#failure)
+-   [success](#success)
+-   [getSystemBucket](#getsystembucket)
 
 ## Config
 
@@ -87,7 +92,7 @@ Returns **[object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/G
 
 The main Kes class. This class is used in the command module to create
 the CLI interface for kes. This class can be extended in order to override
-and modify the behaviour of kes cli.
+and modify the behavior of kes cli.
 
 **Parameters**
 
@@ -151,6 +156,16 @@ Uploads the Cloud Formation template to a given S3 location
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
+### waitFor
+
+Wait for the current stack and log the current outcome
+
+**Parameters**
+
+-   `wait`  
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** undefined
+
 ### cloudFormation
 
 Calls CloudFormation's update-stack or create-stack methods
@@ -168,6 +183,12 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 Describes the cloudformation stack deployed
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+
+### deleteCF
+
+Deletes the current stack
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** undefined
 
 ### opsStack
 
@@ -198,6 +219,12 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 ### updateStack
 
 [Deprecated] Updates an existing CloudFormation stack for the class instance
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
+
+### deleteStack
+
+Deletes the main stack
 
 Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)** returns the promise of an AWS response object
 
@@ -398,3 +425,17 @@ In case of error logs the error and exit with error 1
 **Parameters**
 
 -   `e` **[Error](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error)** error object
+
+## success
+
+Exists the process when called
+
+## getSystemBucket
+
+Discover and returns the system bucket used for deployment
+
+**Parameters**
+
+-   `config` **[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)** cumulus config object
+
+Returns **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** name of the bucket

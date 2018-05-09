@@ -46,10 +46,12 @@ class Config {
   constructor(options) {
     this.region = get(options, 'region');
     this.profile = get(options, 'profile', null);
-    this.deployment = get(options, 'deployment');
+    this.deployment = get(options, 'deployment', 'default');
     this.role = get(options, 'role', process.env.AWS_DEPLOYMENT_ROLE);
     this.stack = get(options, 'stack', null);
     this.parent = get(options, 'parent', null);
+    this.showOutputs = get(options, 'showOutputs', false);
+    this.yes = get(options, 'yes', false);
 
     // use template if provided
     if (has(options, 'template')) {
@@ -232,7 +234,7 @@ class Config {
    * @private
    * @static
    * @param  {Object} config The configuration object
-   * @return {Object} Returns the updated configruation object
+   * @return {Object} Returns the updated configuration object
    */
   static configureLambda(config) {
     if (config.lambdas) {
@@ -313,6 +315,9 @@ class Config {
     if (this.deployment && parsedConfig[this.deployment]) {
       config = merge(config, parsedConfig[this.deployment]);
     }
+    else {
+      throw new Error(`Deployment ${this.deployment} was not found in the kes configuration file.`);
+    }
 
     // doing this twice to ensure variables in child yml files are also parsed and replaced
     config = this.mustacheRender(config, merge({}, config, this.envs));
@@ -341,9 +346,9 @@ class Config {
    */
   parse() {
     const config = this.parseConfig();
-    this.bucket = get(config, 'buckets.internal');
+    this.bucket = utils.getSystemBucket(config);
 
-    // merge with the instnace
+    // merge with the instance
     merge(this, config);
   }
 

@@ -12,7 +12,8 @@
         -   [Lambda Functions](#lambda-functions)
         -   [Handlebar Helpers](#handlebar-helpers)
     -   [Deployment](#deployment)
-        -   [Differenet deployment configurations](#differenet-deployment-configurations)
+        -   [Delete an existing stack](#delete-an-existing-stack)
+        -   [Different deployment configurations](#different-deployment-configurations)
     -   [Deployment Using IAM Role](#deployment-using-iam-role)
         -   [Updating One Lambda Function](#updating-one-lambda-function)
     -   [Use Templates](#use-templates)
@@ -50,6 +51,8 @@ It makes it much easier to deploy lambda functions and create API gateway resour
  -k, --kes-folder <kesFolder>  Path to config folder
  -r, --region <region>         AWS region
  --stack <stack>               stack name, defaults to the config value
+ --showOutputs                  Show the list of a CloudFormation template outputs
+ --yes                          Skip all confirmation prompts
  -d, --deployment <deployment>  Deployment name, default to default
  -h, --help                    output usage information
 
@@ -57,8 +60,9 @@ It makes it much easier to deploy lambda functions and create API gateway resour
  cf [deploy|validate|compile]  CloudFormation Operations:
    create    Creates the CF stack (deprecated, start using deploy)
    update    Updates the CF stack (deprecated, start using deploy)
-   upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+   upsert    Creates the CF stack and Update if already exists (deprecated, start using deploy)
    deploy    Creates the CF stack and Update if already exists
+   delete    Delete the CF stack
    validate  Validates the CF stack
    compile   Compiles the CF stack
    lambda <lambdaName>                         uploads a given lambda function to Lambda service
@@ -86,7 +90,7 @@ The variables in `config.yml` are parsed and used to generate the `cloudformatio
 the `default` section of the `config.yml` is parsed and used in `cloudformation.template.yml`. If
 another deployment is specified in the `config.yml` the values of that deployment overrides the
 values of `default`
-file which is sent to AWS CloudFormation to create and udpate the stack.
+file which is sent to AWS CloudFormation to create and update the stack.
 
 ### CF Stack Name
 
@@ -273,7 +277,15 @@ To create a CF stack or update and existing one run
  kes cf deploy
 ```
 
-### Differenet deployment configurations
+### Delete an existing stack
+
+To delete an existing stack:
+
+```bash
+  kes cf delete
+```
+
+### Different deployment configurations
 
 You can configure different values for different deployments. For example you might want to configure your test deployment
 differently from your staging and production deployments. Here is how to achieve it:
@@ -304,7 +316,7 @@ You can specify an IAM role for the deployment using `--role` option or by setti
 **Note:** You still need an aws user with AssumeRole permission for this to work
 
 ```bash
-kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeplymentRole
+kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeploymentRole
 ```
 
 ### Updating One Lambda Function

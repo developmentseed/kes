@@ -227,6 +227,27 @@ function failure(e) {
   process.exit(1);
 }
 
+/**
+ * Exists the process when called
+ */
+function success() {
+  process.exit(0);
+};
+
+/**
+ * Discover and returns the system bucket used for deployment
+ *
+ * @param {Object} config - cumulus config object
+ * @returns {string} name of the bucket
+ */
+function getSystemBucket(config) {
+  return get(
+    config,
+    'buckets.internal',
+    get(config, 'system_bucket')
+  );
+}
+
 module.exports = {
   exec,
   mergeYamls,
@@ -235,6 +256,8 @@ module.exports = {
   configureAws,
   loadLocalEnvs,
   determineKesClass,
+  getSystemBucket,
   failure,
+  success,
   zip
 };

@@ -7,13 +7,14 @@ const forge = require('node-forge');
 const AWS = require('aws-sdk');
 const path = require('path');
 const fs = require('fs-extra');
+const inquirer = require('inquirer');
 const Lambda = require('./lambda');
 const utils = require('./utils');
 
 /**
  * The main Kes class. This class is used in the command module to create
  * the CLI interface for kes. This class can be extended in order to override
- * and modify the behaviour of kes cli.
+ * and modify the behavior of kes cli.
  *
  * @example
  * const { Kes, Config } = require('kes');
@@ -118,6 +119,10 @@ class Kes {
           cf = utils.mergeYamls(mainCF, overrideCF);
         }
         catch (e) {
+          if (!e.message.includes('ENOENT')) {
+            console.log(`compiling the override template at ${this.config.cfFile} failed:`);
+            throw e;
+          }
           cf = mainCF;
         }
       }
@@ -145,7 +150,7 @@ class Kes {
                   .promise()
                   .then(() => {
                     const httpUrl = `http://${bucket}.s3.amazonaws.com/${key}`;
-                    console.log(`Uploaded: s3://${bucket}/${key}`)
+                    console.log(`Uploaded: s3://${bucket}/${key}`);
                     return httpUrl;
                   });
   }
@@ -179,6 +184,24 @@ class Kes {
         return true;
       }
     });
+  }
+
+  /**
+   * Wait for the current stack and log the current outcome
+   *
+   * @returns {Promise} undefined
+   */
+  waitFor(wait) {
+    console.log('Waiting for the CF operation to complete');
+    return this.cf.waitFor(wait, { StackName: this.stack }).promise()
+      .then(r => {
+        if (r && r.Stacks && r.Stacks[0] && r.Stacks[0].StackStatus) {
+          console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`);
+        }
+        else {
+          console.log(`CF operation is completed`);
+        }
+      });
   }
 
   /**
@@ -237,11 +260,7 @@ class Kes {
         }
         throw e;
       })
-      .then(() => {
-        console.log('Waiting for the CF operation to complete');
-        return this.cf.waitFor(wait, { StackName: this.stack }).promise();
-      })
-      .then(r => console.log(`CF operation is in state of ${r.Stacks[0].StackStatus}`))
+      .then(() => this.waitFor(wait))
       .catch((e) => {
         const errorsWithDetail = [
           'CREATE_FAILED',
@@ -329,12 +348,38 @@ class Kes {
   }
 
   /**
+   * Deletes the current stack
+   *
+   * @returns {Promise} undefined
+   */
+  deleteCF() {
+    return this.cf.deleteStack({
+      StackName: this.stack
+    }).promise()
+    .then(() => this.waitFor('stackDeleteComplete'))
+    .then(() => console.log(`${this.stack} is successfully deleted`));
+  }
+
+  /**
    * Generic create/update  method for CloudFormation
    *
    * @returns {Promise} returns the promise of an AWS response object
    */
   opsStack() {
-    return this.uploadCF().then(() => this.cloudFormation());
+    return this.uploadCF()
+      .then(() => this.cloudFormation())
+      .then(() => {
+        if (this.config.showOutputs) {
+          return this.describeCF();
+        }
+        return Promise.resolve();
+      })
+      .then((r) => {
+        if (r && r.Stacks[0] && r.Stacks[0].Outputs) {
+          console.log('\nList of the CloudFormation outputs:\n');
+          r.Stacks[0].Outputs.map((o) => console.log(`${o.OutputKey}: ${o.OutputValue}`));
+        }
+      });
   }
 
   /**
@@ -372,6 +417,30 @@ class Kes {
    */
   updateStack() {
     return this.opsStack();
+  }
+
+  /**
+   * Deletes the main stack
+   *
+   * @returns {Promise} returns the promise of an AWS response object
+   */
+  deleteStack() {
+    if (this.config.yes) {
+      return this.deleteCF();
+    }
+    return inquirer.prompt(
+      [{
+        type: 'confirm',
+        name: 'delete',
+        message: `Are you sure you want to delete ${this.stack}? This operation is not reversible`
+      }]
+    ).then(answers => {
+      if (answers.delete) {
+        return this.deleteCF();
+      }
+      console.log('Operation canceled');
+      return Promise.resolve();
+    });
   }
 }
 

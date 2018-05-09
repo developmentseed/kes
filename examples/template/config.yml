@@ -18,7 +18,7 @@ default:
     - name: subscribeToLambda1
       subscriptions:
         - protocol: lambda
-          endpoint: '!GetAtt Lambda1LambdaFunction.Arn'
+          name: Lambda1
 
   sqs:
     - name: mySqs

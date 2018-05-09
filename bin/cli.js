@@ -21,7 +21,7 @@ program.version(pckg.version);
 function extractCommanderOptions(program) {
   const options = {};
   Object.keys(program).forEach(property => {
-    if (typeof program[property] === 'string') {
+    if (typeof program[property] === 'string' || typeof program[property] === 'boolean') {
       options[property] = program[property];
     }
   });
@@ -74,7 +74,7 @@ const init = function () {
       config.default.buckets = {};
     }
 
-    config.default.buckets.internal = result.bucket;
+    config.default.system_bucket = result.bucket;
     fs.writeFileSync(path.join(kesFolder, 'config.yml'), yaml.safeDump(config));
 
     fs.createReadStream(
@@ -105,20 +105,23 @@ program
   .option('-k, --kes-folder <kesFolder>', 'Path to config folder')
   .option('-r, --region <region>', 'AWS region', null)
   .option('--stack <stack>', 'stack name, defaults to the config value')
+  .option('--showOutputs', 'Show the list of a CloudFormation template outputs')
+  .option('--yes', 'Skip all confirmation prompts')
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program
-  .command('cf [create|update|upsert|deploy|validate|compile]')
+  .command('cf [create|update|upsert|deploy|validate|compile|delete]')
   .description(`CloudFormation Operations:
   create    Creates the CF stack (deprecated, start using deploy)
   update    Updates the CF stack (deprecated, start using deploy)
-  upsert    Creates the CF stack and Update if already exists (deprected, start using deploy)
+  upsert    Creates the CF stack and Update if already exists (deprecated, start using deploy)
   deploy    Creates the CF stack and Update if already exists
+  delete    Delete the CF stack
   validate  Validates the CF stack
   compile   Compiles the CF stack`)
   .action((cmd, o) => {
     const options = extractCommanderOptions(program);
-    kes.buildCf(options ,cmd);
+    kes.buildCf(options, cmd).then(r => kes.utils.success(r)).catch(e => kes.utils.failure(e));
   });
 
 program
