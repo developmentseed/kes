@@ -118,8 +118,8 @@ test('config with template', (t) => {
   const config = new Config({
     kesFolder: 'examples/app_using_template',
     template: 'examples/template',
-    deployment: 'myDeployment'
+    deployment: 'kesTestDeployment'
   });
 
-  t.is(config.stackName, 'myDeployment-using-template');
+  t.is(config.stackName, 'kes-test-using-template');
 });
