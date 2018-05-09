@@ -39,10 +39,8 @@ jobs:
             ./bin/cli.js cf validate --kes-folder examples/full
             ./bin/cli.js cf validate --kes-folder examples/nested
 
-            ./bin/cli.js cf validate --kes-folder examples/app_using_template --template examples/template
-
-
             npm run test
+            npm run integration-test
 
       - add_ssh_keys:
           fingerprints:

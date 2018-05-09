@@ -5,3 +5,9 @@ myDeployment:
   buckets:
     internal: devseed-kes-deployment
     tests: myTestArtifacts
+  
+  lambdas:
+    func3: # function name must match the lambda folder name in build directory
+      handler: index.handler
+      timeout: 300
+      source: 'examples/code/lambda1/'

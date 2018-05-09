@@ -5,20 +5,20 @@ default:
     - CAPABILITY_NAMED_IAM
 
   lambdas:
-    - name: func1 # function name must match the lambda folder name in build directory
+    func1: # function name must match the lambda folder name in build directory
       handler: func1.handler
       timeout: 300
       s3Source:
-        bucket: mybucket
-        key: file.zip
-    - name: func2 # function name must match the lambda folder name in build directory
+        bucket: devseed-kes-deployment 
+        key: example_lambdas/custom.zip
+    func2:  # function name must match the lambda folder name in build directory
       handler: func2.handler
       timeout: 300
       envs:
         CUSTOM_ENV: myValue
       s3Source:
-        bucket: mybucket
-        key: file.zip
+        bucket: devseed-kes-deployment 
+        key: example_lambdas/lambda.zip
 
 production:
   stackName: my-kes-project-prod

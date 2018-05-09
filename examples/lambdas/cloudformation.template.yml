@@ -43,27 +43,32 @@ Resources:
   # Lambda config BEGIN
   #################################################
 {{#each lambdas}}
-  {{name}}LambdaFunction:
+  {{@key}}LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
       Code:
-        S3Bucket: {{bucket}}
-        S3Key: {{remote}}
-      FunctionName: {{../stackName}}-{{name}}
+      {{#if this.s3Source}}
+        S3Bucket: {{this.s3Source.bucket}}
+        S3Key: {{this.s3Source.key}}
+      {{else}}
+        S3Bucket: {{this.bucket}}
+        S3Key: {{this.remote}}
+      {{/if}}
+      FunctionName: {{../stackName}}-{{@key}}
       Environment:
         Variables:
           stackName: {{../stackName}}
-        {{#each envs}}
+        {{#each this.envs}}
           {{@key}}: {{this}}
         {{/each}}
-      Handler: {{handler}}
-      MemorySize: {{memory}}
+      Handler: {{this.handler}}
+      MemorySize: {{this.memory}}
       Role:
         Fn::GetAtt:
           - LambdaRole
           - Arn
-      Runtime: {{# if runtime}}{{runtime}}{{else}}nodejs6.10{{/if}}
-      Timeout: {{# if timeout}}{{timeout}}{{else}}300{{/if}}
+      Runtime: {{# if this.runtime}}{{this.runtime}}{{else}}nodejs6.10{{/if}}
+      Timeout: {{# if this.timeout}}{{this.timeout}}{{else}}300{{/if}}
 {{/each}}
   #################################################
   # Lambda config END

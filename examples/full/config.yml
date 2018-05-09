@@ -2,10 +2,10 @@ default:
   stackName: kes-full-example
   noDash: KesFullExample
   retryValue: 10
+  system_bucket: devseed-kes-deployment
 
   buckets:
-    internal: devseed-kes-deployment
-    tests: myTestArtifacts
+    test: myTestArtifacts
 
   capabilities:
     - CAPABILITY_NAMED_IAM
@@ -67,7 +67,7 @@ default:
       memory: 256
       source: 'examples/code/api/'
       envs:
-        internal: '{{buckets.internal}}'
+        internal: '{{buckets.test}}'
       apiGateway:
         - path: list
           method: get

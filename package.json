@@ -1,11 +1,12 @@
 {
   "name": "kes",
-  "version": "2.1.2",
+  "version": "2.2.0",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {
     "html-docs": "documentation build bin/cli.js -f html -o _docs --theme node_modules/documentation-devseed-theme",
     "md-docs": "documentation build bin/readme.js -f md -o docs/README.md && documentation build src/** -f md -o docs/API.md",
-    "test": "ava"
+    "integration-test": "ava tests/test.integration.js",
+    "test": "ava tests/test.src.js"
   },
   "bin": {
     "kes": "./bin/cli.js"
