@@ -1,5 +1,5 @@
-myDeployment:
-  stackName: myDeployment-using-template
+kesTestDeployment:
+  stackName: kes-test-using-template
   noDash: myDeployment
 
   buckets:

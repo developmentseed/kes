@@ -20,6 +20,6 @@ default:
         bucket: devseed-kes-deployment 
         key: example_lambdas/lambda.zip
 
-production:
-  stackName: my-kes-project-prod
+kesTestDeployment:
+  stackName: kes-test-project-prod
 

@@ -36,7 +36,7 @@ test.serial.cb('create and delete full example with a template', (t) => {
   const deploy = runCfCommand(
     'deploy',
     'examples/app_using_template',
-    'myDeployment',
+    'kesTestDeployment',
     'examples/lambdas'
   );
 
@@ -51,7 +51,7 @@ test.serial.cb('create and delete full example with a template', (t) => {
     const del = runCfCommand(
       'delete',
       'examples/app_using_template',
-      'myDeployment',
+      'kesTestDeployment',
       'examples/lambdas'
     );
 
@@ -70,7 +70,7 @@ test.serial.cb('create and delete the lambdas example', (t) => {
   const deploy = runCfCommand(
     'deploy',
     'examples/lambdas',
-    'production'
+    'kesTestDeployment'
   );
 
   deploy.stdout.on('data', (data) => {
@@ -84,7 +84,7 @@ test.serial.cb('create and delete the lambdas example', (t) => {
     const del = runCfCommand(
       'delete',
       'examples/lambdas',
-      'production'
+      'kesTestDeployment'
     );
 
     del.stdout.on('data', (data) => {
