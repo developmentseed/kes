@@ -121,7 +121,7 @@ program
   compile   Compiles the CF stack`)
   .action((cmd, o) => {
     const options = extractCommanderOptions(program);
-    kes.buildCf(options, cmd);
+    kes.buildCf(options, cmd).then(r => kes.utils.success(r)).catch(e => kes.utils.failure(e));
   });
 
 program

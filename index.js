@@ -6,8 +6,6 @@ const Kes = require('./src/kes');
 const Config = require('./src/config');
 const utils = require('./src/utils');
 
-const success = (r) => process.exit(0);
-
 /**
  * Builds templates nested in the main template
  * using the specified config and cf file paths
@@ -67,35 +65,34 @@ function buildNestedCfs(config, KesClass, options) {
  */
 function buildCf(options, cmd) {
   const KesClass = utils.determineKesClass(options, Kes);
-  const parentConfig = new Config(options);
+  let parentConfig;
+  try {
+    parentConfig = new Config(options);
+  }
+  catch (e) {
+    return Promise.reject(e);
+  }
 
-  buildNestedCfs(parentConfig, KesClass, options).then((config) => {
+  return buildNestedCfs(parentConfig, KesClass, options).then((config) => {
     const kes = new KesClass(config);
     switch (cmd) {
       case 'create':
         deprecate('"kes cf create" command is deprecated. Use "kes cf deploy" instead');
-        kes.createStack().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.createStack();
       case 'update':
         deprecate('"kes cf update" command is deprecated. Use "kes cf deploy" instead');
-        kes.updateStack().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.updateStack();
       case 'upsert':
         deprecate('"kes cf upsert" command is deprecated. Use "kes cf deploy" instead');
-        kes.upsertStack().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.upsertStack();
       case 'deploy':
-        kes.deployStack().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.deployStack();
       case 'validate':
-        kes.validateTemplate().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.validateTemplate();
       case 'compile':
-        kes.compileCF().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.compileCF();
       case 'delete':
-        kes.deleteStack().then(r => success(r)).catch(e => utils.failure(e));
-        break;
+        return kes.deleteStack();
       default:
         console.log('Wrong choice. Accepted arguments: [create|update|upsert|deploy|validate|compile]');
     }
@@ -113,7 +110,7 @@ function buildLambda(options, cmd) {
     const KesClass = utils.determineKesClass(options, Kes);
     const config = new Config(options);
     const kes = new KesClass(config);
-    kes.updateSingleLambda(cmd).then(r => success(r)).catch(e => utils.failure(e));
+    kes.updateSingleLambda(cmd).then(r => utils.success(r)).catch(e => utils.failure(e));
   }
   else {
     utils.failure(new Error('Lambda name is missing'));

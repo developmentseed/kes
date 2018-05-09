@@ -227,6 +227,13 @@ function failure(e) {
   process.exit(1);
 }
 
+/**
+ * Exists the process when called
+ */
+function success() {
+  process.exit(0);
+};
+
 module.exports = {
   exec,
   mergeYamls,
@@ -236,5 +243,6 @@ module.exports = {
   loadLocalEnvs,
   determineKesClass,
   failure,
+  success,
   zip
 };
