@@ -68,12 +68,12 @@ test('create a config instance', (t) => {
   });
 
   t.is(config.stack, 'my-kes-project');
-  t.is(config.lambdas.length, 2);
-  t.is(config.lambdas[0].fullName, 'my-kes-project-func1');
+  t.is(Object.keys(config.lambdas).length, 2);
+  t.is(config.lambdas.func1.fullName, 'my-kes-project-func1');
 
   // make sure envs are added even if lambdas don't include them
-  t.is(Object.keys(config.lambdas[0].envs).length, 0);
-  t.is(config.lambdas[1].envs.CUSTOM_ENV, 'myValue');
+  t.is(Object.keys(config.lambdas.func1.envs).length, 0);
+  t.is(config.lambdas.func2.envs.CUSTOM_ENV, 'myValue');
 });
 
 test('create a config instance with non default deployment', (t) => {
