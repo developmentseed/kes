@@ -79,11 +79,11 @@ test('create a config instance', (t) => {
 test('create a config instance with non default deployment', (t) => {
   const config = new Config({
     kesFolder: 'examples/lambdas',
-    deployment: 'production',
+    deployment: 'kesTestDeployment',
     region: 'us-east-3'
   });
 
-  t.is(config.stack, 'my-kes-project-prod');
+  t.is(config.stack, 'kes-test-project-prod');
   t.is(config.region, 'us-east-3');
 });
 
