@@ -29,6 +29,7 @@ function buildNestedCfs(config, KesClass, options) {
 
       // no templates are used in nested stacks
       delete newOptions.template;
+      delete newOptions.deployment;
 
       // use the parent stackname
       newOptions.stack = config.stack;
