@@ -74,7 +74,7 @@ const init = function () {
       config.default.buckets = {};
     }
 
-    config.default.buckets.internal = result.bucket;
+    config.default.system_bucket = result.bucket;
     fs.writeFileSync(path.join(kesFolder, 'config.yml'), yaml.safeDump(config));
 
     fs.createReadStream(

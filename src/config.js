@@ -346,11 +346,7 @@ class Config {
    */
   parse() {
     const config = this.parseConfig();
-    this.bucket = get(
-      config,
-      'buckets.internal',
-      get(config, 'system_bucket')
-    );
+    this.bucket = utils.getSystemBucket(config);
 
     // merge with the instance
     merge(this, config);

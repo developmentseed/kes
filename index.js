@@ -37,7 +37,7 @@ function buildNestedCfs(config, KesClass, options) {
 
       // get the bucket name from the parent
       if (!nestedConfig.bucket) {
-        nestedConfig.bucket = config.buckets.internal;
+        nestedConfig.bucket = utils.getSystemBucket(config);
       }
 
       // add nested deployment name

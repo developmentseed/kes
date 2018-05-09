@@ -1,9 +1,9 @@
 kesTestDeployment:
   stackName: kes-test-using-template
   noDash: myDeployment
+  system_bucket: devseed-kes-deployment 
 
   buckets:
-    internal: devseed-kes-deployment
     tests: myTestArtifacts
   
   lambdas:
