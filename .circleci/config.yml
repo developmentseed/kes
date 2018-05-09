@@ -40,7 +40,10 @@ jobs:
             ./bin/cli.js cf validate --kes-folder examples/nested
 
             npm run test
-            npm run integration-test
+
+      - run:
+          name: Integration Tests
+          command: npm run integration-test
 
       - add_ssh_keys:
           fingerprints:
