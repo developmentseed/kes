@@ -122,4 +122,6 @@ test('config with template', (t) => {
   });
 
   t.is(config.stackName, 'kes-test-using-template');
+  t.is(config.bucket, 'devseed-kes-deployment');
+  t.is(config.bucket, config.system_bucket);
 });
