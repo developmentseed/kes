@@ -241,15 +241,16 @@ function success() {
  * @returns {string} name of the bucket
  */
 function getSystemBucket(config) {
-  const bucket = get(
-    config,
-    'buckets.internal',
-    get(config, 'system_bucket')
-  );
-  if (typeof bucket !== 'string') {
-    return undefined;
+  let bucket = get(config, 'buckets.internal');
+  if (bucket && typeof bucket === 'string') {
+    return bucket;
   }
-  return bucket;
+
+  bucket = get(config, 'system_bucket');
+  if (bucket && typeof bucket === 'string') {
+    return bucket;
+  }
+  return undefined;
 }
 
 module.exports = {
