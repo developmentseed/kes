@@ -1,3 +1,7 @@
+## v2.2.1
+
+- fix a bug where `config.bucket` was set as object when the config did not include a string
+
 ## v2.2.0
 
 - show proper logs when the template merging fails due to a yaml 
