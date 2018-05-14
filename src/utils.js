@@ -232,7 +232,7 @@ function failure(e) {
  */
 function success() {
   process.exit(0);
-};
+}
 
 /**
  * Discover and returns the system bucket used for deployment
@@ -241,11 +241,16 @@ function success() {
  * @returns {string} name of the bucket
  */
 function getSystemBucket(config) {
-  return get(
-    config,
-    'buckets.internal',
-    get(config, 'system_bucket')
-  );
+  let bucket = get(config, 'buckets.internal');
+  if (bucket && typeof bucket === 'string') {
+    return bucket;
+  }
+
+  bucket = get(config, 'system_bucket');
+  if (bucket && typeof bucket === 'string') {
+    return bucket;
+  }
+  return undefined;
 }
 
 module.exports = {
