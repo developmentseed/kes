@@ -133,9 +133,9 @@ class Config {
               let parents = [];
 
               // when a segment includes a variable, e.g. {short_name}
-              // we remove the curly braces and underscores and add Var to the name
+              // we remove the non-alphanumeric characters and add Var to the name
               if (startsWith(segment, '{')) {
-                name = `${replace(trim(segment, '{}'), '_', '')}Var`;
+                name = `${replace(segment, /\W/g, '')}Var`;
               }
 
               name = upperFirst(name);
