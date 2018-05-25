@@ -1,3 +1,6 @@
+## v2.2.2
+- support plus and minus apigateway urls
+
 ## v2.2.1
 
 - fix a bug where `config.bucket` was set as object when the config did not include a string
