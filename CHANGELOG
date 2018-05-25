@@ -1,5 +1,5 @@
 ## v2.2.2
-- support plus and minus apigateway urls
+- allow plus in the apigateway path to support the new proxy resource
 
 ## v2.2.1
 
