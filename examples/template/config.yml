@@ -77,6 +77,9 @@ default:
           method: post
           cors: true
           api: myApi
+        - path: '{proxy+}'
+          method: any
+          api: myApi
     - name: Lambda1
       handler: index.handler
       timeout: 300

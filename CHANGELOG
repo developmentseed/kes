@@ -1,3 +1,6 @@
+## v2.2.2
+- allow plus in the apigateway path to support the new proxy resource
+
 ## v2.2.1
 
 - fix a bug where `config.bucket` was set as object when the config did not include a string
