@@ -5,4 +5,4 @@ build
 dist
 cloudformation.yml
 myNestedTemplate.yml
-
+yarn.lock

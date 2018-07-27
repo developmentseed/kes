@@ -98,7 +98,10 @@ class Lambda {
 
     // skip if the file with the same hash is zipped
     if (fs.existsSync(lambda.local)) {
-      return Promise.resolve(lambda);
+      const stats = fs.statSync(lambda.local);
+      if (stats.isFile() && stats.size > 0) {
+        return Promise.resolve(lambda);
+      }
     }
 
     return utils.zip(lambda.local, [lambda.source]).then(() => {
@@ -131,7 +134,10 @@ class Lambda {
       s3.headObject({
         Bucket: this.bucket,
         Key: lambda.remote
-      }).promise().then(() => {
+      }).promise().then((data) => {
+        if (data.ContentLength !== params.Body.byteLength) {
+          throw new Error('File sizes don\'t match');
+        }
         console.log(`Already Uploaded: s3://${this.bucket}/${lambda.remote}`);
         return resolve(lambda);
       }).catch(() => {
@@ -153,7 +159,8 @@ class Lambda {
    * @returns {Promise} returns the promise of updated lambda object
    */
   zipAndUploadLambda(lambda) {
-    return this.zipLambda(lambda).then(l => this.uploadLambda(l));
+    return this.zipLambda(lambda)
+      .then(l => this.uploadLambda(l));
   }
 
   /**
@@ -196,19 +203,29 @@ class Lambda {
       });
       const jobs = Object.keys(uniqueHashes).map(l => this.zipAndUploadLambda(uniqueHashes[l]));
 
-      return Promise.all(jobs).then(() => {
-        // we handle lambdas as both arrays and key/objects
-        // below condition is intended to for cases where
-        // the lambda is returned as a lsit
-        if (Array.isArray(this.config.lambdas)) {
-          this.config.lambdas = lambdas;
+      return Promise.all(jobs)
+        .then(() => {
+          // we handle lambdas as both arrays and key/objects
+          // below condition is intended to for cases where
+          // the lambda is returned as a list
+          if (Array.isArray(this.config.lambdas)) {
+            this.config.lambdas = lambdas;
+            return this.config;
+          }
+          const tmp = {};
+          lambdas.forEach(l => (tmp[l.name] = l));
+          this.config.lambdas = tmp;
           return this.config;
-        }
-        const tmp = {};
-        lambdas.forEach(l => (tmp[l.name] = l));
-        this.config.lambdas = tmp;
-        return this.config;
-      });
+        })
+        .catch((e) => {
+          // if the zip operation stops for any of the lambdas because the source
+          // file is missing, zip files with the size of 0 are created. Removing
+          // the build folder ensures that we start fresh in the next round of zipping
+          if (e.message.includes('ENOENT')) {
+            fs.removeSync(this.buildFolder);
+          }
+          throw e;
+        });
     }
     else return Promise.resolve(this.config);
   }

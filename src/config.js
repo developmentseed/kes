@@ -6,7 +6,6 @@ const get = require('lodash.get');
 const has = require('lodash.has');
 const values = require('lodash.values');
 const startsWith = require('lodash.startswith');
-const trim = require('lodash.trim');
 const replace = require('lodash.replace');
 const upperFirst = require('lodash.upperfirst');
 const capitalize = require('lodash.capitalize');
