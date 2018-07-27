@@ -1,3 +1,6 @@
+## v2.2.3
+- Fix a bug where corrupt zip files were created and uploaded to S3 when the source file didn't exist
+
 ## v2.2.2
 - allow plus in the apigateway path to support the new proxy resource
 

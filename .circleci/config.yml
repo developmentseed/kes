@@ -16,9 +16,14 @@ jobs:
 
       - run:
           name: Install
-          command: |
-            npm install
+          command: npm install
       
+      - run:
+          name: Lint
+          command: |
+            ./node_modules/.bin/eslint src --ext .js
+            ./node_modules/.bin/eslint bin --ext .js
+
       # save cahce
       - save_cache:
           key: deploy-{{ .Branch }}-{{ checksum "package.json" }}
