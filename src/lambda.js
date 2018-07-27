@@ -218,6 +218,9 @@ class Lambda {
           return this.config;
         })
         .catch((e) => {
+          // if the zip operation stops for any of the lambdas because the source
+          // file is missing, zip files with the size of 0 are created. Removing
+          // the build folder ensures that we start fresh in the next round of zipping
           if (e.message.includes('ENOENT')) {
             fs.removeSync(this.buildFolder);
           }
