@@ -218,7 +218,6 @@ class Lambda {
           return this.config;
         })
         .catch((e) => {
-          console.log('hiiiiiiiiiii')
           if (e.message.includes('ENOENT')) {
             fs.removeSync(this.buildFolder);
           }
