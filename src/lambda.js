@@ -159,12 +159,18 @@ class Lambda {
    * @returns {Promise} returns the promise of updated lambda object
    */
   zipAndUploadLambda(lambda) {
+    // only zip lambda if it's not zipped
+    const match = lambda.source.match(/.\.zip/);
+    if (match) {
+      lambda.local = lambda.source;
+      return this.uploadLambda(lambda);
+    }
     return this.zipLambda(lambda)
       .then(l => this.uploadLambda(l));
   }
 
   /**
-   * Zips and Uploads lambda functions in the congifuration object.
+   * Zips and Uploads lambda functions in the configuration object.
    * If the source of the function
    * is already zipped and uploaded, it skips the step only updates the
    * lambda config object.
@@ -256,11 +262,23 @@ class Lambda {
     lambda = this.buildS3Path(lambda);
 
     console.log(`Updating ${name}`);
-    return this.zipLambda(lambda).then(lambda => l.updateFunctionCode({
-      FunctionName: `${stack}-${name}`,
-      ZipFile: fs.readFileSync(lambda.local)
-    }).promise())
-    .then((r) => console.log(`Lambda function ${name} has been updated`));
+    let promise;
+    const match = lambda.source.match(/.\.zip/);
+    if (match) {
+      lambda.local = lambda.source;
+      promise = l.updateFunctionCode({
+        FunctionName: `${stack}-${name}`,
+        ZipFile: fs.readFileSync(lambda.source)
+      }).promise();
+    }
+    else {
+      promise = this.zipLambda(lambda).then(lambda => l.updateFunctionCode({
+        FunctionName: `${stack}-${name}`,
+        ZipFile: fs.readFileSync(lambda.local)
+      }).promise())
+    }
+    return promise.then((r) => console.log(`Lambda function ${name} has been updated`));
+    
   }
 }
 
