@@ -301,7 +301,7 @@ Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/
 
 ### process
 
-Zips and Uploads lambda functions in the congifuration object.
+Zips and Uploads lambda functions in the configuration object.
 If the source of the function
 is already zipped and uploaded, it skips the step only updates the
 lambda config object.

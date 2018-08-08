@@ -1,3 +1,6 @@
+## v2.2.4
+- Add support for .zip file as source
+
 ## v2.2.3
 - Fix a bug where corrupt zip files were created and uploaded to S3 when the source file didn't exist
 
