@@ -275,10 +275,9 @@ class Lambda {
       promise = this.zipLambda(lambda).then(lambda => l.updateFunctionCode({
         FunctionName: `${stack}-${name}`,
         ZipFile: fs.readFileSync(lambda.local)
-      }).promise())
+      }).promise());
     }
     return promise.then((r) => console.log(`Lambda function ${name} has been updated`));
-    
   }
 }
 
