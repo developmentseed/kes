@@ -67,7 +67,7 @@ class Config {
     }
 
     this.kesFolder = get(options, 'kesFolder', path.join(process.cwd(), '.kes'));
-    this.configFile = get(options, 'configFile', path.join(this.kesFolder, 'config.yml'));
+    this.configFile = get(options, 'config', path.join(this.kesFolder, 'config.yml'));
     this.envFile = get(options, 'envFile', path.join(this.kesFolder, '.env'));
     this.cfFile = get(options, 'cfFile', path.join(this.kesFolder, 'cloudformation.template.yml'));
 

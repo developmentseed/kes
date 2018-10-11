@@ -1,3 +1,6 @@
+## v2.2.5
+- Fix a bug where the `--config` parameter was being ignored
+
 ## v2.2.4
 - Add support for .zip file as source
 
@@ -13,7 +16,7 @@
 
 ## v2.2.0
 
-- show proper logs when the template merging fails due to a yaml 
+- show proper logs when the template merging fails due to a yaml
 - a new flag `--showOutputs` will show the output of a CloudFormation template
 - add cloudformation delete functionality
 - support `system_bucket` as the variable for for holding the bucket name used in deployment
