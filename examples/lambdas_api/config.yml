@@ -1,0 +1,35 @@
+default:
+  stackName: my-kes-project
+
+  capabilities:
+    - CAPABILITY_NAMED_IAM
+
+  apis:
+    - name: test
+  test:
+    endpoint: main
+
+  lambdas:
+    func1: # function name must match the lambda folder name in build directory
+      handler: func1.handler
+      timeout: 300
+      s3Source:
+        bucket: devseed-kes-deployment
+        key: example_lambdas/custom.zip
+      apiGateway:
+      - path: example_path
+        method: get
+        cors: true
+        api: test
+        extra_prop: true
+    func2:  # function name must match the lambda folder name in build directory
+      handler: func2.handler
+      timeout: 300
+      envs:
+        CUSTOM_ENV: myValue
+      s3Source:
+        bucket: devseed-kes-deployment
+        key: example_lambdas/lambda.zip
+
+kesTestDeployment:
+  stackName: kes-test-project-prod
