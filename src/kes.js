@@ -7,6 +7,7 @@ const forge = require('node-forge');
 const AWS = require('aws-sdk');
 const path = require('path');
 const fs = require('fs-extra');
+const pRetry = require('p-retry');
 const inquirer = require('inquirer');
 const Lambda = require('./lambda');
 const utils = require('./utils');
@@ -54,6 +55,30 @@ class Kes {
     this.AWS = AWS;
     this.Lambda = Lambda;
     this.startTime = moment();
+  }
+
+  /**
+   * Describe CF stacks by calling the describeStacks CF SDK function.
+   * If the describeStacks call gets throttled by AWS, retry the describeStacks operation
+   *
+   * @param stackName - stack name
+   * @returns {Promise<Object>} - promise that resolves to an Object with information about
+   * the CF stack
+   */
+  describeStack(stackName) {
+    return pRetry(
+      async () => {
+        try {
+          const stack = await this.cf.describeStacks({ StackName: stackName }).promise();
+
+          return stack;
+        }
+        catch (err) {
+          if (err.code === 'ThrottlingException') throw new Error('Trigger retry');
+          throw new pRetry.AbortError(err);
+        }
+      }
+    );
   }
 
   /**
@@ -251,7 +276,7 @@ class Kes {
     let wait = 'stackUpdateComplete';
 
     // check if the stack exists
-    return this.cf.describeStacks({ StackName: this.stack }).promise()
+    return this.describeStack(this.stack)
       .then(r => this.cf.updateStack(params).promise())
       .catch(e => {
         if (e.message.includes('does not exist')) {
@@ -340,11 +365,7 @@ class Kes {
    * @returns {Promise} returns the promise of an AWS response object
    */
   describeCF() {
-    const cf = new AWS.CloudFormation();
-
-    return cf.describeStacks({
-      StackName: this.stack
-    }).promise();
+    return this.describeStack(this.stack);
   }
 
   /**
