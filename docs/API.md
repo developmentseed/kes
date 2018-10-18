@@ -6,6 +6,7 @@
     -   [parse](#parse)
     -   [flatten](#flatten)
 -   [Kes](#kes)
+    -   [describeStack](#describestack)
     -   [updateSingleLambda](#updatesinglelambda)
     -   [compileCF](#compilecf)
     -   [uploadToS3](#uploadtos3)
@@ -113,6 +114,18 @@ kes.deployStack()
  .then(() => updateSingleLambda('myLambda'))
  .catch(e => console.log(e));
 ```
+
+### describeStack
+
+Describe CF stacks by calling the describeStacks CF SDK function.
+If the describeStacks call gets throttled by AWS, retry the describeStacks operation
+
+**Parameters**
+
+-   `stackName`  stack name
+
+Returns **[Promise](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise)&lt;[Object](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object)>** promise that resolves to an Object with information about
+the CF stack
 
 ### updateSingleLambda
 

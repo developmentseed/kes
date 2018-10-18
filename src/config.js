@@ -178,14 +178,16 @@ class Config {
             const methodName = `ApiGatewayMethod${name}${capitalize(method)}`;
 
             // Build the ApiMethod array
-            apiMethods.push({
+            const methodObject = {
               name: methodName,
               method: method.toUpperCase(),
               cors: api.cors || false,
               resource: `ApiGateWayResource${name}`,
               lambda: lambda.name,
               api: api.api
-            });
+            };
+            // add any extra parameters of the api object
+            apiMethods.push(Object.assign({}, api, methodObject));
 
             // populate api dependency list
             try {

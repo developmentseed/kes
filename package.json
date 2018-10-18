@@ -1,6 +1,6 @@
 {
   "name": "kes",
-  "version": "2.2.4",
+  "version": "2.2.5",
   "description": "Making deployment to AWS using CloudFormation easier and fun",
   "scripts": {
     "html-docs": "documentation build bin/cli.js -f html -o _docs --theme node_modules/documentation-devseed-theme",
@@ -81,6 +81,7 @@
     "mustache": "^2.3.0",
     "node-forge": "^0.7.1",
     "p-limit": "^1.2.0",
+    "p-retry": "^2.0.0",
     "prompt": "^1.0.0",
     "yaml-files": "^0.1.0"
   },

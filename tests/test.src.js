@@ -125,3 +125,11 @@ test('config with template', (t) => {
   t.is(config.bucket, 'devseed-kes-deployment');
   t.is(config.bucket, config.system_bucket);
 });
+
+test('apiMethods will accept custom parameters', (t) => {
+  const config = new Config({
+    kesFolder: 'examples/lambdas_api'
+  });
+
+  t.true(config.apiMethods[0].extra_prop);
+});

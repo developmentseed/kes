@@ -1,0 +1,76 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'stack: {{stackName}} | deployed by Kes'
+
+Resources:
+
+  # role for Lambdas that are NOT used with APIGateway
+  LambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+        - Effect: Allow
+          Principal:
+            Service:
+            - lambda.amazonaws.com
+          Action:
+          - sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: KesLambdaRole
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              # Allow Lambda logging
+              - Effect: Allow
+                Action:
+                - logs:DescribeLogStreams
+                - logs:CreateLogGroup
+                - logs:CreateLogStream
+                - logs:PutLogEvents
+                Resource: arn:aws:logs:*:*:*
+
+              # Allow lambdas to call other lambdas
+              - Effect: Allow
+                Action:
+                - lambda:GetFunction
+                - lambda:invokeFunction
+                Resource:
+                - "*"
+
+  #################################################
+  # Lambda config BEGIN
+  #################################################
+{{#each lambdas}}
+  {{@key}}LambdaFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+      {{#if this.s3Source}}
+        S3Bucket: {{this.s3Source.bucket}}
+        S3Key: {{this.s3Source.key}}
+      {{else}}
+        S3Bucket: {{this.bucket}}
+        S3Key: {{this.remote}}
+      {{/if}}
+      FunctionName: {{../stackName}}-{{@key}}
+      Environment:
+        Variables:
+          stackName: {{../stackName}}
+        {{#each this.envs}}
+          {{@key}}: {{this}}
+        {{/each}}
+      Handler: {{this.handler}}
+      MemorySize: {{this.memory}}
+      Role:
+        Fn::GetAtt:
+          - LambdaRole
+          - Arn
+      Runtime: {{# if this.runtime}}{{this.runtime}}{{else}}nodejs6.10{{/if}}
+      Timeout: {{# if this.timeout}}{{this.timeout}}{{else}}300{{/if}}
+{{/each}}
+  #################################################
+  # Lambda config END
+  #################################################
+
