@@ -1,6 +1,6 @@
 ## v2.2.5
 - Add support for arbitrary parameters in the API Gateway methods
-- retry CF describe calls if the request is throttled
+- retry CF describe calls for five times if the request is throttled
 
 ## v2.2.4
 - Add support for .zip file as source
