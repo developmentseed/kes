@@ -43,6 +43,7 @@ Resources:
   # Lambda config BEGIN
   #################################################
 {{#each lambdas}}
+  {{#ifNotEquals this.handler "func3.handler"}}
   {{@key}}LambdaFunction:
     Type: AWS::Lambda::Function
     Properties:
@@ -69,6 +70,7 @@ Resources:
           - Arn
       Runtime: {{# if this.runtime}}{{this.runtime}}{{else}}nodejs6.10{{/if}}
       Timeout: {{# if this.timeout}}{{this.timeout}}{{else}}300{{/if}}
+  {{/ifNotEquals}}
 {{/each}}
   #################################################
   # Lambda config END

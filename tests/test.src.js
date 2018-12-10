@@ -68,7 +68,7 @@ test('create a config instance', (t) => {
   });
 
   t.is(config.stack, 'my-kes-project');
-  t.is(Object.keys(config.lambdas).length, 2);
+  t.is(Object.keys(config.lambdas).length, 3);
   t.is(config.lambdas.func1.fullName, 'my-kes-project-func1');
 
   // make sure envs are added even if lambdas don't include them
