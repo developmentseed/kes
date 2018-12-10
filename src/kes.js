@@ -108,6 +108,14 @@ class Kes {
       return value;
     });
 
+    Handlebars.registerHelper('ifEquals', function ifEquals(arg1, arg2, options) {
+      return (arg1 === arg2) ? options.fn(this) : options.inverse(this);
+    });
+
+    Handlebars.registerHelper('ifNotEquals', function ifNotEquals(arg1, arg2, options) {
+      return (arg1 !== arg2) ? options.fn(this) : options.inverse(this);
+    });
+
     Handlebars.registerHelper('ToJson', function(value) {
       return JSON.stringify(value);
     });

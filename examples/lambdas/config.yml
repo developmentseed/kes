@@ -19,6 +19,12 @@ default:
       s3Source:
         bucket: devseed-kes-deployment 
         key: example_lambdas/lambda.zip
+    func3:
+      handler: func3.handler
+      timeout: 300
+      s3Source:
+        bucket: devseed-kes-deployment 
+        key: example_lambdas/lambda.zip
 
 kesTestDeployment:
   stackName: kes-test-project-prod
