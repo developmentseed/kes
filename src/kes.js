@@ -66,16 +66,20 @@ class Kes {
    * the CF stack
    */
   describeStack(stackName) {
-    const describe = () => this.cf.describeStacks({ StackName: stackName }).promise();
+    const describe = () => this.cf.describeStacks({
+      StackName: stackName
+    })
+    .promise()
+    .catch((error) => {
+      if (error.code !== 'ThrottlingException') {
+        throw new pRetry.AbortError(error.message, error);
+      }
+      throw error;
+    });
 
     return pRetry(describe, {
       onFailedAttempt: error => {
-        if (error.code === 'ThrottlingException') {
-          console.log(`Attempt ${error.attemptNumber} failed. There are ${error.attemptsLeft} attempts left.`);
-        }
-        else {
-          throw new pRetry.AbortError(error);
-        }
+        console.log(`Attempt ${error.attemptNumber} failed. There are ${error.attemptsLeft} attempts left.`);
       },
       retries: 5
     });

@@ -1,3 +1,6 @@
+## v2.2.6
+- fix how p-retry handles exceptions
+
 ## v2.2.5
 - Add support for arbitrary parameters in the API Gateway methods
 - retry CF describe calls for five times if the request is throttled
