@@ -194,7 +194,7 @@ function determineKesClass(options, Kes) {
       else {
         kesFolder = path.join(process.cwd(), '.kes');
       }
-      Kes = require(`${path.join(process.cwd(), kesFolder, 'kes.js')}`);
+      Kes = require(`${path.join(kesFolder, 'kes.js')}`);
     }
     catch (e) {
       // check if there is a template and the template has kes class
