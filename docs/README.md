@@ -73,7 +73,7 @@ It makes it much easier to deploy lambda functions and create API gateway resour
 Go to your project directory and run the following command.
 
 ```bash
-$ npm init
+$ kes init
 ```
 
 This will create a `.kes` folder on your project folder. It will include the following files:
