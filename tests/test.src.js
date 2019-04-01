@@ -3,9 +3,9 @@
 const test = require('ava');
 const yaml = require('js-yaml');
 const has = require('lodash.has');
-const Config = require('../index').Config;
-const utils = require('../index').utils;
 const AWS = require('aws-sdk');
+const { Config, utils, Kes } = require('../index');
+const BetterKes = require('./override/kes');
 
 test('should load local env variables', (t) => {
   const envs = utils.loadLocalEnvs('examples/lambdas/.env');
@@ -132,4 +132,58 @@ test('apiMethods will accept custom parameters', (t) => {
   });
 
   t.true(config.apiMethods[0].extra_prop);
+});
+
+test('utils.determineKesClass should load Kes overrides', (t) => {
+  let Kes;
+  let options = {
+    kesFolder: '../tests/override'
+  };
+
+  try {
+    Kes = utils.determineKesClass(options, Kes);
+  }
+  catch (e) {
+    t.fail(e);
+  }
+  t.deepEqual(Kes, BetterKes);
+
+  options = {
+    template: 'tests/override'
+  };
+
+  try {
+    Kes = utils.determineKesClass(options, Kes);
+  }
+  catch (e) {
+    t.fail(e);
+  }
+  t.deepEqual(Kes, BetterKes);
+});
+
+test('utils.determineKesClass should throw errors when failing to load Kes overrides', (t) => {
+  let Kes;
+  let options = {
+    kesFolder: '../tests/override-fail'
+  };
+
+  try {
+    Kes = utils.determineKesClass(options, Kes);
+    t.fail('Expected error to be thrown');
+  }
+  catch (e) {
+    t.is(e.message, "Cannot find module './non-existent-path'");
+  }
+
+  options = {
+    template: 'tests/override-fail'
+  };
+
+  try {
+    Kes = utils.determineKesClass(options, Kes);
+    t.fail('Expected error to be thrown');
+  }
+  catch (e) {
+    t.is(e.message, "Cannot find module './non-existent-path'");
+  }
 });
