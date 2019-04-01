@@ -235,7 +235,7 @@ function determineKesClass(options, Kes) {
     }
   }
 
-  return KesOverride ? KesOverride : Kes;
+  return KesOverride || Kes;
 }
 
 /**
