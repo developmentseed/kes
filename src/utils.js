@@ -180,20 +180,24 @@ function mergeYamls(file1, file2) {
  * @returns {Class} - A Kes override class
  */
 function loadKesOverride(kesFolder, kesClass = 'kes.js') {
-  const kesOverridePath = path.join(kesFolder, kesClass);
+  let kesOverridePath = path.resolve(kesFolder, kesClass);
   let KesOverride;
+
   try {
     KesOverride = require(kesOverridePath);
   }
   catch (e) {
-    // If error is something error than the file not existing,
-    // throw it and stop Kes from going further.
-    if (!e.message ||
-        e.message !== `Cannot find module '${kesOverridePath}'`) {
+    // If the Kes override file exists, then the error occured when
+    // trying to parse the file, so re-throw and prevent Kes from
+    // going further.
+    const fileExists = fs.existsSync(kesOverridePath);
+    if (fileExists) {
       throw e;
     }
+
     console.log(`No Kes override found at ${kesOverridePath}, continuing`);
   }
+
   return KesOverride;
 }
 
