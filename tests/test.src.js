@@ -137,14 +137,14 @@ test('apiMethods will accept custom parameters', (t) => {
 test('utils.determineKesClass should load Kes overrides', (t) => {
   let Kes;
   let options = {
-    kesFolder: '../tests/override'
+    kesFolder: 'tests/override'
   };
 
   try {
     Kes = utils.determineKesClass(options, Kes);
   }
   catch (e) {
-    t.fail(e);
+    t.fail(`Unexpected error: ${e.message}`);
   }
   t.is(Kes.name, 'BetterKes');
 
@@ -156,14 +156,14 @@ test('utils.determineKesClass should load Kes overrides', (t) => {
     Kes = utils.determineKesClass(options, Kes);
   }
   catch (e) {
-    t.fail(e);
+    t.fail(`Unexpected error: ${e.message}`);
   }
   t.is(Kes.name, 'BetterKes');
 });
 
 test('utils.determineKesClass should throw errors when failing to load Kes overrides', (t) => {
   let options = {
-    kesFolder: '../tests/override-fail'
+    kesFolder: 'tests/override-fail'
   };
 
   try {
