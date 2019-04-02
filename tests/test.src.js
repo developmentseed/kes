@@ -146,7 +146,7 @@ test('utils.determineKesClass should load Kes overrides', (t) => {
   catch (e) {
     t.fail(e);
   }
-  t.deepEqual(Kes, BetterKes);
+  t.is(Kes.name, 'BetterKes');
 
   options = {
     template: 'tests/override'
@@ -158,17 +158,16 @@ test('utils.determineKesClass should load Kes overrides', (t) => {
   catch (e) {
     t.fail(e);
   }
-  t.deepEqual(Kes, BetterKes);
+  t.is(Kes.name, 'BetterKes');
 });
 
 test('utils.determineKesClass should throw errors when failing to load Kes overrides', (t) => {
-  let Kes;
   let options = {
     kesFolder: '../tests/override-fail'
   };
 
   try {
-    Kes = utils.determineKesClass(options, Kes);
+    utils.determineKesClass(options, Kes);
     t.fail('Expected error to be thrown');
   }
   catch (e) {
@@ -180,7 +179,7 @@ test('utils.determineKesClass should throw errors when failing to load Kes overr
   };
 
   try {
-    Kes = utils.determineKesClass(options, Kes);
+    utils.determineKesClass(options, Kes);
     t.fail('Expected error to be thrown');
   }
   catch (e) {
