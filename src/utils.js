@@ -162,7 +162,6 @@ function fileToString(file) {
  * @param {String} file2 Yaml path to file 2 or file 2 string
  * @returns {String} Merged Yaml file in string format
  */
-
 function mergeYamls(file1, file2) {
   const obj1 = yaml.safeLoad(fileToString(file1), { schema: yamlfiles.YAML_FILES_SCHEMA });
   const obj2 = yaml.safeLoad(fileToString(file2), { schema: yamlfiles.YAML_FILES_SCHEMA });
@@ -171,46 +170,76 @@ function mergeYamls(file1, file2) {
 }
 
 /**
+ * Attempt to load a Kes override class.
+ *
+ * Throw the error if it is something other than that the Kes override
+ * class does not exist.
+ *
+ * @param {string} kesFolder - The folder to look in for a Kes override class
+ * @param {string} kesClass - The path/filename to look for as a Kes override class
+ * @returns {Class} - A Kes override class
+ */
+function loadKesOverride(kesFolder, kesClass = 'kes.js') {
+  let kesOverridePath = path.resolve(kesFolder, kesClass);
+  let KesOverride;
+
+  try {
+    KesOverride = require(kesOverridePath);
+  }
+  catch (e) {
+    // If the Kes override file exists, then the error occured when
+    // trying to parse the file, so re-throw and prevent Kes from
+    // going further.
+    const fileExists = fs.existsSync(kesOverridePath);
+    if (fileExists) {
+      throw e;
+    }
+
+    console.log(`No Kes override found at ${kesOverridePath}, continuing`);
+  }
+
+  return KesOverride;
+}
+
+/**
  * Based on the information passed from the CLI by the commander
  * module this function determines whether to use the default Kes class
  * or use the override class provided by the user
+ *
  * @param {object} options The options passed by the commander library
  * @param {Class} Kes the default kes class
  * @returns {Class} Kes class
  */
 function determineKesClass(options, Kes) {
-  // if there is a kes class specified use that
+  let KesOverride;
+
+  // If there is a kes class specified, use that
   const kesClass = get(options, 'kesClass');
   if (kesClass) {
-    Kes = require(`${path.join(process.cwd(), kesClass)}`);
+    KesOverride = loadKesOverride(process.cwd(), kesClass);
   }
   else {
-    // check if there is kes.js in the kes-folder
-    try {
-      let kesFolder;
-      if (options.kesFolder) {
-        kesFolder = options.kesFolder;
-      }
-      else {
-        kesFolder = path.join(process.cwd(), '.kes');
-      }
-      Kes = require(`${path.join(kesFolder, 'kes.js')}`);
+    let kesFolder;
+
+    // Check if there is kes.js in the kes folder
+    if (options.kesFolder) {
+      kesFolder = options.kesFolder;
     }
-    catch (e) {
-      // check if there is a template and the template has kes class
+    else {
+      kesFolder = path.join(process.cwd(), '.kes');
+    }
+    KesOverride = loadKesOverride(kesFolder);
+
+    // If the first Kes override didn't load, check if there is
+    // a kes.js in the template folder.
+    if (!KesOverride) {
       const template = get(options, 'template', '/path/to/nowhere');
-      try {
-        const kesPath = path.join(process.cwd(), template, 'kes.js');
-        fs.lstatSync(kesPath);
-        Kes = require(`${kesPath}`);
-      }
-      catch (e) {
-        // do nothing
-      }
+      kesFolder = path.join(process.cwd(), template);
+      KesOverride = loadKesOverride(kesFolder);
     }
   }
 
-  return Kes;
+  return KesOverride || Kes;
 }
 
 /**
