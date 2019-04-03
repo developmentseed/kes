@@ -1,3 +1,8 @@
+## Unreleased
+
+- Changed `utils.determineKesClass()` to throw errors when Kes class override files are found, but cannot be loaded
+- Added `utils.loadKesOverride()` to attempt loading all Kes class override files
+
 ## v2.2.7
 - fix a bug where Kes class overrides were not picked up. #70
 
