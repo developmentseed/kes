@@ -135,51 +135,64 @@ test('apiMethods will accept custom parameters', (t) => {
 });
 
 test('utils.determineKesClass should load Kes overrides', (t) => {
-  let Kes;
-  let options = {
-    kesFolder: 'tests/override'
-  };
+  let KesOverride;
 
   try {
-    Kes = utils.determineKesClass(options, Kes);
+    KesOverride = utils.determineKesClass({
+      kesFolder: 'tests/override'
+    }, Kes);
   }
   catch (e) {
     t.fail(`Unexpected error: ${e.message}`);
   }
-  t.is(Kes.name, 'BetterKes');
-
-  options = {
-    template: 'tests/override'
-  };
+  t.is(KesOverride.name, 'BetterKes');
 
   try {
-    Kes = utils.determineKesClass(options, Kes);
+    KesOverride = utils.determineKesClass({
+      template: 'tests/override'
+    }, Kes);
   }
   catch (e) {
     t.fail(`Unexpected error: ${e.message}`);
   }
-  t.is(Kes.name, 'BetterKes');
+  t.is(KesOverride.name, 'BetterKes');
+
+  try {
+    KesOverride = utils.determineKesClass({
+      kesClass: 'tests/override/kes.js'
+    }, Kes);
+  }
+  catch (e) {
+    t.fail(`Unexpected error: ${e.message}`);
+  }
+  t.is(KesOverride.name, 'BetterKes');
 });
 
 test('utils.determineKesClass should throw errors when failing to load Kes overrides', (t) => {
-  let options = {
-    kesFolder: 'tests/override-fail'
-  };
-
   try {
-    utils.determineKesClass(options, Kes);
+    utils.determineKesClass({
+      kesFolder: 'tests/override-fail'
+    }, Kes);
     t.fail('Expected error to be thrown');
   }
   catch (e) {
     t.is(e.message, "Cannot find module './non-existent-path'");
   }
 
-  options = {
-    template: 'tests/override-fail'
-  };
+  try {
+    utils.determineKesClass({
+      template: 'tests/override-fail'
+    }, Kes);
+    t.fail('Expected error to be thrown');
+  }
+  catch (e) {
+    t.is(e.message, "Cannot find module './non-existent-path'");
+  }
 
   try {
-    utils.determineKesClass(options, Kes);
+    utils.determineKesClass({
+      kesClass: 'tests/override-fail/kes.js'
+    }, Kes);
     t.fail('Expected error to be thrown');
   }
   catch (e) {
