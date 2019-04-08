@@ -88,7 +88,7 @@
   "devDependencies": {
     "ava": "^0.21.0",
     "documentation": "~5.2.2",
-    "documentation-devseed-theme": "^0.1.5",
+    "documentation-devseed-theme": "^0.1.6",
     "eslint": "^3.19.0",
     "eslint-config-standard": "^10.2.1",
     "eslint-plugin-import": "^2.2.0",
