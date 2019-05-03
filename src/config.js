@@ -57,6 +57,7 @@ class Config {
       const templatePath = get(options, 'template');
       fs.lstatSync(templatePath);
       this.template = {
+        baseName: path.basename(templatePath),
         kesFolder: templatePath,
         configFile: path.join(templatePath, 'config.yml'),
         cfFile: path.join(templatePath, 'cloudformation.template.yml')

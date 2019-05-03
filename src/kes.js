@@ -249,7 +249,17 @@ class Kes {
   cloudFormation() {
     const cfParams = [];
     // add custom params from the config file if any
-    if (this.config.params) {
+    if (this.config.params[this.config.template.baseName]) {
+      this.config.params[this.config.template.baseName].forEach((p) => {
+        cfParams.push({
+          ParameterKey: p.name,
+          ParameterValue: p.value,
+          UsePreviousValue: p.usePrevious || false
+          //NoEcho: p.noEcho || true
+        });
+      });
+    }
+    else if (this.config.params) {
       this.config.params.forEach((p) => {
         cfParams.push({
           ParameterKey: p.name,
