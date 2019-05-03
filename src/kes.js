@@ -259,7 +259,7 @@ class Kes {
     if (this.config.params[this.config.template.baseName]) {
       this.config.params[this.config.template.baseName].forEach(pushToCfParams);
     }
-    else if (this.config.params) {
+    else if (this.config.params && this.config.params instanceof Array) {
       this.config.params.forEach(pushToCfParams);
     }
 
