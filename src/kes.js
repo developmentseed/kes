@@ -255,7 +255,6 @@ class Kes {
           ParameterKey: p.name,
           ParameterValue: p.value,
           UsePreviousValue: p.usePrevious || false
-          //NoEcho: p.noEcho || true
         });
       });
     }
@@ -265,7 +264,6 @@ class Kes {
           ParameterKey: p.name,
           ParameterValue: p.value,
           UsePreviousValue: p.usePrevious || false
-          //NoEcho: p.noEcho || true
         });
       });
     }
