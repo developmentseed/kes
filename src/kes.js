@@ -248,24 +248,19 @@ class Kes {
    */
   cloudFormation() {
     const cfParams = [];
+    const pushToCfParams = (p) => {
+      cfParams.push({
+        ParameterKey: p.name,
+        ParameterValue: p.value,
+        UsePreviousValue: p.usePrevious || false
+      });
+    };
     // add custom params from the config file if any
     if (this.config.params[this.config.template.baseName]) {
-      this.config.params[this.config.template.baseName].forEach((p) => {
-        cfParams.push({
-          ParameterKey: p.name,
-          ParameterValue: p.value,
-          UsePreviousValue: p.usePrevious || false
-        });
-      });
+      this.config.params[this.config.template.baseName].forEach(pushToCfParams);
     }
     else if (this.config.params) {
-      this.config.params.forEach((p) => {
-        cfParams.push({
-          ParameterKey: p.name,
-          ParameterValue: p.value,
-          UsePreviousValue: p.usePrevious || false
-        });
-      });
+      this.config.params.forEach(pushToCfParams);
     }
 
     const capabilities = get(this.config, 'capabilities', []);
