@@ -1,3 +1,9 @@
+## Unreleased
+
+- Changed `Config` to store the basename of the `--template` option's path.
+- Added change to `cloudFormation()` to support multiple templates with one config file, by allowing
+  parameters to be nested under `template.baseName` keys. Backwards-compatible.
+
 ## v2.2.8
 
 - Changed `utils.determineKesClass()` to throw errors when Kes class override files are found, but cannot be loaded
