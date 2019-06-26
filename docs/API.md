@@ -36,6 +36,7 @@
 -   [configureAws](#configureaws)
 -   [fileToString](#filetostring)
 -   [mergeYamls](#mergeyamls)
+-   [loadKesOverride](#loadkesoverride)
 -   [determineKesClass](#determinekesclass)
 -   [failure](#failure)
 -   [success](#success)
@@ -417,6 +418,20 @@ replace values of file 1 if they have the same key.
 -   `file2` **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Yaml path to file 2 or file 2 string
 
 Returns **[String](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** Merged Yaml file in string format
+
+## loadKesOverride
+
+Attempt to load a Kes override class.
+
+Throw the error if it is something other than that the Kes override
+class does not exist.
+
+**Parameters**
+
+-   `kesFolder` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The folder to look in for a Kes override class
+-   `kesClass` **[string](https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String)** The path/filename to look for as a Kes override class (optional, default `'kes.js'`)
+
+Returns **Class** A Kes override class
 
 ## determineKesClass
 
