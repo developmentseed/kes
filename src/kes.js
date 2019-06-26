@@ -297,7 +297,7 @@ class Kes {
           if (this.config.noRollback) {
             params.OnFailure = 'DO_NOTHING';
           }
-          
+
           return this.cf.createStack(params).promise();
         }
         throw e;
