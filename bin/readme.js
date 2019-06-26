@@ -31,6 +31,7 @@
  *  --showOutputs                  Show the list of a CloudFormation template outputs
  *  --yes                          Skip all confirmation prompts
  *  -d, --deployment <deployment>  Deployment name, default to default
+ *  --noRollback                 Don't delete Cloudformation stacks that fail to deploy
  *  -h, --help                    output usage information
  *
  *  Commands:

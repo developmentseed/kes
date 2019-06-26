@@ -107,6 +107,7 @@ program
   .option('--stack <stack>', 'stack name, defaults to the config value')
   .option('--showOutputs', 'Show the list of a CloudFormation template outputs')
   .option('--yes', 'Skip all confirmation prompts')
+  .option('--noRollback', 'Don\'t delete Cloudformation stacks that fail to deploy')
   .option('-d, --deployment <deployment>', 'Deployment name, default to default');
 
 program

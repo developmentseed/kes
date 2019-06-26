@@ -293,8 +293,8 @@ class Kes {
       .catch(e => {
         if (e.message.includes('does not exist')) {
           wait = 'stackCreateComplete';
-          
-          if (this.config.envs.NO_ROLLBACK) {
+
+          if (this.config.noRollback) {
             params.OnFailure = 'DO_NOTHING';
           }
           
