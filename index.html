@@ -1,0 +1,3856 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>kes 2.2.8 | Documentation</title>
+  <meta name='viewport' content='width=device-width,initial-scale=1'>
+  <link href='assets/bass.css' type='text/css' rel='stylesheet' />
+  <link href='assets/style.css' type='text/css' rel='stylesheet' />
+  <link href='assets/github.css' type='text/css' rel='stylesheet' />
+  <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,700,700i' />
+</head>
+<body class='documentation m0'>
+  <div class='page flex'>
+    <header class='page__header'>
+      <div class='inner'>
+        <div class='page__headline'>
+          <h1 class='mb0 no-anchor page__title'>kes</h1>
+          <p class='mb1 page__subtitle'><code>2.2.8</code></p>
+        </div>
+
+        <a id='menu-toggle' href='#prime-nav' title='Show/hide menu' class='menu-toggle'><span>Browse</span></a>
+
+        <nav class='page__prime-nav' id='prime-nav'>
+          <input placeholder='Filter' id='filter-input' class='col12 block input' type='text' />
+
+          <h2 class='mb1 page__subtitle'>Contents</h2>
+
+          <div class='page__nav-contents'>
+            <div id='toc'>
+              <ul class='ppn__menu'>
+                
+                  
+                  <li><a
+                    href='#'
+                    class=' ppn__menu-item'>
+                    
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#buildnestedcfs'
+                    class=' ppn__menu-item'>
+                    buildNestedCfs
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#buildcf'
+                    class=' ppn__menu-item'>
+                    buildCf
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#buildlambda'
+                    class=' ppn__menu-item'>
+                    buildLambda
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#kes'
+                    class=' toggle-sibling ppn__menu-item'>
+                    Kes
+                    <span class='icon'>▸</span>
+                  </a>
+                  
+                  <div class='toggle-target display-none'>
+                    
+                    
+                      <ul class='list-reset py1-ul pl1 ppn__menu-item'>
+                        <li class='h5 ppn__section-title'><span>Instance members</span></li>
+                        
+                        <li><a
+                          href='#kesdescribestack'
+                          class='regular pre-open ppn__menu-item'>
+                          #describeStack
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesupdatesinglelambda'
+                          class='regular pre-open ppn__menu-item'>
+                          #updateSingleLambda
+                        </a></li>
+                        
+                        <li><a
+                          href='#kescompilecf'
+                          class='regular pre-open ppn__menu-item'>
+                          #compileCF
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesuploadtos3'
+                          class='regular pre-open ppn__menu-item'>
+                          #uploadToS3
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesuploadcf'
+                          class='regular pre-open ppn__menu-item'>
+                          #uploadCF
+                        </a></li>
+                        
+                        <li><a
+                          href='#keswaitfor'
+                          class='regular pre-open ppn__menu-item'>
+                          #waitFor
+                        </a></li>
+                        
+                        <li><a
+                          href='#kescloudformation'
+                          class='regular pre-open ppn__menu-item'>
+                          #cloudFormation
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesvalidatetemplate'
+                          class='regular pre-open ppn__menu-item'>
+                          #validateTemplate
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesdescribecf'
+                          class='regular pre-open ppn__menu-item'>
+                          #describeCF
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesdeletecf'
+                          class='regular pre-open ppn__menu-item'>
+                          #deleteCF
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesopsstack'
+                          class='regular pre-open ppn__menu-item'>
+                          #opsStack
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesupsertstack'
+                          class='regular pre-open ppn__menu-item'>
+                          #upsertStack
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesdeploystack'
+                          class='regular pre-open ppn__menu-item'>
+                          #deployStack
+                        </a></li>
+                        
+                        <li><a
+                          href='#kescreatestack'
+                          class='regular pre-open ppn__menu-item'>
+                          #createStack
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesupdatestack'
+                          class='regular pre-open ppn__menu-item'>
+                          #updateStack
+                        </a></li>
+                        
+                        <li><a
+                          href='#kesdeletestack'
+                          class='regular pre-open ppn__menu-item'>
+                          #deleteStack
+                        </a></li>
+                        
+                      </ul>
+                    
+                    
+                    
+                  </div>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#config'
+                    class=' toggle-sibling ppn__menu-item'>
+                    Config
+                    <span class='icon'>▸</span>
+                  </a>
+                  
+                  <div class='toggle-target display-none'>
+                    
+                    
+                      <ul class='list-reset py1-ul pl1 ppn__menu-item'>
+                        <li class='h5 ppn__section-title'><span>Instance members</span></li>
+                        
+                        <li><a
+                          href='#configparse'
+                          class='regular pre-open ppn__menu-item'>
+                          #parse
+                        </a></li>
+                        
+                        <li><a
+                          href='#configflatten'
+                          class='regular pre-open ppn__menu-item'>
+                          #flatten
+                        </a></li>
+                        
+                      </ul>
+                    
+                    
+                    
+                  </div>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#zip'
+                    class=' ppn__menu-item'>
+                    zip
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#exec'
+                    class=' ppn__menu-item'>
+                    exec
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#configureaws'
+                    class=' ppn__menu-item'>
+                    configureAws
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#filetostring'
+                    class=' ppn__menu-item'>
+                    fileToString
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#mergeyamls'
+                    class=' ppn__menu-item'>
+                    mergeYamls
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#loadkesoverride'
+                    class=' ppn__menu-item'>
+                    loadKesOverride
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#determinekesclass'
+                    class=' ppn__menu-item'>
+                    determineKesClass
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#failure'
+                    class=' ppn__menu-item'>
+                    failure
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#success'
+                    class=' ppn__menu-item'>
+                    success
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#getsystembucket'
+                    class=' ppn__menu-item'>
+                    getSystemBucket
+                    
+                  </a>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#lambda'
+                    class=' toggle-sibling ppn__menu-item'>
+                    Lambda
+                    <span class='icon'>▸</span>
+                  </a>
+                  
+                  <div class='toggle-target display-none'>
+                    
+                    
+                      <ul class='list-reset py1-ul pl1 ppn__menu-item'>
+                        <li class='h5 ppn__section-title'><span>Instance members</span></li>
+                        
+                        <li><a
+                          href='#lambdabuilds3path'
+                          class='regular pre-open ppn__menu-item'>
+                          #buildS3Path
+                        </a></li>
+                        
+                        <li><a
+                          href='#lambdagethash'
+                          class='regular pre-open ppn__menu-item'>
+                          #getHash
+                        </a></li>
+                        
+                        <li><a
+                          href='#lambdaziplambda'
+                          class='regular pre-open ppn__menu-item'>
+                          #zipLambda
+                        </a></li>
+                        
+                        <li><a
+                          href='#lambdauploadlambda'
+                          class='regular pre-open ppn__menu-item'>
+                          #uploadLambda
+                        </a></li>
+                        
+                        <li><a
+                          href='#lambdazipanduploadlambda'
+                          class='regular pre-open ppn__menu-item'>
+                          #zipAndUploadLambda
+                        </a></li>
+                        
+                        <li><a
+                          href='#lambdaprocess'
+                          class='regular pre-open ppn__menu-item'>
+                          #process
+                        </a></li>
+                        
+                        <li><a
+                          href='#lambdaupdatesinglelambda'
+                          class='regular pre-open ppn__menu-item'>
+                          #updateSingleLambda
+                        </a></li>
+                        
+                      </ul>
+                    
+                    
+                    
+                  </div>
+                  
+                  </li>
+                
+                  
+                  <li><a
+                    href='#localrun'
+                    class=' ppn__menu-item'>
+                    localRun
+                    
+                  </a>
+                  
+                  </li>
+                
+              </ul>
+
+              <div class='mt1 h6 quiet'>
+                <a class='page__subtitle' href='http://documentation.js.org/reading-documentation.html'>Need help reading this?</a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main class='page__body'>
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id=''>
+      
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <h1>Kes: Making deployment with CloudFormation Fun</h1>
+<p>Kes helps with managing and deploying AWS resources using CloudFormation.</p>
+<p>It makes it much easier to deploy lambda functions and create API gateway resources.</p>
+<h2>Installation</h2>
+<pre class='hljs'>  $ npm install -g kes
+  $ kes -h
+
+   Usage: kes TYPE COMMAND [options]
+
+   Start a Kes project
+
+ Options:
+
+ -V, --version                 output the version number
+ -p, --profile &lt;profile&gt;       AWS profile name to use <span class="hljs-keyword">for</span> authentication
+ --role &lt;role&gt;                 AWS role arn to be assumed <span class="hljs-keyword">for</span> the deployment
+ -c, --config &lt;config&gt;         Path to config file
+ --env-file &lt;envFile&gt;          Path to env file
+ --cf-file &lt;cfFile&gt;            Path to CloudFormation templateUrl
+ -t, --template &lt;template&gt;      A kes application template used as the base <span class="hljs-keyword">for</span> the configuration
+ --kes-class &lt;kesClass&gt;        Kes Class override
+ -k, --kes-folder &lt;kesFolder&gt;  Path to config folder
+ -r, --region &lt;region&gt;         AWS region
+ --stack &lt;stack&gt;               stack name, defaults to the config value
+ --showOutputs                  Show the list of a CloudFormation template outputs
+ --yes                          Skip all confirmation prompts
+ -d, --deployment &lt;deployment&gt;  Deployment name, default to default
+ --noRollback                 Don<span class="hljs-string">'t delete Cloudformation stacks that fail to deploy
+ -h, --help                    output usage information
+
+ Commands:
+ cf [deploy|validate|compile]  CloudFormation Operations:
+   create    Creates the CF stack (deprecated, start using deploy)
+   update    Updates the CF stack (deprecated, start using deploy)
+   upsert    Creates the CF stack and Update if already exists (deprecated, start using deploy)
+   deploy    Creates the CF stack and Update if already exists
+   delete    Delete the CF stack
+   validate  Validates the CF stack
+   compile   Compiles the CF stack
+   lambda &lt;lambdaName&gt;                         uploads a given lambda function to Lambda service</span></pre>
+<h2>Setting Up the First Project</h2>
+<p>Go to your project directory and run the following command.</p>
+<pre class='hljs'>$ npm init</pre>
+<p>This will create a <code>.kes</code> folder on your project folder. It will include the following files:</p>
+<table>
+<thead>
+<tr>
+<th>file</th>
+<th>description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>.env</code></td>
+<td>This optional file can hold your project secrets and should not be committed</td>
+</tr>
+<tr>
+<td><code>cloudformation.template.yml</code></td>
+<td>A base CF template written with Mustache/Handlebar templating language</td>
+</tr>
+<tr>
+<td><code>config.yml</code></td>
+<td>The main required configuration file for a kes deployment</td>
+</tr>
+<tr>
+<td><code>kes.js</code></td>
+<td>An optional Kes class override that can change how Kes class is used</td>
+</tr>
+</tbody>
+</table>
+<p>The <code>cloudformation.template.yml</code> and <code>config.yml</code> are required files.
+The variables in <code>config.yml</code> are parsed and used to generate the <code>cloudformation.yml</code>. By default,
+the <code>default</code> section of the <code>config.yml</code> is parsed and used in <code>cloudformation.template.yml</code>. If
+another deployment is specified in the <code>config.yml</code> the values of that deployment overrides the
+values of <code>default</code>
+file which is sent to AWS CloudFormation to create and update the stack.</p>
+<h3>CF Stack Name</h3>
+<p>The Cloudformation stack name is the same as <code>stackName</code> in <code>config.yml</code>.</p>
+<h3>Parameters</h3>
+<p>To pass parameters to the CloudFormation template, use the <code>parameters</code> key in config.yml. Example:</p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack</span>
+<span class="hljs-attr">  parameters:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">MyParameter</span>
+<span class="hljs-attr">      value:</span> <span class="hljs-string">someValue</span></pre>
+<pre class='hljs'><span class="hljs-comment"># cloudformation.template.yml</span>
+<span class="hljs-attr">AWSTemplateFormatVersion:</span> <span class="hljs-string">'2010-09-09'</span>
+<span class="hljs-attr">Description:</span> <span class="hljs-string">'stack: <span class="hljs-template-variable">{{stackName}}</span> | deployed by Kes'</span>
+<span class="hljs-attr">Parameters:</span>
+<span class="hljs-attr">  MyParameter:</span>
+<span class="hljs-attr">    Type:</span> <span class="hljs-string">String</span>
+<span class="hljs-attr">    Description:</span> <span class="hljs-string">'My parameter'</span></pre>
+<h3>CF Capabailities</h3>
+<p>To pass capabilities such as <code>CAPABILITY_IAM</code> use <code>capabilities</code> key:</p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack</span>
+<span class="hljs-attr">  parameters:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">MyParameter</span>
+<span class="hljs-attr">      value:</span> <span class="hljs-string">someValue</span>
+<span class="hljs-attr">  capabilities:</span>
+<span class="hljs-bullet">    -</span> <span class="hljs-string">CAPABILITY_IAM</span></pre>
+<h3>CloudFormation Tagging</h3>
+<p>To manage tags associated with your CloudFormation stack, use the <code>tags</code> key:</p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  tags:</span>
+<span class="hljs-attr">    color:</span> <span class="hljs-string">orange</span>
+<span class="hljs-attr">    tree:</span> <span class="hljs-string">oak</span></pre>
+<h3>Lambda Functions</h3>
+<p>To add lambda functions, use <code>lambdas</code> key and add them as array object.
+The lambda function code can be either a folder or file on your computer
+or a zip file on aws.</p>
+<p><strong>Note:</strong> In version 2.0.0 of kes, the lambda packaging is handled natively in nodejs.
+If you point the <code>source</code> to a directory, the directory is saved at the root of the zip
+package. This changes how handler path should be setup.</p>
+<p>For example, if the <code>index.js</code> is located at <code>/path/to/package/index.js</code> and
+<code>source: /path/to/package/index.js</code>, the handler should be <code>handler: index.handler</code>.</p>
+<p><strong>Required Fields:</strong></p>
+<ul>
+<li>name</li>
+<li>handler</li>
+<li>source/s3Source</li>
+</ul>
+<p><strong>Env Variables:</strong>
+You can add env variables to each lambda function as shown in the example below.</p>
+<p><strong>Example:</strong></p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack</span>
+<span class="hljs-attr">  parameters:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">MyParameter</span>
+<span class="hljs-attr">      value:</span> <span class="hljs-string">someValue</span>
+<span class="hljs-attr">  capabilities:</span>
+<span class="hljs-bullet">    -</span> <span class="hljs-string">CAPABILITY_IAM</span>
+
+<span class="hljs-attr">  lambdas:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">myLambda1</span>
+<span class="hljs-attr">      handler:</span> <span class="hljs-string">index.handler</span>
+<span class="hljs-attr">      timeout:</span> <span class="hljs-number">200</span>
+<span class="hljs-attr">      source:</span> <span class="hljs-string">'node_modules/someNpmPackage'</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">myLambda2</span>
+<span class="hljs-attr">      handler:</span> <span class="hljs-string">package.handler</span>
+<span class="hljs-attr">      timeout:</span><span class="hljs-number">100</span>
+<span class="hljs-attr">      s3Source:</span>
+<span class="hljs-attr">        bucket:</span> <span class="hljs-string">mybucket</span>
+<span class="hljs-attr">        key:</span> <span class="hljs-string">mylambda.zip</span>
+<span class="hljs-attr">      envs:</span>
+<span class="hljs-attr">        DEBUG:</span> <span class="hljs-literal">true</span></pre>
+<p><strong>Note:</strong></p>
+<p>Adding lambda functions in the config.yml has no effect unless you add
+the relevant CF syntax to <code>cloudformation.template.yml</code></p>
+<h3>Handlebar Helpers</h3>
+<p>We use <a href="http://handlebarsjs.com/">Handlebar</a> for templating a CF template.</p>
+<p><strong>Each</strong></p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">name1</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">name2</span></pre>
+<pre class='hljs'><span class="hljs-comment"># cloudformation.template.yml</span>
+<span class="hljs-attr">Resources:</span>
+
+<span class="hljs-string">{{#</span> <span class="hljs-string">each</span> <span class="hljs-string">myArray}}</span>
+  <span class="hljs-string">{{name}}:</span>
+<span class="hljs-attr">    Type:</span> <span class="hljs-string">SomeAWSResource</span>
+<span class="hljs-string">{{/each}}</span></pre>
+<p><strong>If/else</strong></p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">name1</span>
+<span class="hljs-attr">      runtime:</span> <span class="hljs-string">python2.7</span>
+<span class="hljs-attr">    - name:</span> <span class="hljs-string">name2</span></pre>
+<pre class='hljs'><span class="hljs-comment"># cloudformation.template.yml</span>
+<span class="hljs-attr">Resources:</span>
+
+<span class="hljs-string">{{#</span> <span class="hljs-string">each</span> <span class="hljs-string">myArray}}</span>
+  <span class="hljs-string">{{name}}:</span>
+<span class="hljs-attr">    Type:</span> <span class="hljs-string">SomeAWSResource</span>
+<span class="hljs-attr">    Properties:</span>
+<span class="hljs-attr">      Runtime:</span> <span class="hljs-string">{{#</span> <span class="hljs-string">if</span> <span class="hljs-string">runtime}}{{runtime}}{{else}}nodejs6.10{{/if}}</span>
+<span class="hljs-string">{{/each}}</span></pre>
+<p><strong>Each for Objects</strong></p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - DEBUG:</span> <span class="hljs-literal">true</span></pre>
+<pre class='hljs'><span class="hljs-comment"># cloudformation.template.yml</span>
+<span class="hljs-attr">Resources:</span>
+
+<span class="hljs-string">{{#</span> <span class="hljs-string">each</span> <span class="hljs-string">myArray}}</span>
+<span class="hljs-attr">  Lambda:</span>
+<span class="hljs-attr">    Type:</span> <span class="hljs-string">SomeAWSResource</span>
+<span class="hljs-attr">    Properties:</span>
+<span class="hljs-attr">      Environments:</span>
+<span class="hljs-bullet">        -</span> <span class="hljs-string">{{@key}}:</span> <span class="hljs-string">{{this}}</span>
+<span class="hljs-string">{{/each}}</span></pre>
+<h2>Deployment</h2>
+<p>To create a CF stack or update and existing one run</p>
+<pre class='hljs'> kes cf deploy</pre>
+<h3>Delete an existing stack</h3>
+<p>To delete an existing stack:</p>
+<pre class='hljs'>  kes cf delete</pre>
+<h3>Different deployment configurations</h3>
+<p>You can configure different values for different deployments. For example you might want to configure your test deployment
+differently from your staging and production deployments. Here is how to achieve it:</p>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack-test</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - DEBUG:</span> <span class="hljs-literal">true</span>
+
+<span class="hljs-attr">staging:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack-staging</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - DEBUG:</span> <span class="hljs-literal">false</span></pre>
+<p>To deploy a stack with the <code>staging</code> configuration run:</p>
+<pre class='hljs'>kes cf deploy --deployment staging</pre>
+<h2>Deployment Using IAM Role</h2>
+<p>You can specify an IAM role for the deployment using <code>--role</code> option or by setting <code>AWS_DEPLOYMENT_ROLE</code> environment variable.</p>
+<p><strong>Note:</strong> You still need an aws user with AssumeRole permission for this to work</p>
+<pre class='hljs'>kes cf deploy --profile myUser --role arn:aws:iam::00000000000:role/myDeploymentRole</pre>
+<h3>Updating One Lambda Function</h3>
+<p>To update one lambda function outside of CF</p>
+<pre class='hljs'> kes lambda myLambda</pre>
+<h2>Use Templates</h2>
+<p>Kes enables you to distribute your AWS applications built with kes using a concept called template. A template is essentially a <code>.kes</code> folder with
+a <code>cloudformation.template.yml</code>, a <code>config.yml</code> and a <code>kes.js</code> if needed.</p>
+<p>The user of a template can point to your template folder with the <code>--template</code> flag and the kes command will use the template to build the cloudformation.yml.</p>
+<p>The user still has the option of creating her own <code>config.yml</code> and <code>cloudformation.template.yml</code>. Any variables in these files will override existing ones
+in the template or append it if it doesn't exist.</p>
+<p>This setup gives users of the templates a great degree of flexibility and ownership.</p>
+<h2>Nested Templates</h2>
+<p>Kes supports use of <a href="https://aws.amazon.com/blogs/devops/use-nested-stacks-to-create-reusable-templates-and-support-role-specialization/">Cloudformation Nested Templates</a>.
+To use nested templates, create a separate <code>template.yml</code> and <code>config.yml</code> files for each nested template using the same rules explained above.
+Then include references in your main <code>config.yml</code>.</p>
+<p>All nested templates will receive the parent configuration under the <code>parent</code> key.</p>
+<h3>Example</h3>
+<pre class='hljs'><span class="hljs-comment"># config.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack-test</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - DEBUG:</span> <span class="hljs-literal">true</span>
+<span class="hljs-attr">  nested_templates:</span>
+<span class="hljs-attr">    myNestedTemplate:</span>
+<span class="hljs-attr">      cfFile:</span> <span class="hljs-string">/path/to/myNestedTemplate.template.yml</span>
+<span class="hljs-attr">      configFile:</span> <span class="hljs-string">/path/to/myNestedConfig.yml</span>
+
+<span class="hljs-attr">staging:</span>
+<span class="hljs-attr">  stackName:</span> <span class="hljs-string">myStack-staging</span>
+<span class="hljs-attr">  myArray:</span>
+<span class="hljs-attr">    - DEBUG:</span> <span class="hljs-literal">false</span></pre>
+<pre class='hljs'><span class="hljs-comment"># myNestedConfig.yml</span>
+<span class="hljs-attr">default:</span>
+<span class="hljs-attr">  timeout:</span> <span class="hljs-number">300</span></pre>
+<pre class='hljs'><span class="hljs-comment"># myNestedTemplate.template.yml</span>
+<span class="hljs-attr">Resources:</span>
+
+<span class="hljs-string">{{#</span> <span class="hljs-string">each</span> <span class="hljs-string">parent.myArray}}</span>
+<span class="hljs-attr">  Lambda:</span>
+<span class="hljs-attr">    Type:</span> <span class="hljs-string">SomeAWSResource</span>
+<span class="hljs-attr">    Properties:</span>
+<span class="hljs-attr">      Timeout:</span> <span class="hljs-string">{{../timeout}}</span>
+<span class="hljs-attr">      Environments:</span>
+<span class="hljs-bullet">        -</span> <span class="hljs-string">{{@key}}:</span> <span class="hljs-string">{{this}}</span>
+<span class="hljs-string">{{/each}}</span></pre>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='buildnestedcfs'>
+      buildNestedCfs
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Builds templates nested in the main template
+using the specified config and cf file paths</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>buildNestedCfs(config: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, KesClass: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Kes config object
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>KesClass</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    the Kes Class
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The options passed by the commander library
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns a promise of an updated Kes config object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='buildcf'>
+      buildCf
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Builds, uploads and deploy a Cloudformation based on options passed
+from the commander library</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>buildCf(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, cmd: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Options passed by the commander library
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>cmd</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the argument selected in the CLI, e.g. deploy, update, etc.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='buildlambda'>
+      buildLambda
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Builds and uploads a lambda function based on the options passed by the commander</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>buildLambda(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, cmd: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    Options passed by the commander library
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>cmd</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    the argument selected in the CLI, e.g. lambda name
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/undefined">undefined</a></code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='kes'>
+      Kes
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>The main Kes class. This class is used in the command module to create
+the CLI interface for kes. This class can be extended in order to override
+and modify the behavior of kes cli.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>new Kes(config: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    an instance of the Config class (config.js)
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> { Kes, Config } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'kes'</span>);
+
+<span class="hljs-keyword">const</span> options = { <span class="hljs-attr">stack</span>: <span class="hljs-string">'myStack'</span> };
+<span class="hljs-keyword">const</span> config = <span class="hljs-keyword">new</span> Config(options);
+<span class="hljs-keyword">const</span> kes = <span class="hljs-keyword">new</span> Kes(config);
+
+<span class="hljs-comment">// create a new stack</span>
+kes.deployStack()
+ .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> describeCF())
+ .then(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> updateSingleLambda(<span class="hljs-string">'myLambda'</span>))
+ .catch(<span class="hljs-function"><span class="hljs-params">e</span> =&gt;</span> <span class="hljs-built_in">console</span>.log(e));</pre>
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='kesdescribestack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>describeStack(stackName)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Describe CF stacks by calling the describeStacks CF SDK function.
+If the describeStacks call gets throttled by AWS, retry the describeStacks operation</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>describeStack(stackName: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>stackName</span> <code class='quiet'>(any)</code>
+	    stack name
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a>&#x3C;<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>></code>:
+        promise that resolves to an Object with information about
+the CF stack
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesupdatesinglelambda'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>updateSingleLambda(name)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Updates code of a deployed lambda function</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>updateSingleLambda(name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the name of the lambda function defined in config.yml
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kescompilecf'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>compileCF()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Compiles a CloudFormation template in Yaml format.</p>
+<p>Reads the configuration yaml from <code>.kes/config.yml</code>.</p>
+<p>Writes the template to <code>.kes/cloudformation.yml</code>.</p>
+<p>Uses <code>.kes/cloudformation.template.yml</code> as the base template
+for generating the final CF template.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>compileCF(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesuploadtos3'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>uploadToS3(bucket, key, body)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>This is just a wrapper around AWS s3.upload method.
+It uploads a given string to a S3 object.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>uploadToS3(bucket: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, key: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, body: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>bucket</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the s3 bucket name
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>key</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the path and name of the object
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>body</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the content of the object
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesuploadcf'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>uploadCF()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Uploads the Cloud Formation template to a given S3 location</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>uploadCF(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='keswaitfor'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>waitFor(wait)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Wait for the current stack and log the current outcome</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>waitFor(wait: any): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>wait</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        undefined
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kescloudformation'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>cloudFormation()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Calls CloudFormation's update-stack or create-stack methods</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>cloudFormation(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesvalidatetemplate'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>validateTemplate()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Validates the CF template</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>validateTemplate(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesdescribecf'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>describeCF()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Describes the cloudformation stack deployed</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>describeCF(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesdeletecf'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>deleteCF()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Deletes the current stack</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>deleteCF(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        undefined
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesopsstack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>opsStack()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Generic create/update  method for CloudFormation</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>opsStack(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesupsertstack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>upsertStack()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>[Deprecated] Creates a CloudFormation stack for the class instance
+If exists, will update the existing one</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>upsertStack(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesdeploystack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>deployStack()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Creates a CloudFormation stack for the class instance
+If exists, will update the existing one</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>deployStack(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kescreatestack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>createStack()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>[Deprecated] Creates a CloudFormation stack for the class instance</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>createStack(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesupdatestack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>updateStack()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>[Deprecated] Updates an existing CloudFormation stack for the class instance</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>updateStack(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='kesdeletestack'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>deleteStack()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Deletes the main stack</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>deleteStack(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of an AWS response object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='config'>
+      Config
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>This class handles reading and parsing configuration files.
+It primarily reads <code>config.yml</code> and <code>.env</code> files</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>new Config(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, stack: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, deployment: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, configFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, envFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    a js object that includes required options.
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.stack</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>?</code>
+                  </td>
+                  <td class='break-word'><span>the stack name
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.deployment</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>null</code>)
+                  </td>
+                  <td class='break-word'><span>the deployment name
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.region</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>&#39;us-east-1&#39;</code>)
+                  </td>
+                  <td class='break-word'><span>the aws region
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.profile</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>null</code>)
+                  </td>
+                  <td class='break-word'><span>the profile name
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.kesFolder</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>&#39;.kes&#39;</code>)
+                  </td>
+                  <td class='break-word'><span>the path to the kes folder
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.configFile</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>&#39;config.yml&#39;</code>)
+                  </td>
+                  <td class='break-word'><span>the path to the config.yml
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.envFile</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>&#39;.env&#39;</code>)
+                  </td>
+                  <td class='break-word'><span>the path to the .env file
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>options.cfFile</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  
+                    (default <code>&#39;cloudformation.template.yml&#39;</code>)
+                  </td>
+                  <td class='break-word'><span>the path to the CF template
+</span></td>
+                </tr>
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>stack</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Stack name
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>deployment</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Deployment name
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>configFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    path to the config.yml file
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>envFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    path to the .env file (optional)
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> config = <span class="hljs-keyword">new</span> Config(<span class="hljs-string">'mystack'</span>, <span class="hljs-string">'dev'</span>, <span class="hljs-string">'.kes/config.yml'</span>, <span class="hljs-string">'.kes/.env'</span>);</pre>
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='configparse'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>parse()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Main method of the class. It parses a configuration and returns it
+as a JS object.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>parse(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        the configuration object
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-keyword">const</span> configInstance = <span class="hljs-keyword">new</span> Config(<span class="hljs-literal">null</span>, <span class="hljs-literal">null</span>, <span class="hljs-string">'path/to/config.yml'</span>, <span class="hljs-string">'path/to/.env'</span>);
+config = configInstance.parse();</pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='configflatten'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>flatten()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Return a javascript object (not a class instance) of the
+config class</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>flatten(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+        a javascript object version of the class
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='zip'>
+      zip
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Zips a list of files or directories</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>zip(zipFile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, srcList: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>, dstPath: type): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>zipFile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    filename and path where the zip file is stored
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>srcList</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Array">array</a>)</code>
+	    array of files and directories paths
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>dstPath</span> <code class='quiet'>(type)</code>
+	    for directories whether to put the directories at
+root of the zip file or relative to your path on the local machine
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='exec'>
+      exec
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Executes shell commands synchronously and logs the
+stdout to console.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>exec(cmd: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, verbose: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>): <a href="https://nodejs.org/api/buffer.html">Buffer</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>cmd</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Bash command
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>verbose</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Boolean">Boolean</a>
+            = <code>true</code>)</code>
+	    whether to post stdout to console
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://nodejs.org/api/buffer.html">Buffer</a></code>:
+        The command's stdout in for of Buffer
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='configureaws'>
+      configureAws
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Updates region of an AWS configuration and point to the correct
+of profile on ~/.aws/credentials file if necessary</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>configureAws(region: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, profile: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, role: any)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>region</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>&#39;us-east-1&#39;</code>)</code>
+	    AWS region
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>profile</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>
+            = <code>null</code>)</code>
+	    aws credentials profile name
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>role</span> <code class='quiet'>(any)</code>
+	    
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='filetostring'>
+      fileToString
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Checks if the input is a file, if it is a file,
+it reads it and return the content, otherwise just pass
+the input as an output</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>fileToString(file: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>file</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    A file path or a string
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        String content of a given file
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='mergeyamls'>
+      mergeYamls
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Merges two yaml files. The merge is done using lodash.merge
+and it happens recursively. Meaning that values of file2 will
+replace values of file 1 if they have the same key.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>mergeYamls(file1: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, file2: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>file1</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Yaml path to file 1 or file 1 string
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>file2</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    Yaml path to file 2 or file 2 string
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>:
+        Merged Yaml file in string format
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='loadkesoverride'>
+      loadKesOverride
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Attempt to load a Kes override class.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>loadKesOverride(kesFolder: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, kesClass: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): Class</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>kesFolder</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    The folder to look in for a Kes override class
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>kesClass</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>
+            = <code>&#39;kes.js&#39;</code>)</code>
+	    The path/filename to look for as a Kes override class
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>Class</code>:
+        A Kes override class
+
+      
+    
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Throws</div>
+    <ul>
+      
+        <li><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>: Error when trying to load/parse the Kes override file
+</li>
+      
+    </ul>
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='determinekesclass'>
+      determineKesClass
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Based on the information passed from the CLI by the commander
+module this function determines whether to use the default Kes class
+or use the override class provided by the user</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>determineKesClass(options: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>, Kes: Class): Class</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>options</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    The options passed by the commander library
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>Kes</span> <code class='quiet'>(Class)</code>
+	    the default kes class
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code>Class</code>:
+        Kes class
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='failure'>
+      failure
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>In case of error logs the error and exit with error 1</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>failure(e: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>e</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Error">Error</a>)</code>
+	    error object
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='success'>
+      success
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Exists the process when called</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>success()</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='getsystembucket'>
+      getSystemBucket
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Discover and returns the system bucket used for deployment</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>getSystemBucket(config: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    cumulus config object
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a></code>:
+        name of the bucket
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='lambda'>
+      Lambda
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>Copy, zip and upload lambda functions to S3</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>new Lambda(config: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>, kesFolder: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, bucket: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>, key: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>config</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    the configuration object
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>kesFolder</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the path to the 
+<code>.kes</code>
+ folder
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>bucket</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the S3 bucket name
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>key</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    the main folder to store the data in the bucket (stack)
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Instance Members</div>
+    <div class="clearfix">
+  
+    <div class='border-bottom' id='lambdabuilds3path'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>buildS3Path(lambda)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Adds hash value, bucket name, and remote and local paths
+for lambdas that have source value.</p>
+<p>If a s3Source is usaed, only add remote and bucket values</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>buildS3Path(lambda: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>lambda</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a>)</code>
+	    the lambda object
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">object</a></code>:
+        the lambda object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='lambdagethash'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>getHash(folderName, method)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>calculate the hash value for a given path</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>getHash(folderName: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>, method: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>): <a href="https://nodejs.org/api/buffer.html">buffer</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>folderName</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    directory path
+
+          </div>
+          
+        </div>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>method</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">string</a>)</code>
+	    hash type, default to shasum
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://nodejs.org/api/buffer.html">buffer</a></code>:
+        hash value
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='lambdaziplambda'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>zipLambda(lambda)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>zip a given lambda function source code</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>zipLambda(lambda: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>lambda</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    the lambda object
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of the lambda object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='lambdauploadlambda'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>uploadLambda(lambda)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Uploads the zipped lambda code to a given s3 bucket
+if the zip file already exists on S3 it skips the upload</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>uploadLambda(lambda: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>lambda</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    the lambda object. It must have the following properties
+
+          </div>
+          
+          <table class='mt1 mb2 fixed-table h5 col-12'>
+            <colgroup>
+              <col width='30%' />
+              <col width='70%' />
+            </colgroup>
+            <thead>
+              <tr class='bold fill-light'>
+                <th>Name</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody class='mt1'>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>lambda.bucket</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  </td>
+                  <td class='break-word'><span>the s3 buckt name
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>lambda.remote</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  </td>
+                  <td class='break-word'><span>the lambda code's key (path and filename) on s3
+</span></td>
+                </tr>
+              
+                <tr>
+                  <td class='break-word'><span class='code bold'>lambda.local</span> <code class='quiet'><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a></code>
+                  </td>
+                  <td class='break-word'><span>the zip files location on local machine
+</span></td>
+                </tr>
+              
+            </tbody>
+          </table>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of updated lambda object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='lambdazipanduploadlambda'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>zipAndUploadLambda(lambda)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Zips and Uploads a lambda function. If the source of the function
+is already zipped and uploaded, it skips the step only updates the
+lambda config object.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>zipAndUploadLambda(lambda: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>lambda</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a>)</code>
+	    the lambda object.
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of updated lambda object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='lambdaprocess'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>process()</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Zips and Uploads lambda functions in the configuration object.
+If the source of the function
+is already zipped and uploaded, it skips the step only updates the
+lambda config object.</p>
+<p>If the lambda config includes a link to zip file on S3, it skips
+the whole step.</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>process(): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns the promise of updated configuration object
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+    <div class='border-bottom' id='lambdaupdatesinglelambda'>
+      <div class="clearfix small pointer toggle-sibling">
+        <div class="py1 contain">
+            <a class='icon pin-right py1 dark-link caret-right'>▸</a>
+            <span class='code strong strong truncate'>updateSingleLambda(name)</span>
+        </div>
+      </div>
+      <div class="clearfix display-none toggle-target">
+        <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+
+  <div class="markdown-body">
+    <p>Uploads the zip code of a single lambda function to AWS Lambda</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>updateSingleLambda(name: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>name</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/String">String</a>)</code>
+	    name of the lambda function
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Promise">Promise</a></code>:
+        returns AWS response for lambda code update operation
+
+      
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+</section>
+
+      </div>
+    </div>
+  
+</div>
+
+  
+
+  
+</section>
+
+        
+      
+        
+          <section class='p2 mb2 clearfix bg-white minishadow'>
+
+  
+  <div class='clearfix'>
+    
+    <h3 class='fl m0' id='localrun'>
+      localRun
+    </h3>
+    
+    
+  </div>
+  
+
+  <div class="markdown-body">
+    <p>A simple helper for running a function if <code>local</code> is passed as argument</p>
+
+  </div>
+
+  <div class='pre p1 fill-light mt0'>localRun(func: <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>): <a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></div>
+  
+  
+
+  
+  
+  
+  
+  
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Parameters</div>
+    <div class='prose'>
+      
+        <div class='space-bottom0'>
+          <div>
+            <span class='code bold'>func</span> <code class='quiet'>(<a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Statements/function">Function</a>)</code>
+	    A javascript function
+
+          </div>
+          
+        </div>
+      
+    </div>
+  
+
+  
+
+  
+    
+      <div class='py1 quiet mt1 prose-big'>Returns</div>
+      <code><a href="https://developer.mozilla.org/docs/Web/JavaScript/Reference/Global_Objects/Object">Object</a></code>:
+        returns the result of the function call
+
+      
+    
+  
+
+  
+
+  
+    <div class='py1 quiet mt1 prose-big'>Example</div>
+    
+      
+      <pre class='p1 overflow-auto round fill-light'><span class="hljs-comment">// test.js</span>
+<span class="hljs-keyword">const</span> { localRun } = <span class="hljs-built_in">require</span>(<span class="hljs-string">'kes'</span>);
+localRun(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+  <span class="hljs-built_in">console</span>.log(<span class="hljs-string">'my function'</span>);
+});
+<span class="hljs-comment">// result</span>
+<span class="hljs-comment">// $ node test.js local</span>
+<span class="hljs-comment">// my function</span></pre>
+    
+  
+
+  
+
+  
+
+  
+</section>
+
+        
+      
+    </main>
+
+    <footer class='page__footer' role='contentinfo'>
+      <div class='inner'>
+        <p>
+          <a href='https://developmentseed.org' title='Visit Development Seed website'><img src='assets/images/devseed-logo-symbol.svg' alt='Development Seed logo symbol' width='512' height='152'> <span>Development Seed</span></a>
+          <small>2019</small>
+        </p>
+      </div>
+    </footer>
+  </div>
+
+  <script src='assets/anchor.js'></script>
+  <script src='assets/site.js'></script>
+  <script src='assets/nav.js'></script>
+</body>
+</html>
