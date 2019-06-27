@@ -50,6 +50,7 @@ class Config {
     this.stack = get(options, 'stack', null);
     this.parent = get(options, 'parent', null);
     this.showOutputs = get(options, 'showOutputs', false);
+    this.noRollback = get(options, 'noRollback', false);
     this.yes = get(options, 'yes', false);
 
     // use template if provided

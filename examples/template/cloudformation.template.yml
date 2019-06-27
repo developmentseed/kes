@@ -67,7 +67,7 @@ Resources:
   CustomResource:
     Type: Custom::Kes
     Properties:
-      ServiceToken: 
+      ServiceToken:
         Fn::GetAtt:
           - CustomLambdaFunction
           - Arn
@@ -311,7 +311,7 @@ Resources:
         Fn::GetAtt:
           - LambdaRole
           - Arn
-      Runtime: {{# if runtime}}{{runtime}}{{else}}nodejs6.10{{/if}}
+      Runtime: {{# if runtime}}{{runtime}}{{else}}nodejs8.10{{/if}}
       Timeout: {{timeout}}
       Tags:
         - Key: Project

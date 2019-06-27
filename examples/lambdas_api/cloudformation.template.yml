@@ -67,7 +67,7 @@ Resources:
         Fn::GetAtt:
           - LambdaRole
           - Arn
-      Runtime: {{# if this.runtime}}{{this.runtime}}{{else}}nodejs6.10{{/if}}
+      Runtime: {{# if this.runtime}}{{this.runtime}}{{else}}nodejs8.10{{/if}}
       Timeout: {{# if this.timeout}}{{this.timeout}}{{else}}300{{/if}}
 {{/each}}
   #################################################

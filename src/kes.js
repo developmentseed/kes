@@ -293,6 +293,11 @@ class Kes {
       .catch(e => {
         if (e.message.includes('does not exist')) {
           wait = 'stackCreateComplete';
+
+          if (this.config.noRollback) {
+            params.OnFailure = 'DO_NOTHING';
+          }
+
           return this.cf.createStack(params).promise();
         }
         throw e;
