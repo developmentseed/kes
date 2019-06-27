@@ -172,12 +172,10 @@ function mergeYamls(file1, file2) {
 /**
  * Attempt to load a Kes override class.
  *
- * Throw the error if it is something other than that the Kes override
- * class does not exist.
- *
  * @param {string} kesFolder - The folder to look in for a Kes override class
  * @param {string} kesClass - The path/filename to look for as a Kes override class
  * @returns {Class} - A Kes override class
+ * @throws {Error} - Error when trying to load/parse the Kes override file
  */
 function loadKesOverride(kesFolder, kesClass = 'kes.js') {
   let kesOverridePath = path.resolve(kesFolder, kesClass);
