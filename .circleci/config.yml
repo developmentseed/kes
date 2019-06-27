@@ -2,8 +2,7 @@ version: 2
 jobs:
   build:
     docker:
-      - image: circleci/node:6
-
+      - image: circleci/node:8
 
     working_directory: ~/kes
     steps:
@@ -17,7 +16,7 @@ jobs:
       - run:
           name: Install
           command: npm install
-      
+
       - run:
           name: Lint
           command: |
@@ -78,4 +77,4 @@ jobs:
               npm publish || echo 'npm publishing failed'
             fi
 
-      
+

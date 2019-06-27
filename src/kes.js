@@ -66,16 +66,15 @@ class Kes {
    * the CF stack
    */
   describeStack(stackName) {
-    const describe = () => this.cf.describeStacks({
-      StackName: stackName
-    })
-    .promise()
-    .catch((error) => {
-      if (error.code !== 'ThrottlingException') {
-        throw new pRetry.AbortError(error.message, error);
-      }
-      throw error;
-    });
+    const describe = () =>
+      this.cf.describeStacks({ StackName: stackName })
+        .promise()
+        .catch((error) => {
+          if (error.code !== 'ThrottlingException') {
+            throw new pRetry.AbortError(error.message, error);
+          }
+          throw error;
+        });
 
     return pRetry(describe, {
       onFailedAttempt: error => {
@@ -184,12 +183,12 @@ class Kes {
    */
   uploadToS3(bucket, key, body) {
     return this.s3.upload({ Bucket: bucket, Key: key, Body: body })
-                  .promise()
-                  .then(() => {
-                    const httpUrl = `http://${bucket}.s3.amazonaws.com/${key}`;
-                    console.log(`Uploaded: s3://${bucket}/${key}`);
-                    return httpUrl;
-                  });
+      .promise()
+      .then(() => {
+        const httpUrl = `http://${bucket}.s3.amazonaws.com/${key}`;
+        console.log(`Uploaded: s3://${bucket}/${key}`);
+        return httpUrl;
+      });
   }
 
   /**
@@ -391,11 +390,10 @@ class Kes {
    * @returns {Promise} undefined
    */
   deleteCF() {
-    return this.cf.deleteStack({
-      StackName: this.stack
-    }).promise()
-    .then(() => this.waitFor('stackDeleteComplete'))
-    .then(() => console.log(`${this.stack} is successfully deleted`));
+    return this.cf.deleteStack({ StackName: this.stack })
+      .promise()
+      .then(() => this.waitFor('stackDeleteComplete'))
+      .then(() => console.log(`${this.stack} is successfully deleted`));
   }
 
   /**
