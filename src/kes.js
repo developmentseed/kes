@@ -172,6 +172,7 @@ class Kes {
       return fs.writeFileSync(destPath, cf);
     }).catch((e) => {
       console.log(e);
+      throw e;
     });
   }
 
