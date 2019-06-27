@@ -86,8 +86,8 @@
     "yaml-files": "^0.1.0"
   },
   "devDependencies": {
-    "ava": "^0.21.0",
-    "documentation": "~5.2.2",
+    "ava": "^2.1.0",
+    "documentation": "^11.0.1",
     "documentation-devseed-theme": "^0.1.6",
     "eslint": "^6.0.1",
     "eslint-config-standard": "^10.2.1",
