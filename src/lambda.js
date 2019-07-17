@@ -134,7 +134,13 @@ class Lambda {
       s3.headObject({
         Bucket: this.bucket,
         Key: lambda.remote
-      }).promise().then((data) => {
+      }).promise().catch(
+          (e) => {
+            console.log('Error uploading lambda to: ' + params.Bucket + '/' + params.Key);
+
+            throw e;
+          }
+      ).then((data) => {
         if (data.ContentLength !== params.Body.byteLength) {
           throw new Error('File sizes don\'t match');
         }

@@ -170,6 +170,9 @@ class Kes {
       const destPath = path.join(this.config.kesFolder, this.cf_template_name);
       console.log(`Template saved to ${destPath}`);
       return fs.writeFileSync(destPath, cf);
+    }).catch((e) => {
+      console.log(e);
+      throw e;
     });
   }
 
