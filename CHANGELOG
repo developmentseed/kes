@@ -1,3 +1,7 @@
+## v2.2.9
+
+- Added support for `--noRollback` flag that will prevent Cloudformation stack rollback on failure
+
 ## v2.2.8
 
 - Changed `utils.determineKesClass()` to throw errors when Kes class override files are found, but cannot be loaded
